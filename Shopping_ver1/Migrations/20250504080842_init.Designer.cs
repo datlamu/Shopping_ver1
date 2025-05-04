@@ -11,7 +11,7 @@ using Shopping_ver1.Repository;
 namespace Shopping_ver1.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250503065433_init")]
+    [Migration("20250504080842_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,9 +43,8 @@ namespace Shopping_ver1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -72,9 +71,8 @@ namespace Shopping_ver1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

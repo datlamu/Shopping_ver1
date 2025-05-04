@@ -18,5 +18,16 @@ namespace Shopping_ver1.Models
         public BrandModel Brand { get; set; }
         public CategoryModel Category { get; set; }
         public string Image { get; set; }
+        public ProductModel() { }
+        public ProductModel(string name, string slug, string description, decimal price, BrandModel brand, CategoryModel category, string image)
+        {
+            this.Name = name;
+            this.Slug = slug;
+            this.Description = description;
+            this.Price = price;
+            this.Brand = brand;
+            this.Category = category;
+            this.Image = image;
+        }
     }
 }

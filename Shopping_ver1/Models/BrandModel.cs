@@ -12,6 +12,14 @@ namespace Shopping_ver1.Models
         public string Description { get; set; }
         [Required]
         public string Slug { get; set; }
-        public string Status { get; set; }
+        public int Status { get; set; }
+        public BrandModel() { }
+        public BrandModel(string name, string description, string slug, int status)
+        {
+            this.Name = name;
+            this.Description = description;
+            this.Slug = slug;
+            this.Status = status;
+        }
     }
 }
