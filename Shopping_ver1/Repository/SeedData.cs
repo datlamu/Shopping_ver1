@@ -12,11 +12,11 @@ namespace Shopping_ver1.Repository
             {
                 CategoryModel cake = new CategoryModel("Cake", "cake", "Cake is best", 1);
                 CategoryModel dessert = new CategoryModel("Dessert", "dessert", "Dessert is best", 1);
-                BrandModel cakeVN = new BrandModel("CakeVN", "cakeVN", "CakeVN is best", 1);
-                BrandModel cakeUSA = new BrandModel("CakeUSA", "cakeUSA", "CakeUSA is best", 1);
+                BrandModel vietnam = new BrandModel("Vietnam", "vietnam", "Vietnam is best", 1);
+                BrandModel china = new BrandModel("China", "china", "China is best", 1);
                 _context.Products.AddRange(
-                    new ProductModel("Bánh kem matcha", "Bánh kem matcha", "Rất ngon", 100000, cakeVN, cake, "1.jpg"),
-                    new ProductModel("Bánh kẹo bông", "Bánh kẹo bông", "Ngon", 50000, cakeUSA, dessert, "2.jpg")
+                    new ProductModel("Cake Matcha", "cake-matcha", "Very Good", 100000, vietnam, cake, "1.jpg"),
+                    new ProductModel("Dessert Cotton", "dessert-cotton", "Good", 50000, china, dessert, "2.jpg")
                 );
                 _context.SaveChanges();
             }

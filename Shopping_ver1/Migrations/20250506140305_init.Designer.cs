@@ -11,7 +11,7 @@ using Shopping_ver1.Repository;
 namespace Shopping_ver1.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250504080842_init")]
+    [Migration("20250506140305_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
