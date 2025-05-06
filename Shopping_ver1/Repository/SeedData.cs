@@ -10,13 +10,13 @@ namespace Shopping_ver1.Repository
             _context.Database.Migrate();
             if (!_context.Products.Any())
             {
-                CategoryModel laptop = new CategoryModel("Macbook", "macbook", "Macbook is best", 1);
-                CategoryModel pc = new CategoryModel("Pc", "pc", "Pc is best", 1);
-                BrandModel apple = new BrandModel("Apple", "apple", "Apple is best", 1);
-                BrandModel samsung = new BrandModel("Samsung", "samsung", "Samsung is best", 1);
+                CategoryModel cake = new CategoryModel("Cake", "cake", "Cake is best", 1);
+                CategoryModel dessert = new CategoryModel("Dessert", "dessert", "Dessert is best", 1);
+                BrandModel cakeVN = new BrandModel("CakeVN", "cakeVN", "CakeVN is best", 1);
+                BrandModel cakeUSA = new BrandModel("CakeUSA", "cakeUSA", "CakeUSA is best", 1);
                 _context.Products.AddRange(
-                    new ProductModel("Macbook", "macbook", "Very good", 100000, apple, laptop, "image1.jpg"),
-                    new ProductModel("Pc", "Pc", "Good", 150000, samsung, pc, "image2.jpg")
+                    new ProductModel("Bánh kem matcha", "Bánh kem matcha", "Rất ngon", 100000, cakeVN, cake, "1.jpg"),
+                    new ProductModel("Bánh kẹo bông", "Bánh kẹo bông", "Ngon", 50000, cakeUSA, dessert, "2.jpg")
                 );
                 _context.SaveChanges();
             }
