@@ -12,12 +12,14 @@
 			<div class="col-sm-4">
 				<div class="product-image-wrapper">
 					<div class="single-products">
-						<div class="productinfo text-center">
-							<img src="~/images/@item.Image" alt="@item.Name" width="100%" />
-							<h2>@item.Price.ToString("#,0", System.Globalization.CultureInfo.InvariantCulture).Replace(",", ".") VNĐ</h2>
-							<p>@item.Name</p>
-							<a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
-						</div>
+						<a asp-controller="Product" asp-action="Details" asp-route-id="@item.Id">
+							<div class="productinfo text-center">
+								<img src="~/images/@item.Image" alt="@item.Name" width="100%" />
+								<h2>@item.Price.ToString("#,0", System.Globalization.CultureInfo.InvariantCulture).Replace(",", ".") VNĐ</h2>
+								<p>@item.Name</p>
+								<a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+							</div>
+						</a>
 					</div>
 					<div class="choose">
 						<ul class="nav nav-pills nav-justified">
