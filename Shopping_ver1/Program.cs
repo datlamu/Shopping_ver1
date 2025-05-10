@@ -3,15 +3,16 @@ using Shopping_ver1.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DBConnect
+// * DBConnect
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["ConnectionStrings:ConnectedDb"]);
 });
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Add Session
+// * Add Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(option =>
 {
@@ -30,13 +31,16 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// * use Session
+app.UseSession();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-//Seeding Data 
+// * Seeding Data 
 var context = app.Services.CreateScope().ServiceProvider.GetRequiredService<DataContext>();
 SeedData.SeedingData(context);
 
