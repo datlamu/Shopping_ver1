@@ -51,6 +51,9 @@ namespace Shopping_ver1.Controllers
             // Cập nhật giỏ hàng vào session
             HttpContext.Session.SetJson("Cart", cart);
 
+            // In thông báo
+            TempData["success"] = "Add item to cart Successfully!!!";
+
             // Trả về trang trước đó ( 1 URL nên dùng cho chi tiết sản phẩm )
             return Redirect(Request.Headers["Referer"].ToString());
         }
@@ -70,6 +73,9 @@ namespace Shopping_ver1.Controllers
             // Cập nhật giỏ hàng vào session
             if (cart.Count > 0)
                 HttpContext.Session.SetJson("Cart", cart);
+
+            // In thông báo
+            TempData["success"] = "Increase item quantity to cart Successfully!!!";
 
             // Trả về trang giỏ hàng
             return RedirectToAction("Index");
@@ -95,6 +101,9 @@ namespace Shopping_ver1.Controllers
             else
                 HttpContext.Session.SetJson("Cart", cart);
 
+            // In thông báo
+            TempData["success"] = "Decrease item quantity to cart Successfully!!!";
+
             // Trả về trang giỏ hàng
             return RedirectToAction("Index");
         }
@@ -114,6 +123,9 @@ namespace Shopping_ver1.Controllers
             else
                 HttpContext.Session.SetJson("Cart", cart);
 
+            // In thông báo
+            TempData["success"] = "Remove item of cart Successfully!!!";
+
             // Trả về trang giỏ hàng
             return RedirectToAction("Index");
         }
@@ -123,6 +135,10 @@ namespace Shopping_ver1.Controllers
         {
             // Xóa giỏ hàng ở session
             HttpContext.Session.Remove("Cart");
+
+            // In thông báo
+            TempData["success"] = "Clear all item of cart Successfully!!!";
+
             // Trả về trang giỏ hàng
             return RedirectToAction("Index");
         }
