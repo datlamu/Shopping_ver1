@@ -1,9 +1,10 @@
 ﻿@model IEnumerable<ProductModel>
 @{
+	ViewData["title"] = "List Product";
 	var index = 1;
 }
 <h3>List Product</h3>
-<a asp-controller="Product" asp-action="Add">Add</a>
+<a asp-action="Create">Create New Product</a>
 <table class="table">
 	<thead>
 		<tr>

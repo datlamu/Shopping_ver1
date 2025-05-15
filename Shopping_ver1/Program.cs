@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Repository;
+using Shopping_ver1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,9 @@ builder.Services.AddSession(option =>
     option.Cookie.IsEssential = true;
 });
 
+// * Add ProductService
+builder.Services.AddScoped<IProductService, ProductService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -37,12 +41,13 @@ app.UseSession();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "defaul",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    name: "areas",
+//pattern: "{area:exists}/{controller=Product}/{action=Index}/{id?}");
+pattern: "{area=admin}/{controller=Product}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
-    name: "area",
-    pattern: "{area:exists}/{controller=Product}/{action=Index}/{id?}");
+    name: "defaul",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // * Seeding Data 
 var context = app.Services.CreateScope().ServiceProvider.GetRequiredService<DataContext>();
