@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Net;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
@@ -6,12 +7,12 @@ using Shopping_ver1.Services;
 
 public class ProductService : IProductService
 {
-    private readonly DataContext _context;
+    private readonly DataContext _dataContext;
     private readonly IWebHostEnvironment _env;
 
     public ProductService(DataContext context, IWebHostEnvironment env)
     {
-        _context = context;
+        _dataContext = context;
         _env = env;
     }
 
@@ -26,13 +27,13 @@ public class ProductService : IProductService
     }
 
     // Kiểm tra slug có bị trùng trong cơ sở dữ liệu
-    public async Task<bool> IsSlugUniqueAsync(string slug)
+    public async Task<bool> IsSlugUnique(string slug)
     {
-        return !await _context.Products.AnyAsync(p => p.Slug == slug);
+        return !await _dataContext.Products.AnyAsync(p => p.Slug == slug);
     }
 
     // Xử lý ảnh sau đó trả về tên của ảnh đó
-    public async Task<string> SaveImageAsync(IFormFile imageUpload)
+    public async Task<string> SaveImage(IFormFile imageUpload)
     {
         // Đảo bảo đã có file được upload
         if (imageUpload == null || imageUpload.Length == 0)
@@ -59,11 +60,51 @@ public class ProductService : IProductService
     }
 
     // Lưu sản phẩm vào database
-    public async Task SaveProductAsync(ProductModel product, string imageName)
+    public async Task SaveProduct(ProductModel product, string imageName, string action)
     {
         product.Image = imageName;
+        // Format lại text trong Description
+        // Bước 1: Decode các thực thể HTML như &nbsp;, &amp;, &lt;, v.v.
+        product.Description = WebUtility.HtmlDecode(product.Description);
+
+        // Bước 2: Loại bỏ toàn bộ thẻ HTML nếu còn sót
         product.Description = Regex.Replace(product.Description, "<.*?>", string.Empty);
-        await _context.Products.AddAsync(product);
-        await _context.SaveChangesAsync();
+
+        // Bước 3 (tuỳ chọn): Loại bỏ khoảng trắng đầu/cuối và chuẩn hoá khoảng trắng
+        product.Description = Regex.Replace(product.Description, @"\s+", " ").Trim();
+
+        if (action == "Create")
+            await _dataContext.Products.AddAsync(product);
+        else if (action == "Edit")
+            _dataContext.Products.Update(product);
+
+        await _dataContext.SaveChangesAsync();
+    }
+    public async Task<bool> DeleteProduct(int id)
+    {
+        try
+        {
+            // Tìm sản phẩm
+            var product = await _dataContext.Products.FindAsync(id);
+            if (product == null) return false;
+
+            // Xóa ảnh trong wroot
+            if (product.Image != "default.png")
+            {
+                string path = Path.Combine(_env.WebRootPath, "media/products", product.Image);
+                if (File.Exists(path))
+                    File.Delete(path);
+            }
+
+            // Xóa và lưu lại
+            _dataContext.Products.Remove(product);
+            await _dataContext.SaveChangesAsync();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
     }
 }

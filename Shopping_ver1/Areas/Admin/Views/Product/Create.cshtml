@@ -1,10 +1,13 @@
 ﻿@model ProductModel
 @{
 	ViewData["title"] = "Create Product";
+	// Kiểm tra action nào được chọn nếu có model thì gán id chính nó
+	var isEdit = Model != null && Model.Id != 0;
 }
 <h3>List Product</h3>
 
-<form asp-action="Create" enctype="multipart/form-data">
+<form asp-action="@(isEdit ? "Edit" : "Create")" asp-area="Admin" enctype="multipart/form-data">
+	@Html.AntiForgeryToken()
 	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 	<div class="form-group">
 		<label>Name</label>
@@ -37,20 +40,41 @@
 	</div>
 	<div class="form-group">
 		<label>Image</label>
-		<input asp-for="ImageUpload" class="form" />
-		<span asp-validation-for="ImageUpload" class="text-danger" />
+		<input asp-for="ImageUpload" type="file" class="form-control" onchange="previewImage(this)" />
+		<span class="text-danger">
+			@Html.ValidationMessage("ImageUpload", null, new { @class = "text-danger" })
+		</span>
+		<br />
+		<img id="preview-img" src="~/media/products/@(string.IsNullOrEmpty(Model?.Image) ? "default.png" : Model.Image)" alt="Ảnh sản phẩm" width="120" />
+		<input type="hidden" asp-for="Image" />
 	</div>
 	<div class="form-group">
-		<button class="btn btn-success">Create</button>
+		<button class="btn btn-success">@(isEdit ? "Edit" : "Create")</button>
 	</div>
 </form>
 @* RenderPartial *@
-@section Scrips {
+@section Scripts {
 	@{
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
+
+	@* Edit cho TextArea bằng ckeditor*@
 	<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 	<script>
 		CKEDITOR.replace('Description',{versionCheck: false});
+	</script>
+
+	@* Hiển thị ảnh khi chọn file *@
+	<script>
+		function previewImage(input) {
+			const preview = document.getElementById('preview-img');
+			if (input.files && input.files[0]) {
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					preview.src = e.target.result;
+				};
+				reader.readAsDataURL(input.files[0]);
+			}
+		}
 	</script>
 }

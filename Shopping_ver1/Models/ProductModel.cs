@@ -23,7 +23,6 @@ namespace Shopping_ver1.Models
         public BrandModel Brand { get; set; }
         public CategoryModel Category { get; set; }
         public string Image { get; set; }
-        [Required(ErrorMessage = "Bạn phải chọn 1 ảnh")]
         [NotMapped]
         [FileExtension]
         public IFormFile ImageUpload { get; set; }
