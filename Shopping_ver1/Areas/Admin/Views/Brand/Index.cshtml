@@ -35,7 +35,7 @@
 				</td>
 				<td>
 					<a class="btn btn-warning btn-sm" asp-controller="Brand" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-					<a class="btn btn-danger btn-sm" asp-controller="Brand" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+					<a class="btn btn-danger btn-sm confirmDeletion" asp-controller="Brand" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
 				</td>
 			</tr>
 		}
