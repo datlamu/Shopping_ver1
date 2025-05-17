@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Models;
@@ -148,6 +147,8 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             TempData["Success"] = "Chỉnh sửa sản phẩm thành công!!!";
             return RedirectToAction("Index");
         }
+
+        // Xóa sản phẩm
         public async Task<IActionResult> Delete(int id)
         {
             // Xóa sản phẩm

@@ -102,7 +102,7 @@ public class ProductService : IProductService
 
             return true;
         }
-        catch (Exception ex)
+        catch
         {
             return false;
         }

@@ -23,6 +23,7 @@ builder.Services.AddSession(option =>
 
 // * Add ProductService
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 var app = builder.Build();
 
@@ -40,10 +41,10 @@ app.UseSession();
 
 app.UseAuthorization();
 
-//app.MapControllerRoute(
-//    name: "areas",
-////pattern: "{area:exists}/{controller=Product}/{action=Index}/{id?}");
-//pattern: "{area=admin}/{controller=Product}/{action=Index}/{id?}");
+app.MapControllerRoute(
+    name: "areas",
+//pattern: "{area:exists}/{controller=Product}/{action=Index}/{id?}");
+pattern: "{area=admin}/{controller=Product}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "defaul",

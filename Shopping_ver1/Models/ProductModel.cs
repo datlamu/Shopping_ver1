@@ -10,7 +10,6 @@ namespace Shopping_ver1.Models
         [Required(ErrorMessage = "Yêu cầu nhập tên sản phẩm")]
         public string Name { get; set; }
         public string Slug { get; set; }
-        [Required(ErrorMessage = "Yêu cầu nhập mô tả sản phẩm")]
         public string Description { get; set; }
         [Required(ErrorMessage = "Yêu cầu nhập giá sản phẩm")]
         [Range(0.01, double.MaxValue)]
