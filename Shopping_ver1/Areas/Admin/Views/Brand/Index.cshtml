@@ -1,0 +1,45 @@
+﻿@model IEnumerable<BrandModel>
+@{
+	ViewData["title"] = "Brands";
+	var index = 1;
+}
+<h3>Brands</h3>
+<a asp-controller="Brand" asp-action="Create">Create New Brand</a>
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">#</th>
+			<th scope="col">Name</th>
+			<th scope="col">Description</th>
+			<th scope="col">Status</th>
+			<th scope="col">Manage</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<th scope="row">@(index++)</th>
+				<td>@item.Name</td>
+				<td>@item.Description</td>
+				<td>
+					@if (item.Status == 1)
+					{
+						<span class="text-success">Hiển thị</span>
+					}
+					else
+					{
+						<span class="text-danger">Ẩn</span>
+					}
+
+				</td>
+				<td>
+					<a class="btn btn-warning btn-sm" asp-controller="Brand" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+					<a class="btn btn-danger btn-sm" asp-controller="Brand" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+

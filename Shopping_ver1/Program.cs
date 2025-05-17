@@ -24,6 +24,7 @@ builder.Services.AddSession(option =>
 // * Add ProductService
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IBrandService, BrandService>();
 
 var app = builder.Build();
 
