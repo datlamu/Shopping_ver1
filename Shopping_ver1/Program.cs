@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
@@ -44,11 +45,21 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "areas",
-//pattern: "{area:exists}/{controller=Product}/{action=Index}/{id?}");
-pattern: "{area=admin}/{controller=Product}/{action=Index}/{id?}");
+    pattern: "{area:exists}/{controller=Product}/{action=Index}/{id?}");
+//pattern: "{area=admin}/{controller=Product}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
-    name: "defaul",
+    name: "category",
+    pattern: "/category/{Slug?}",
+    defaults: new { controller = "Category", action = "Index" });
+
+app.MapControllerRoute(
+    name: "brand",
+    pattern: "/brand/{Slug?}",
+    defaults: new { controller = "Brand", action = "Index" });
+
+app.MapControllerRoute(
+    name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // * Seeding Data 
