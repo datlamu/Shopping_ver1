@@ -1,10 +1,10 @@
-﻿using System.Data;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Models;
 
 namespace Shopping_ver1.Repository
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<AppUserModel>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
