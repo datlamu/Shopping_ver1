@@ -4,7 +4,7 @@ using Shopping_ver1.Models;
 
 namespace Shopping_ver1.Repository
 {
-    public class DataContext : IdentityDbContext<AppUserModel>
+    public class DataContext : IdentityDbContext<UserModel>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

@@ -1,11 +1,11 @@
 ﻿@model BrandModel
 @{
-	ViewData["title"] = "Create Brand";
 	// Kiểm tra action nào được chọn nếu có model thì gán id chính nó
 	var isEdit = Model != null && Model.Id != 0;
+	ViewData["title"] = isEdit ? "Edit Brand" : "Create Brand";
 }
-<h3>Create Brand</h3>
-<form asp-action="@(isEdit ? "Edit" : "Create")" asp-area="Admin" enctype="multipart/form-data">
+<h3>@(isEdit ? "Edit Brand" : "Create Brand")</h3>
+<form asp-action="@(isEdit ? "Edit" : "Create")" asp-area="Admin" method="post" enctype="multipart/form-data">
 	@Html.AntiForgeryToken()
 	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 	<div class="form-group">

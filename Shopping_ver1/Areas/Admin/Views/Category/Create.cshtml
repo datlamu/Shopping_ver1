@@ -1,11 +1,11 @@
 ﻿@model CategoryModel
 @{
-	ViewData["title"] = "Create Category";
 	// Kiểm tra action nào được chọn nếu có model thì gán id chính nó
 	var isEdit = Model != null && Model.Id != 0;
+	ViewData["title"] = isEdit ? "Edit Category" : "Create Category";
 }
-<h3>Create Category</h3>
-<form asp-action="@(isEdit ? "Edit" : "Create")" asp-area="Admin" enctype="multipart/form-data">
+<h3>@(isEdit ? "Edit Category" : "Create Category")</h3>
+<form asp-action="@(isEdit ? "Edit" : "Create")" asp-area="Admin" method="post" enctype="multipart/form-data">
 	@Html.AntiForgeryToken()
 	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 	<div class="form-group">
