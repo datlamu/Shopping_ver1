@@ -28,6 +28,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 
 // *6 Add Identity
 builder.Services.AddIdentity<UserModel, IdentityRole>()

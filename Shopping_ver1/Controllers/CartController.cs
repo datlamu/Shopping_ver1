@@ -26,11 +26,6 @@ namespace Shopping_ver1.Controllers
             return View(cartItemViewModel);
         }
 
-        public IActionResult Checkout()
-        {
-            return View();
-        }
-
         // Thêm vào giỏ hàng
         public async Task<IActionResult> Add(int id)
         {

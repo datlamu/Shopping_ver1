@@ -17,7 +17,7 @@
 						<td class="price">Price</td>
 						<td class="quantity">Quantity</td>
 						<td class="total">Total</td>
-						<td></td>
+						<td>Manage</td>
 					</tr>
 				</thead>
 				<tbody>
@@ -27,7 +27,7 @@
 						{
 							<tr>
 								<td class="cart_product">
-									<a href=""><img src="~/images/@item.Image" width="200px" alt=""></a>
+									<a href=""><img src="~/media/products/@item.Image" width="200px" alt=""></a>
 								</td>
 								<td class="cart_description">
 									<h4><a href="">@item.ProductName</a></h4>
@@ -50,13 +50,19 @@
 								</td>
 							</tr>
 						}
-						<tr rowspan="6">
+						<tr rowspan="5">
 							<td colspan="6" class="cart_total">
 								<p class="cart_total_price">Grand Total: @Model.GrandTotal</p>
 							</td>
 							<td>
 								<a class="btn btn-danger btn-sm" asp-controller="Cart" asp-action="Clear">Clear</a>
 							</td>
+							@if (User.Identity?.IsAuthenticated ?? false)
+							{
+								<td>
+									<a class="btn btn-primary btn-sm" asp-controller="Checkout" asp-action="Index">Checkout</a>
+								</td>
+							}
 						</tr>
 					}
 					else
