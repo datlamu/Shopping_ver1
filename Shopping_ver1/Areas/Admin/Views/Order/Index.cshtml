@@ -1,0 +1,45 @@
+﻿@model IEnumerable<OrderModel>
+@{
+	var index = 1;
+}
+<h3>Danh sách hóa đơn</h3>
+<a asp-controller="Category" asp-action="Create">Create New Category</a>
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">#</th>
+			<th scope="col">UserName</th>
+			<th scope="col">OrderCode</th>
+			<th scope="col">CreateDate</th>
+			<th scope="col">Status</th>
+			<th scope="col">Manage</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<th scope="row">@(index++)</th>
+				<td>@item.UserName</td>
+				<td>@item.OrderCode</td>
+				<td>@item.CreateDate</td>
+				<td>
+					@if (item.Status == 1)
+					{
+						<span class="text-success">Đã xử lý</span>
+					}
+					else
+					{
+						<span class="text-danger">Đang xử lý</span>
+					}
+				</td>
+				<td>
+					<a class="btn btn-warning btn-sm" asp-controller="Order" asp-action="View" asp-route-id="@item.OrderCode">View</a>
+					<a class="btn btn-danger btn-sm confirmDeletion" asp-controller="Order" asp-action="Delete" asp-route-id="@item.OrderCode">Delete</a>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+
