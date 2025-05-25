@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
-using Shopping_ver1.Services;
 
 namespace Shopping_ver1.Areas.Admin.Controllers
 {
@@ -17,13 +14,25 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         {
             _dataContext = context;
         }
+        // Danh sách đơn hàng
         public async Task<IActionResult> Index()
         {
-            var product = await _dataContext.Orders.OrderByDescending(p => p.Id).ToListAsync();
+            // Lấy ra danh sách đơn hàng
+            var orders = await _dataContext.Orders.OrderByDescending(p => p.Id).ToListAsync();
 
-            return View(product);
+            return View(orders);
         }
 
+        // Chi tiết đơn hàng
+        public async Task<IActionResult> OrderDetail(string orderCode)
+        {
+            // Lấy ra chi tiết của đơn hàng đó dựa trên orderCode
+            var orderDetails = await _dataContext.OrderDetails
+                .Include(o => o.Product)
+                .Where(od => od.OrderCode == orderCode)
+                .ToListAsync();
 
+            return View(orderDetails);
+        }
     }
 }
