@@ -8,7 +8,7 @@ using Shopping_ver1.Services;
 namespace Shopping_ver1.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
         private readonly DataContext _dataContext;
