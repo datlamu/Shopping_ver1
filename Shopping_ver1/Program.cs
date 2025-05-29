@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
@@ -90,8 +91,18 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// *2 Seeding Data 
-var context = app.Services.CreateScope().ServiceProvider.GetRequiredService<DataContext>();
-SeedData.SeedingData(context);
+// 2* seed data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<DataContext>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    // *2 Seeding products
+    await SeedData.SeedingDataAsync(context);
+
+    // *2 Seeding roles
+    await RoleInitializer.SeedRolesAsync(roleManager);
+}
 
 app.Run();

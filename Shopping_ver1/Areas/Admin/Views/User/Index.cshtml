@@ -1,0 +1,35 @@
+﻿@{
+	var index = 1;
+}
+<h3>Danh sách người dùng</h3>
+<a class="btn btn-success btn-sm" asp-controller="User" asp-action="CreateUser">Tạo người dùng mới</a>
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">#</th>
+			<th scope="col">UserName</th>
+			<th scope="col">Email</th>
+			<th scope="col">PhoneNumber</th>
+			<th scope="col">Role</th>
+			<th scope="col">Manage</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var user in Model)
+		{
+			<tr>
+				<th scope="row">@(index++)</th>
+				<td>@user.User.UserName</td>
+				<td>@user.User.Email</td>
+				<td>@user.User.PhoneNumber</td>
+				<td>@user.RoleName</td>
+				<td>
+					<a class="btn btn-warning btn-sm" asp-controller="User" asp-action="EditUser" asp-route-id="@user.User.Id">Edit</a>
+					<a class="btn btn-danger btn-sm confirmDeletion" asp-controller="User" asp-action="DeleteUser" asp-route-id="@user.User.Id">Delete</a>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+

@@ -1,27 +1,27 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Shopping_ver1.Models.ViewModels
 {
-    public class RegisterViewModel
+    public class EditUserViewModel
     {
-        [Required(ErrorMessage = "Hãy nhập Username")]
+        public string Id { get; set; }
         public string UserName { get; set; }
-        [Required(ErrorMessage = "Hãy nhập Email"), EmailAddress]
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
-        [DataType(DataType.Password), Required(ErrorMessage = "Hãy nhập Password")]
-        public string Password { get; set; }
         public string RoleId { get; set; }
         public IEnumerable<SelectListItem> Roles { get; set; }
 
-        public RegisterViewModel() { }
-        public RegisterViewModel(UserModel user)
+        public EditUserViewModel() { }
+
+        public EditUserViewModel(UserModel user, string roleId, IEnumerable<SelectListItem> roles)
         {
+            Id = user.Id;
             UserName = user.UserName;
             Email = user.Email;
             PhoneNumber = user.PhoneNumber;
+            RoleId = roleId;
+            Roles = roles;
         }
-
     }
 }

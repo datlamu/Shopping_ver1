@@ -56,7 +56,8 @@ namespace Shopping_ver1.Controllers
         [HttpGet]
         public ActionResult Register()
         {
-            return View();
+            var user = new RegisterViewModel();
+            return View(user);
         }
         [HttpPost]
         [AutoValidateAntiforgeryToken]

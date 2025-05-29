@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Models;
 using Shopping_ver1.Models.ViewModels;
 
@@ -9,30 +11,133 @@ namespace Shopping_ver1.Services
         // Identity managers ( Quản lý đăng nhập và người dùng )
         private readonly UserManager<UserModel> _userManager;
         private readonly SignInManager<UserModel> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         // Inject Identity managers
-        public UserService(UserManager<UserModel> userManager, SignInManager<UserModel> signInManager)
+        public UserService(UserManager<UserModel> userManager, SignInManager<UserModel> signInManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
-        // Đăng nhập tài khoản
+        // Đăng nhập
         public async Task<SignInResult> LoginAsync(LoginViewModel user)
         {
-            return await _signInManager.PasswordSignInAsync(user.Username, user.Password, false, false);
+            return await _signInManager.PasswordSignInAsync(user.UserName, user.Password, false, false);
         }
 
-        // Đăng ký tài khoản
-        public async Task<IdentityResult> RegisterAsync(RegisterViewModel user)
+        // Đăng ký
+        public async Task<IdentityResult> RegisterAsync(RegisterViewModel user, string role = "User")
         {
+            // Tạo user model
             var userModel = new UserModel
             {
-                UserName = user.Username,
-                Email = user.Email
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber
             };
 
-            return await _userManager.CreateAsync(userModel, user.Password);
+            // Tạo tài khoản
+            var result = await _userManager.CreateAsync(userModel, user.Password);
+
+            // Kiểm tra kết quả 
+            if (result.Succeeded)
+            {
+                // Gán role cho user
+                await _userManager.AddToRoleAsync(userModel, role);
+            }
+            return result;
+        }
+
+        // Lấy thông tin
+        public async Task<EditUserViewModel> GetEditUserViewModelAsync(string userId)
+        {
+            // Kiểm tra id
+            if (string.IsNullOrEmpty(userId)) return null;
+
+            // Kiểm tra user
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return null;
+
+            // Lấy danh sách role
+            var roles = await _roleManager.Roles.ToListAsync();
+            var selectListRoles = new SelectList(roles, "Id", "Name");
+
+            // Tìm RoleId từ RoleName
+            var roleName = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+            var roleId = selectListRoles.FirstOrDefault(r => r.Text == roleName)?.Value;
+
+            // Trả về ViewModel
+            return new EditUserViewModel(user, roleId, selectListRoles);
+        }
+
+        // Chỉnh sửa thông tin
+        public async Task<(bool Success, string Message)> EditUserAsync(EditUserViewModel model)
+        {
+            // Tìm kiểm user
+            var user = await _userManager.FindByIdAsync(model.Id);
+            if (user == null)
+                return (false, "Không tìm thấy user");
+
+            // Lấy thông tin thay đổi
+            user.Email = model.Email;
+            user.UserName = model.UserName;
+            user.PhoneNumber = model.PhoneNumber;
+
+            // Cập nhật
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+                return (false, "Cập nhật user thất bại");
+
+            // Xóa role cũ
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            if (!removeResult.Succeeded)
+                return (false, "Xóa role cũ thất bại");
+
+            // Tìm Role từ RoleId
+            var role = await _roleManager.FindByIdAsync(model.RoleId);
+            if (role == null)
+                return (false, "Role không hợp lệ");
+
+            // Thêm gán role cho user từ RoleName
+            var result = await _userManager.AddToRoleAsync(user, role.Name);
+            if (!result.Succeeded)
+                return (false, "Gán role thất bại");
+
+            // Kết quả nếu thành công
+            return (true, "Cập nhật thành công");
+        }
+
+        // Xóa user
+        public async Task<(bool Success, string Message)> DeleteUserAsync(string userId)
+        {
+            // Kiểm tra Id
+            if (string.IsNullOrEmpty(userId))
+                return (false, "ID không hợp lệ!");
+
+            // Kiểm tra User
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return (false, "Không tìm thấy thông tin user này!");
+
+            // Lấy xóa Role của User
+            var roles = await _userManager.GetRolesAsync(user);
+            if (roles.Any())
+            {
+                var removeResult = await _userManager.RemoveFromRolesAsync(user, roles);
+                if (!removeResult.Succeeded)
+                    return (false, "Xóa role của người dùng thất bại!");
+            }
+
+            // Xóa User
+            var deleteResult = await _userManager.DeleteAsync(user);
+            if (!deleteResult.Succeeded)
+                return (false, "Xóa người dùng thất bại!");
+
+            // Kết quả nếu thành công
+            return (true, "Xóa thành công!");
         }
 
         // Đăng xuất

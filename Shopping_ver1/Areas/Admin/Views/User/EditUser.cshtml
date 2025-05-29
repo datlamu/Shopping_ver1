@@ -1,7 +1,4 @@
-﻿@model RegisterViewModel
-@{
-	ViewData["Title"] = "Register Account";
-}
+﻿@model EditUserViewModel
 <section id="">
 	<!--form-->
 	<div class="container">
@@ -9,13 +6,13 @@
 			<div class="col-sm-4 col-sm-offset-4">
 				<div class="signup-form">
 					<!--sign up form-->
-					<h2>New User Signup!</h2>
-					<form asp-controller="Account" asp-action="Register" method="post">
+					<h2>Edit User</h2>
+					<form asp-controller="User" asp-action="EditUser" method="post">
 						@Html.AntiForgeryToken()
 						<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 						<div class="form-group">
 							<label>UserName</label>
-							<input asp-for="UserName" class="form-control" />
+							<input asp-for="UserName" readonly class="form-control" />
 							<span asp-validation-for="UserName" class="text-danger" />
 						</div>
 						<div class="form-group">
@@ -24,12 +21,18 @@
 							<span asp-validation-for="Email" class="text-danger" />
 						</div>
 						<div class="form-group">
-							<label>Password</label>
-							<input asp-for="Password" class="form-control" />
-							<span asp-validation-for="Password" class="text-danger" />
+							<label>PhoneNumber</label>
+							<input asp-for="PhoneNumber" class="form-control" />
+							<span asp-validation-for="PhoneNumber" class="text-danger" />
 						</div>
-						<button class="btn btn-default">Register</button>
-						<a asp-controller="Account" asp-action="Login">Login Account</a>
+						<div class="form-group">
+							<label>Role</label>
+							<select asp-for="RoleId" class="form-control" asp-items="@Model.Roles">
+							</select>
+							<span asp-validation-for="RoleId" class="text-danger" />
+						</div>
+						<button class="btn btn-default">Edit</button>
+						<a asp-controller="User" asp-action="Index">Quay lại danh sách người dùng</a>
 					</form>
 				</div><!--/sign up form-->
 			</div>
