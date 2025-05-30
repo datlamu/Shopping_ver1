@@ -1,7 +1,10 @@
 ﻿@model IEnumerable<CategoryModel>
 @{
-	ViewData["title"] = "Categories";
+	// Số thứ tự
 	var index = 1;
+
+	// Lấy phân trang, fallback nếu null
+	var pager = ViewBag.Pager as Paginate ?? new Paginate();
 }
 <h3>Categories</h3>
 <a asp-controller="Category" asp-action="Create">Create New Category</a>
@@ -41,5 +44,4 @@
 		}
 	</tbody>
 </table>
-
-
+<partial name="_Paging" model="@pager" />

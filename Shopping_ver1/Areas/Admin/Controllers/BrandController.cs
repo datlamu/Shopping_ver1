@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Shopping_ver1.Helpers;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
@@ -19,13 +21,24 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             _dataContext = context;
             _bs = bs;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var brands = await _dataContext.Brands
-                .OrderByDescending(b => b.Id)
+            // Tổng số Items
+            var totalItems = await _dataContext.Brands.CountAsync();
+
+            // Tạo đối tượng phân trang
+            var pager = new Paginate(totalItems, page);
+
+            // Danh sách items
+            var data = await _dataContext.Brands
+                .OrderByDescending(p => p.Id)
+                .Skip(pager.Skip) // Bỏ qua số lượng phần tử
+                .Take(pager.PageSize) // Lấy số lượng phần tử tiếp đó
                 .ToListAsync();
 
-            return View(brands);
+            ViewBag.Pager = pager;
+
+            return View(data);
         }
         // Tạo sản danh thương hiệu
         [HttpGet]

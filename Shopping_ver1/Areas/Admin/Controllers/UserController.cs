@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Shopping_ver1.Helpers;
 using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
@@ -24,10 +26,16 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             _dataContext = dataContext;
         }
         // Danh sách các user
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            // Linq - lấy danh sách user 
-            var usersWithRoles = await (
+            // Tổng số Items
+            var totalItems = await _dataContext.Categories.CountAsync();
+
+            // Tạo đối tượng phân trang
+            var pager = new Paginate(totalItems, page);
+
+            // Danh sách items - Linq
+            var data = await (
                 from u in _dataContext.Users
                 join ur in _dataContext.UserRoles on u.Id equals ur.UserId
                 join r in _dataContext.Roles on ur.RoleId equals r.Id
@@ -36,9 +44,14 @@ namespace Shopping_ver1.Areas.Admin.Controllers
                     User = u,
                     RoleName = r.Name
                 }
-            ).ToListAsync();
+            )
+            .Skip(pager.Skip) // Bỏ qua số lượng phần tử
+            .Take(pager.PageSize) // Lấy số lượng phần tử tiếp đó
+            .ToListAsync();
 
-            return View(usersWithRoles);
+            ViewBag.Pager = pager;
+
+            return View(data);
         }
 
         // Tạo user mới

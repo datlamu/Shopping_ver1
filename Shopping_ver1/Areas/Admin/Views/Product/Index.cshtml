@@ -1,7 +1,10 @@
 ﻿@model IEnumerable<ProductModel>
 @{
-	ViewData["title"] = "List Product";
+	// Số thứ tự
 	var index = 1;
+
+	// Lấy phân trang, fallback nếu null
+	var pager = ViewBag.Pager as Paginate ?? new Paginate();
 }
 <h3>List Product</h3>
 <a asp-controller="Product" asp-action="Create">Create New Product</a>
@@ -37,5 +40,4 @@
 		}
 	</tbody>
 </table>
-
-
+<partial name="_Paging" model="@pager" />

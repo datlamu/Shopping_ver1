@@ -1,5 +1,9 @@
 ﻿@{
+	// Số thứ tự
 	var index = 1;
+
+	// Lấy phân trang, fallback nếu null
+	var pager = ViewBag.Pager as Paginate ?? new Paginate();
 }
 <h3>Danh sách người dùng</h3>
 <a class="btn btn-success btn-sm" asp-controller="User" asp-action="CreateUser">Tạo người dùng mới</a>
@@ -31,5 +35,4 @@
 		}
 	</tbody>
 </table>
-
-
+<partial name="_Paging" model="@pager" />

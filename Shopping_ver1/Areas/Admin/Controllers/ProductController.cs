@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Shopping_ver1.Helpers;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
@@ -19,15 +20,26 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             _dataContext = context;
             _ps = productService;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var product = await _dataContext.Products
+            // Tổng số Items
+            var totalItems = await _dataContext.Products.CountAsync();
+
+            // Tạo đối tượng phân trang
+            var pager = new Paginate(totalItems, page);
+
+            // Danh sách items
+            var data = await _dataContext.Products
                 .OrderByDescending(p => p.Id)
                 .Include(p => p.Category)
                 .Include(p => p.Brand)
+                .Skip(pager.Skip) // Bỏ qua số lượng phần tử
+                .Take(pager.PageSize) // Lấy số lượng phần tử tiếp đó
                 .ToListAsync();
 
-            return View(product);
+            ViewBag.Pager = pager;
+
+            return View(data);
         }
 
         // Tạo sản phẩm mới
@@ -87,6 +99,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             TempData["Success"] = "Thêm sản phẩm thành công!!!";
             return RedirectToAction("Index");
         }
+
         // Chỉnh sửa sản phẩm
         [HttpGet]
         public async Task<IActionResult> Edit(int id)

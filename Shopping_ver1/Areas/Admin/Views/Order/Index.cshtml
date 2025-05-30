@@ -1,6 +1,10 @@
 ﻿@model IEnumerable<OrderModel>
 @{
+	// Số thứ tự
 	var index = 1;
+
+	// Lấy phân trang, fallback nếu null
+	var pager = ViewBag.Pager as Paginate ?? new Paginate();
 }
 <h3>Danh sách đơn hàng</h3>
 <table class="table">
@@ -40,5 +44,4 @@
 		}
 	</tbody>
 </table>
-
-
+<partial name="_Paging" model="@pager" />
