@@ -12,19 +12,36 @@ namespace Shopping_ver1.Services
         private readonly UserManager<UserModel> _userManager;
         private readonly SignInManager<UserModel> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IEmailService _emailService;
 
         // Inject Identity managers
-        public UserService(UserManager<UserModel> userManager, SignInManager<UserModel> signInManager, RoleManager<IdentityRole> roleManager)
+        public UserService(
+            UserManager<UserModel> userManager,
+            SignInManager<UserModel> signInManager,
+            RoleManager<IdentityRole> roleManager,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _emailService = emailService;
         }
 
         // Đăng nhập
         public async Task<SignInResult> LoginAsync(LoginViewModel user)
         {
-            return await _signInManager.PasswordSignInAsync(user.UserName, user.Password, false, false);
+            var result = await _signInManager.PasswordSignInAsync(user.UserName, user.Password, false, false);
+
+            // Đăng nhập thành công ( test email )
+            if (result.Succeeded)
+            {
+                var toEmail = "172100119@dntu.edu.vn";
+                var subject = "Đăng nhập thành công !";
+                var body = "Chúc bạn có trải nghiệm vui vẻ nhé !";
+                await _emailService.SendEmailAsync(toEmail, subject, body);
+            }
+
+            return result;
         }
 
         // Đăng ký

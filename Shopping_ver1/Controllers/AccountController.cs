@@ -8,11 +8,13 @@ namespace Shopping_ver1.Controllers
     {
         // Service
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
         // Inject Service
-        public AccountController(IUserService userService)
+        public AccountController(IUserService userService, IEmailService emailService)
         {
             _userService = userService;
+            _emailService = emailService;
         }
 
         public IActionResult Index()
@@ -47,7 +49,6 @@ namespace Shopping_ver1.Controllers
                 return View(user);
             }
 
-            // Đăng nhập thành công
             TempData["Success"] = "Đăng nhập thành công!";
             return Redirect(user.ReturnUrl ?? "/");
         }

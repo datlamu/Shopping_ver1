@@ -30,6 +30,8 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICheckoutService, CheckoutService>();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 // *6 Add Identity
 builder.Services.AddIdentity<UserModel, IdentityRole>()
@@ -91,7 +93,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// 2* seed data
+// 2* Seed Data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

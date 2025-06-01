@@ -5,10 +5,12 @@ using Shopping_ver1.Services;
 public class CheckoutService : ICheckoutService
 {
     private readonly DataContext _context;
+    private readonly IEmailService _emailService;
 
-    public CheckoutService(DataContext context)
+    public CheckoutService(DataContext context, IEmailService emailService)
     {
         _context = context;
+        _emailService = emailService;
     }
 
     // Thanh toán
@@ -28,6 +30,13 @@ public class CheckoutService : ICheckoutService
 
         // Lưu lại database
         await _context.SaveChangesAsync();
+
+        // Đặt hàng thành công ( test email )
+        var toEmail = "172100119@dntu.edu.vn";
+        var subject = "Đặt hàng thành công !";
+        var body = $"Cảm ơn bạn đã ủng hộ, Mã đơn hàng của bạn là: {orderCode}!";
+        await _emailService.SendEmailAsync(toEmail, subject, body);
+
         return orderCode;
     }
 }

@@ -9,9 +9,11 @@ namespace Shopping_ver1.Controllers
     public class CheckoutController : Controller
     {
         private readonly ICheckoutService _cks;
-        public CheckoutController(ICheckoutService cks)
+        private readonly IEmailService _emailService;
+        public CheckoutController(ICheckoutService cks, IEmailService emailService)
         {
             _cks = cks;
+            _emailService = emailService;
         }
         // Thực hiện thanh toán
         public async Task<IActionResult> Index()
