@@ -1,26 +1,68 @@
 ﻿@model IEnumerable<OrderDetailModel>
 @{
 	var index = 1;
+	decimal total = 0;
+	decimal subtotal = 0;
+	string orderStatus = ViewBag.OrderStatus == 0 ? "selected" : "";
 }
 <h3>Chi tiết đơn hàng</h3>
+<a class="btn btn-success" asp-controller="Order" asp-action="Index">Quay về danh sách đơn hàng</a>
 <table class="table">
 	<thead>
 		<tr>
 			<th scope="col">#</th>
 			<th scope="col">OrderCode</th>
 			<th scope="col">UserName</th>
+			<th scope="col">ProductName</th>
+			<th scope="col">Price</th>
+			<th scope="col">Quantity</th>
+			<th scope="col">Subtotal</th>
 		</tr>
 	</thead>
 	<tbody>
 		@foreach (var item in Model)
 		{
+			subtotal = item.Quantity * item.Price;
+			total += subtotal;
 			<tr>
+				<input type="hidden" asp-for="@item.OrderCode" class="getOrderCode" />
 				<th scope="row">@(index++)</th>
 				<td>@item.OrderCode</td>
 				<td>@item.UserName</td>
+				<td>@item.Product.Name</td>
+				<td>@item.Price</td>
+				<td>@item.Quantity</td>
+				<td>@subtotal.ToString("")</td>
 			</tr>
 		}
+		<tr>
+			<th colspan="6">Total: @total.ToString("")</th>
+			<td>
+				<select class="form-control select-update-order" name="Status">
+					<option value="1">Đang xử lý</option>
+					<!option value="0" @orderStatus>Đã xử lý</!option>
+				</select>
+			</td>
+		</tr>
 	</tbody>
 </table>
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			// Khi có sự thay đổi trong select-update-order thì kích hoạt event change
+			$('.select-update-order').change(function () {
 
+				// Url Action
+				var url = '/Admin/Order/UpdateOrder';
+				// Lấy status và ordercode
+				var	status = $(this).val();
+				var orderCode = $('.getOrderCode').val();
+				let data = {status,orderCode};
+
+				// Gọi Ajax
+				sendAjax({ url, data});
+			});
+		});
+	</script>
+}
 

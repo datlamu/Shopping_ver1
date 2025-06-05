@@ -29,15 +29,15 @@
 				<td>
 					@if (item.Status == 1)
 					{
-						<span class="text-success">Đã xử lý</span>
+						<span class="text-danger">Đang xử lý</span>
 					}
 					else
 					{
-						<span class="text-danger">Đang xử lý</span>
+						<span class="text-success">Đã xử lý</span>
 					}
 				</td>
 				<td>
-					<a class="btn btn-warning btn-sm" asp-controller="Order" asp-action="OrderDetail" asp-route-orderCode="@item.OrderCode">Order Detail</a>
+					<a class="btn btn-warning btn-sm" asp-controller="Order" asp-action="OrderDetail" asp-route-orderCode="@item.OrderCode" asp-route-status="@item.Status">Order Detail</a>
 					<a class="btn btn-danger btn-sm confirmDeletion" asp-controller="Order" asp-action="Delete" asp-route-orderCode="@item.OrderCode">Delete</a>
 				</td>
 			</tr>

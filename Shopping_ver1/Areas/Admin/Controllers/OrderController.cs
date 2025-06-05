@@ -1,9 +1,6 @@
-﻿using System.Linq;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Shopping_ver1.Helpers;
-using Shopping_ver1.Repository;
+using Shopping_ver1.Services;
 
 namespace Shopping_ver1.Areas.Admin.Controllers
 {
@@ -11,26 +8,15 @@ namespace Shopping_ver1.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class OrderController : Controller
     {
-        private readonly DataContext _dataContext;
-        public OrderController(DataContext context)
+        private readonly IOrderService _orderService;
+        public OrderController(IOrderService orderService)
         {
-            _dataContext = context;
+            _orderService = orderService;
         }
         // Danh sách đơn hàng
         public async Task<IActionResult> Index(int page = 1)
         {
-            // Tổng số Items
-            var totalItems = await _dataContext.Orders.CountAsync();
-
-            // Tạo đối tượng phân trang
-            var pager = new Paginate(totalItems, page);
-
-            // Danh sách items
-            var data = await _dataContext.Orders
-                .OrderByDescending(p => p.Id)
-                .Skip(pager.Skip) // Bỏ qua số lượng phần tử
-                .Take(pager.PageSize) // Lấy số lượng phần tử tiếp đó
-                .ToListAsync();
+            var (data, pager) = await _orderService.GetOrderlistAsync(page);
 
             ViewBag.Pager = pager;
 
@@ -38,15 +24,44 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         }
 
         // Chi tiết đơn hàng
-        public async Task<IActionResult> OrderDetail(string orderCode)
+        public async Task<IActionResult> OrderDetail(string orderCode, int status)
         {
-            // Lấy ra chi tiết của đơn hàng đó dựa trên orderCode
-            var orderDetails = await _dataContext.OrderDetails
-                .Include(o => o.Product)
-                .Where(od => od.OrderCode == orderCode)
-                .ToListAsync();
+            // Chi tiết đơn hàng
+            var data = await _orderService.GetOrderDetailAsync(orderCode);
 
-            return View(orderDetails);
+            ViewBag.OrderStatus = status;
+
+            return View(data);
+        }
+
+        // Cập nhật đơn hàng
+        [HttpPost]
+        public async Task<IActionResult> UpdateOrder(string orderCode, int status)
+        {
+            // Cập nhật và kiểm tra
+            var result = await _orderService.UpdateOrderAsync(orderCode, status);
+            if (!result.success)
+            {
+                return Json(new { result.success, result.message });
+            }
+
+            // Cập nhật thành công
+            return Json(new { result.success, result.message });
+        }
+
+        // Xóa đơn hàng 
+        public async Task<IActionResult> Delete(string orderCode)
+        {
+            // Xóa và kiểm tra
+            var result = await _orderService.DeleteOrderAsync(orderCode);
+            if (!result.success)
+            {
+                return NotFound();
+            }
+
+            // Xóa thành công
+            TempData["Success"] = "Xóa danh đơn hàng thành công !!!";
+            return RedirectToAction("Index");
         }
     }
 }
