@@ -68,7 +68,7 @@
 	<section>
 		<div class="container">
 			<div class="row">
-				<partial name="_NotificationPartial" />
+
 				@RenderBody()
 			</div>
 		</div>
@@ -87,14 +87,9 @@
 	<script src="~/backend/js/ajax-helper.js"></script>
 	@* Sweet Alert của SweetAlert2 hiện thông báo *@
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.0/dist/sweetalert2.all.min.js"></script>
-	<script>
-		$(function() {
-			var message = '@TempData["success"]';
-			if(message != '')
-				Swal.fire(message);
-		})
-	</script>
 	@* Render nội dung của section có tên là "Scrips" nếu nó tồn tại *@
 	@await RenderSectionAsync("Scripts", required: false)
+	@* sử dụng NotificationPartial + SweetAlert2 *@
+	<partial name="_NotificationPartial" />
 </body>
 </html>
