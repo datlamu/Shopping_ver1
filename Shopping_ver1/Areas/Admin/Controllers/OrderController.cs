@@ -38,14 +38,8 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateOrder(string orderCode, int status)
         {
-            // Cập nhật và kiểm tra
+            // Cập nhật và trả kết quả cho ajax
             var result = await _orderService.UpdateOrderAsync(orderCode, status);
-            if (!result.success)
-            {
-                return Json(new { result.success, result.message });
-            }
-
-            // Cập nhật thành công
             return Json(new { result.success, result.message });
         }
 
