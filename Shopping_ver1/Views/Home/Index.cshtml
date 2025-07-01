@@ -18,7 +18,7 @@
 								<h2>@item.Price.ToString("#,0", System.Globalization.CultureInfo.InvariantCulture).Replace(",", ".") VNĐ</h2>
 								<p>@item.Name</p>
 							</a>
-							<a class="btn btn-default add-to-cart" asp-controller="Cart" asp-action="Add" asp-route-id="@item.Id"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+							<button class="btn btn-default add-to-cart" value="@item.Id"><i class="fa fa-shopping-cart"></i>Add to cart</button>
 						</div>
 					</div>
 					<div class="choose">
@@ -32,3 +32,21 @@
 		}
 	</div><!--features_items-->
 </div>
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			// Chay khi button được click vào
+			$('.add-to-cart').click(function () {
+
+				// Url Action
+				var url = '/Cart/Add';
+				// Lấy status và productId
+				var	id = $(this).val();
+				let data = { id };
+
+				// Gọi Ajax
+				sendAjax({ url, data });
+			});
+		});
+	</script>
+}

@@ -1,80 +1,88 @@
-﻿@using Shopping_ver1.Models.ViewModels
-@model CartItemViewModel
-<section id="cart_items">
-	<div class="container">
-		<div class="breadcrumbs">
-			<ol class="breadcrumb">
-				<li><a href="#">Home</a></li>
-				<li class="active">Shopping Cart</li>
-			</ol>
-		</div>
-		<div class="table-responsive cart_info">
-			<table class="table table-condensed">
-				<thead>
-					<tr class="cart_menu">
-						<td class="image">Item</td>
-						<td class="description"></td>
-						<td class="price">Price</td>
-						<td class="quantity">Quantity</td>
-						<td class="total">Total</td>
-						<td>Manage</td>
-					</tr>
-				</thead>
-				<tbody>
-					@if (Model.CartItems.Count > 0)
-					{
-						foreach (var item in Model.CartItems)
-						{
-							<tr>
-								<td class="cart_product">
-									<a href=""><img src="~/media/products/@item.Image" width="200px" alt=""></a>
-								</td>
-								<td class="cart_description">
-									<h4><a href="">@item.ProductName</a></h4>
-									<p>@item.ProductId</p>
-								</td>
-								<td class="cart_price">
-									<p>@item.Price</p>
-								</td>
-								<td class="cart_quantity">
-									<a class="btn btn-primary btn-sm" asp-controller="Cart" asp-action="Increase" asp-route-id="@item.ProductId"> + </a>
-									<input class="cart_quantity_input" type="text" name="quantity" value="@item.Quantity" autocomplete="off" size="2">
-									<a class="btn btn-success btn-sm" asp-controller="Cart" asp-action="Decrease" asp-route-id="@item.ProductId"> - </a>
-									<a class="btn btn-danger btn-sm" asp-controller="Cart" asp-action="Remove" asp-route-id="@item.ProductId">Remove</a>
-								</td>
-								<td class="cart_total">
-									<p class="cart_total_price">@item.Total</p>
-								</td>
-								<td class="cart_delete">
-									<a class="cart_quantity_delete" href=""><i class="fa fa-times"></i></a>
-								</td>
-							</tr>
-						}
-						<tr rowspan="5">
-							<td colspan="6" class="cart_total">
-								<p class="cart_total_price">Grand Total: @Model.GrandTotal</p>
-							</td>
-							<td>
-								<a class="btn btn-danger btn-sm" asp-controller="Cart" asp-action="Clear">Clear</a>
-							</td>
-							@if (User.Identity?.IsAuthenticated ?? false)
-							{
-								<td>
-									<a class="btn btn-primary btn-sm" asp-controller="Checkout" asp-action="Index">Checkout</a>
-								</td>
-							}
-						</tr>
+﻿<div id="cartTableContainer">
+	<partial name="_CartTablePartial" model="Model" />
+</div>
+@section Scripts {
+	<script>
+		// Tải lại bảng
+		function reloadCartTable() {
+			$("#cartTableContainer").load("/Cart/GetCartTable", function () {
+				attachCartEvents(); // Gắn lại sự kiện sau khi load xong
+			});
+		}
+		// Gắn sự kiện giỏ hàng
+		function attachCartEvents() {
+		// Chạy khi button được click vào
+			$('.increase-cartitem').off('click').on('click', function () {
+
+				// Url Action
+				var url = '/Cart/Increase';
+				// Lấy id của sản phẩm
+				var	id = $(this).val();
+				let data = { id };
+
+				// Gọi Ajax
+				sendAjax({
+					url,
+					data,
+					onSuccess: function () {
+						reloadCartTable();
 					}
-					else
-					{
-						<tr>
-							<td class="cart_total">
-								<p class="cart_total_price"><h4>Your Cart is Empty</h4></p>
-							</td>
-						</tr>
+				});
+			});
+			$('.decrease-cartitem').off('click').on('click', function () {
+
+				// Url Action
+				var url = '/Cart/Decrease';
+				// Lấy id của sản phẩm
+				var	id = $(this).val();
+				let data = { id };
+
+				// Gọi Ajax
+				sendAjax({
+					url,
+					data,
+					onSuccess: function () {
+						reloadCartTable();
 					}
-				</tbody>
-			</table>
-		</div>
-	</div>
-</section> <!--/#cart_items-->
+				});
+			});
+			$('.remove-cartitem').off('click').on('click', function () {
+
+				// Url Action
+				var url = '/Cart/Remove';
+				// Lấy id của sản phẩm
+				var	id = $(this).val();
+				let data = { id };
+
+				// Gọi Ajax
+				sendAjax({
+					url,
+					data,
+					onSuccess: function () {
+						reloadCartTable();
+					}
+				});
+			});
+			$('.clear-cart').off('click').on('click', function () {
+
+				// Url Action
+				var url = '/Cart/Clear';
+				// Lấy id của sản phẩm
+				var	id = $(this).val();
+				let data = { id };
+
+				// Gọi Ajax
+				sendAjax({
+					url,
+					data,
+					onSuccess: function () {
+						reloadCartTable();
+					}
+				});
+			});
+		}
+		$(document).ready(function () {
+			attachCartEvents();
+		});
+	</script>
+}

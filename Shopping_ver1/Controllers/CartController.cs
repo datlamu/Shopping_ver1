@@ -1,141 +1,95 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Shopping_ver1.Models;
-using Shopping_ver1.Models.ViewModels;
-using Shopping_ver1.Repository;
+using Shopping_ver1.Services;
 
 namespace Shopping_ver1.Controllers
 {
     public class CartController : Controller
     {
-        private readonly DataContext _dataContext;
-        public CartController(DataContext context)
+        private readonly ICartService _cartservice;
+        public CartController(ICartService cartservice)
         {
-            _dataContext = context;
+            _cartservice = cartservice;
         }
 
-        // Hiện sản phẩm giỏ hàng
+        // Hiện sản phẩm trong giỏ hàng
         public IActionResult Index()
         {
-            List<CartItemModel> cartItem = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
-            CartItemViewModel cartItemViewModel = new()
-            {
-                CartItems = cartItem,
-                GrandTotal = cartItem.Sum(x => x.Total),
-            };
+            // Lấy sản phẩm từ giỏ hàng
+            var listCartItem = _cartservice.GetListCartItem();
 
-            return View(cartItemViewModel);
+            return View(listCartItem);
         }
 
         // Thêm vào giỏ hàng
+        [HttpPost]
         public async Task<IActionResult> Add(int id)
         {
-            // Lấy giỏ hàng từ session
-            List<CartItemModel> cart = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
-            // Tìm sản phẩm trong giỏ hàng theo id
-            CartItemModel cartItem = cart.Where(c => c.ProductId == id).FirstOrDefault();
+            var result = await _cartservice.AddAsync(id);
 
-            // Thêm sản phẩm vào giỏ hàng
-            if (cartItem == null)
+            return Json(new
             {
-                ProductModel product = await _dataContext.Products.FindAsync(id);
-                cart.Add(new CartItemModel(product));
-            }
-            else
-                cartItem.Quantity += 1;
-
-            // Cập nhật giỏ hàng vào session
-            HttpContext.Session.SetJson("Cart", cart);
-
-            // In thông báo
-            TempData["success"] = "Add item to cart Successfully!!!";
-
-            // Trả về trang trước đó ( 1 URL nên dùng cho chi tiết sản phẩm )
-            return Redirect(Request.Headers["Referer"].ToString());
+                success = result.Success,
+                message = result.Message
+            });
         }
 
         // Tăng số lượng sản phẩm trong giỏ hàng
-        public async Task<IActionResult> Increase(int id)
+        [HttpPost]
+        public IActionResult Increase(int id)
         {
-            // Lấy giỏ hàng từ session
-            List<CartItemModel> cart = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
-            // Tìm sản phẩm trong giỏ hàng theo id
-            CartItemModel cartItem = cart.Where(c => c.ProductId == id).FirstOrDefault();
+            var result = _cartservice.Increase(id);
 
-            // Tăng số lượng của sản phẩm đó
-            if (cartItem != null)
-                cartItem.Quantity += 1;
-
-            // Cập nhật giỏ hàng vào session
-            if (cart.Count > 0)
-                HttpContext.Session.SetJson("Cart", cart);
-
-            // In thông báo
-            TempData["success"] = "Increase item quantity to cart Successfully!!!";
-
-            // Trả về trang giỏ hàng
-            return RedirectToAction("Index");
+            return Json(new
+            {
+                success = result.Success,
+                message = result.Message
+            });
         }
 
         // Giảm số lượng sản phẩm trong giỏ hàng
-        public async Task<IActionResult> Decrease(int id)
+        [HttpPost]
+        public IActionResult Decrease(int id)
         {
-            // Lấy giỏ hàng từ session
-            List<CartItemModel> cart = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
-            // Tìm sản phẩm trong giỏ hàng theo id
-            CartItemModel cartItem = cart.Where(c => c.ProductId == id).FirstOrDefault();
+            var result = _cartservice.Decrease(id);
 
-            // Giảm số lượng trong giỏ hàng
-            if (cartItem.Quantity > 1)
-                cartItem.Quantity -= 1;
-            else
-                cart.Remove(cartItem);
-
-            // Xóa hoặc Cập nhật giỏ hàng vào session
-            if (cart.Count == 0)
-                HttpContext.Session.Remove("Cart");
-            else
-                HttpContext.Session.SetJson("Cart", cart);
-
-            // In thông báo
-            TempData["success"] = "Decrease item quantity to cart Successfully!!!";
-
-            // Trả về trang giỏ hàng
-            return RedirectToAction("Index");
+            return Json(new
+            {
+                success = result.Success,
+                message = result.Message
+            });
         }
 
         // Xóa sản phẩm trong giỏ hàng
-        public async Task<IActionResult> Remove(int id)
+        [HttpPost]
+        public IActionResult Remove(int id)
         {
-            // Lấy giỏ hàng từ session
-            List<CartItemModel> cart = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
+            var result = _cartservice.Remove(id);
 
-            // Tìm và xóa sản phẩm khỏi giỏ hàng
-            cart.RemoveAll(c => c.ProductId == id);
-
-            // Xóa hoặc Cập nhật giỏ hàng vào session
-            if (cart.Count == 0)
-                HttpContext.Session.Remove("Cart");
-            else
-                HttpContext.Session.SetJson("Cart", cart);
-
-            // In thông báo
-            TempData["success"] = "Remove item of cart Successfully!!!";
-
-            // Trả về trang giỏ hàng
-            return RedirectToAction("Index");
+            return Json(new
+            {
+                success = result.Success,
+                message = result.Message
+            });
         }
 
         // Xóa toàn bộ sản phẩm trong giỏ hàng
-        public async Task<IActionResult> Clear()
+        [HttpPost]
+        public IActionResult Clear()
         {
-            // Xóa giỏ hàng ở session
-            HttpContext.Session.Remove("Cart");
+            var result = _cartservice.Clear();
 
-            // In thông báo
-            TempData["success"] = "Clear all item of cart Successfully!!!";
+            return Json(new
+            {
+                success = result.Success,
+                message = result.Message
+            });
+        }
 
-            // Trả về trang giỏ hàng
-            return RedirectToAction("Index");
+        // Tải lại table giỏ hàng để cập nhật dữ liệu mới ( ajax )
+        public IActionResult GetCartTable()
+        {
+            var model = _cartservice.GetListCartItem();
+            return PartialView("_CartTablePartial", model);
         }
     }
 }

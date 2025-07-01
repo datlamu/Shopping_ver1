@@ -38,7 +38,7 @@
 		<tr>
 			<th colspan="6">Total: @total.ToString("")</th>
 			<td>
-				<select class="form-control select-update-order" name="Status">
+				<select class="form-control select-update-order">
 					<option value="1">Đang xử lý</option>
 					<!option value="0" @orderStatus>Đã xử lý</!option>
 				</select>
@@ -57,7 +57,7 @@
 				// Lấy status và ordercode
 				var	status = $(this).val();
 				var orderCode = $('.getOrderCode').val();
-				let data = {status,orderCode};
+				let data = { status, orderCode };
 
 				// Gọi Ajax
 				sendAjax({ url, data});

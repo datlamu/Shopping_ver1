@@ -4,28 +4,26 @@
         url: url,
         data: data,
         success: function (result) {
-            // Kiểm tra
-            if (result.success) {
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: result.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                // Nếu có function thì thực thi
-                if (typeof onSuccess === "function") {
-                    onSuccess(result);
-                }
+            Swal.fire({
+                position: 'top-end',
+                icon: result.success ? 'success' : 'error',
+                title: result.message,
+                showConfirmButton: false,
+                timer: 1500
+            });
+
+            if (result.success && typeof onSuccess === "function") {
+                onSuccess(result);
             }
-            else
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'error',
-                    title: result.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+        },
+        error: function () {
+            Swal.fire({
+                position: 'top-end',
+                icon: 'error',
+                title: "Có lỗi xảy ra.",
+                showConfirmButton: false,
+                timer: 1500
+            });
         }
     });
 }

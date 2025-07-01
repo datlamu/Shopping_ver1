@@ -196,7 +196,6 @@
 	<section>
 		<div class="container">
 			<div class="row">
-				@Html.Partial("_ NotificationPartial")
 				@RenderBody()
 			</div>
 		</div>
@@ -369,6 +368,15 @@
 	<script src="~/js/price-range.js"></script>
 	<script src="~/js/jquery.prettyPhoto.js"></script>
 	<script src="~/js/main.js"></script>
+	@* Alert *@
+	<script src="~/backend/js/site.js"></script>
+	@* Ajax *@
+	<script src="~/backend/js/ajax-helper.js"></script>
+	@* Sweet Alert của SweetAlert2 hiện thông báo *@
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.0/dist/sweetalert2.all.min.js"></script>
+	@* Render nội dung của section có tên là "Scrips" nếu nó tồn tại *@
 	@await RenderSectionAsync("Scripts", required: false)
+	@* sử dụng NotificationPartial + SweetAlert2 *@
+	<partial name="_NotificationPartial" />
 </body>
 </html>
