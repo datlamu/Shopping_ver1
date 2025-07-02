@@ -29,6 +29,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Chi tiết đơn hàng
             var data = await _orderService.GetOrderDetailAsync(orderCode);
 
+            // Lưu trạng thái đơn hàng vào ViewBag
             ViewBag.OrderStatus = status;
 
             return View(data);
@@ -40,22 +41,35 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         {
             // Cập nhật và trả kết quả cho ajax
             var result = await _orderService.UpdateOrderAsync(orderCode, status);
-            return Json(new { result.success, result.message });
+
+            return Json(new
+            {
+                result.Success,
+                result.Message
+            });
         }
 
         // Xóa đơn hàng 
+        [HttpPost]
         public async Task<IActionResult> Delete(string orderCode)
         {
             // Xóa và kiểm tra
             var result = await _orderService.DeleteOrderAsync(orderCode);
-            if (!result.success)
-            {
-                return NotFound();
-            }
 
-            // Xóa thành công
-            TempData["Success"] = "Xóa danh đơn hàng thành công !!!";
-            return RedirectToAction("Index");
+            return Json(new
+            {
+                result.Success,
+                result.Message
+            });
+        }
+        // Tải lại table cập nhật dữ liệu mới ( ajax )
+        public async Task<IActionResult> GetOrderTable(int page = 1)
+        {
+            var (data, pager) = await _orderService.GetOrderlistAsync(page);
+
+            ViewBag.Pager = pager;
+
+            return PartialView("_OrderTablePartial", data);
         }
     }
 }

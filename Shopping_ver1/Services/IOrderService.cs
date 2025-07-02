@@ -13,10 +13,10 @@ namespace Shopping_ver1.Services
         Task<List<OrderDetailModel>> GetOrderDetailAsync(string orderCode);
 
         // Cập nhật thông tin đơn hàng
-        Task<(bool success, string message)> UpdateOrderAsync(string orderCode, int status);
+        Task<OperationResult> UpdateOrderAsync(string orderCode, int status);
 
         // Xóa đơn hàng
-        Task<(bool success, string message)> DeleteOrderAsync(string orderCode);
+        Task<OperationResult> DeleteOrderAsync(string orderCode);
 
     }
 }

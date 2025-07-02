@@ -55,45 +55,44 @@ public class OrderService : IOrderService
         {
             return new List<OrderDetailModel>();
         }
-
     }
 
     // Cập nhật thông tin đơn hàng
-    public async Task<(bool success, string message)> UpdateOrderAsync(string orderCode, int status)
+    public async Task<OperationResult> UpdateOrderAsync(string orderCode, int status)
     {
-        // Tìm đơn hàng và kiểm tra
-        var order = await _dataContext.Orders.FirstOrDefaultAsync(o => o.OrderCode == orderCode);
-        if (order == null)
-        {
-            return (false, "Không tìm thấy đơn đặt hàng");
-        }
-
         try
         {
+            // Tìm đơn hàng và kiểm tra
+            var order = await _dataContext.Orders.FirstOrDefaultAsync(o => o.OrderCode == orderCode);
+            if (order == null)
+            {
+                return new OperationResult(false, "Không tìm thấy đơn đặt hàng");
+            }
+
             // Cập nhật đơn hàng
             order.Status = status;
             await _dataContext.SaveChangesAsync();
 
-            return (true, "Cập nhật đơn hàng thành công !");
+            return new OperationResult(true, "Cập nhật đơn hàng thành công !");
         }
         catch
         {
-            return (false, "Cập nhật đơn hàng thất bại !");
+            return new OperationResult(false, "Cập nhật đơn hàng thất bại !");
         }
     }
 
     // Xóa đơn hàng
-    public async Task<(bool success, string message)> DeleteOrderAsync(string orderCode)
+    public async Task<OperationResult> DeleteOrderAsync(string orderCode)
     {
-        // Lấy đơn hàng và kiểm tra
-        var order = await _dataContext.Orders.FirstOrDefaultAsync(o => o.OrderCode == orderCode);
-        if (order == null)
-        {
-            return (false, "Không tìm thấy đơn hàng này !");
-        }
-
         try
         {
+            // Lấy đơn hàng và kiểm tra
+            var order = await _dataContext.Orders.FirstOrDefaultAsync(o => o.OrderCode == orderCode);
+            if (order == null)
+            {
+                return new OperationResult(false, "Không tìm thấy đơn hàng này !");
+            }
+
             // Chi tiết đơn hàng liên quan
             var orderDetails = await _dataContext.OrderDetails
                 .Where(od => od.OrderCode == orderCode)
@@ -104,11 +103,11 @@ public class OrderService : IOrderService
             _dataContext.Orders.Remove(order);
             await _dataContext.SaveChangesAsync();
 
-            return (true, "Xóa đơn hàng thành công !");
+            return new OperationResult(true, "Xóa đơn hàng thành công !");
         }
         catch
         {
-            return (false, "Xóa đơn hàng thất bại !");
+            return new OperationResult(false, "Xóa đơn hàng thất bại !");
         }
     }
 }

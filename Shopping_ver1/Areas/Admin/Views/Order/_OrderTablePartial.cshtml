@@ -1,0 +1,46 @@
+﻿@model IEnumerable<OrderModel>
+@{
+	// Lấy phân trang, fallback nếu null
+	var pager = ViewBag.Pager as Paginate ?? new Paginate();
+	// Số thứ tự
+	var index = pager.Skip + 1;
+}
+<h3>Danh sách đơn hàng</h3>
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">#</th>
+			<th scope="col">UserName</th>
+			<th scope="col">OrderCode</th>
+			<th scope="col">CreateDate</th>
+			<th scope="col">Status</th>
+			<th scope="col">Manage</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<th scope="row">@(index++)</th>
+				<td>@item.UserName</td>
+				<td>@item.OrderCode</td>
+				<td>@item.CreateDate</td>
+				<td>
+					@if (item.Status == 1)
+					{
+						<span class="text-danger">Đang xử lý</span>
+					}
+					else
+					{
+						<span class="text-success">Đã xử lý</span>
+					}
+				</td>
+				<td>
+					<a class="btn btn-warning btn-sm" asp-controller="Order" asp-action="OrderDetail" asp-route-orderCode="@item.OrderCode" asp-route-status="@item.Status">Order Detail</a>
+					<button class="btn btn-danger btn-sm confirmDeletion delete-orderitem" value="@item.OrderCode">Delete</button>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+<partial name="_Paging" model="@pager" />
