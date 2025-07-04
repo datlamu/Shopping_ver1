@@ -18,10 +18,19 @@
             TotalItems = totalItems;
 
             // Số lượng item trên 1 trang
-            PageSize = pageSize;
+            PageSize = pageSize > 0 ? pageSize : 10;
 
             // Tổng số trang ( làm tròn lên nếu không chia hết VD: 3.1 = 4 )
             TotalPages = (int)Math.Ceiling((decimal)totalItems / PageSize);
+
+            // Nếu không có trang nào, đặt mặc định CurrentPage = 1
+            if (TotalPages == 0)
+            {
+                CurrentPage = 1;
+                StartPage = 1;
+                EndPage = 1;
+                return;
+            }
 
             // Trang hiện tại
             CurrentPage = Math.Clamp(pageInput, 1, TotalPages);

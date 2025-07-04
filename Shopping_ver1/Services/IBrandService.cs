@@ -1,16 +1,19 @@
-﻿using Shopping_ver1.Models;
+﻿using Shopping_ver1.Helpers;
+using Shopping_ver1.Models;
 
 namespace Shopping_ver1.Services
 {
     public interface IBrandService
     {
-        // Tạo slug từ tên thương hiệu
-        string GenerateSlug(string name);
-        // Kiểm tra slug có bị trùng trong database
-        Task<bool> IsSlugUnique(string slug);
-        // Lưu thông tin danh mục vào database
-        Task SaveBrand(BrandModel brand, string action);
+        // Tìm kiếm thương hiệu chỉnh sửa
+        Task<BrandModel?> GetUpdateBrandAsync(int id);
+        // Lấy danh sách thương hiệu
+        Task<(List<BrandModel> data, Paginate pager)> GetBrandlistAsync(int page);
+        // Tạo thương hiệu mới
+        Task<OperationResult> CreateBrandAsync(BrandModel brand);
+        // Tạo thương hiệu mới
+        Task<OperationResult> UpdateBrandAsync(BrandModel brand);
         // Xóa danh mục
-        Task<bool> DeleteBrand(int id);
+        Task<OperationResult> DeleteBrandAsync(int id);
     }
 }

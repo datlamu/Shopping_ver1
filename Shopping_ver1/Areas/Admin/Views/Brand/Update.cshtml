@@ -1,9 +1,9 @@
 ﻿@model BrandModel
 @{
-	ViewData["title"] = "Create Brand";
+	ViewData["title"] = "Update Brand";
 }
-<h3>Create Brand</h3>
-<form asp-action="Create" asp-area="Admin" method="post" enctype="multipart/form-data">
+<h3>Update Brand</h3>
+<form asp-action="Update" asp-area="Admin" method="post" enctype="multipart/form-data">
 	@Html.AntiForgeryToken()
 	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 	<div class="form-group">
@@ -25,8 +25,9 @@
 		<span asp-validation-for="Status" class="text-danger" />
 	</div>
 	<div class="form-group">
-		<button class="btn btn-success">Create</button>
+		<button class="btn btn-success">Update</button>
 	</div>
+	<input asp-for="Id" type="hidden" />
 	<input type="hidden" name="page" value="@ViewBag.Page" />
 </form>
 <a asp-controller="Brand" asp-action="Index">Back to brands</a>

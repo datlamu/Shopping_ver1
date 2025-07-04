@@ -1,10 +1,6 @@
-﻿using System.Linq;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Shopping_ver1.Helpers;
 using Shopping_ver1.Models;
-using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
 
 namespace Shopping_ver1.Areas.Admin.Controllers
@@ -13,121 +9,112 @@ namespace Shopping_ver1.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class BrandController : Controller
     {
-        private readonly DataContext _dataContext;
-        private readonly IBrandService _bs;
+        private readonly IBrandService _brandService;
 
-        public BrandController(DataContext context, IBrandService bs)
+        public BrandController(IBrandService brandService)
         {
-            _dataContext = context;
-            _bs = bs;
+            _brandService = brandService;
         }
+
+        // Danh sách các thương hiệu
         public async Task<IActionResult> Index(int page = 1)
         {
-            // Tổng số Items
-            var totalItems = await _dataContext.Brands.CountAsync();
-
-            // Tạo đối tượng phân trang
-            var pager = new Paginate(totalItems, page);
-
-            // Danh sách items
-            var data = await _dataContext.Brands
-                .OrderByDescending(p => p.Id)
-                .Skip(pager.Skip) // Bỏ qua số lượng phần tử
-                .Take(pager.PageSize) // Lấy số lượng phần tử tiếp đó
-                .ToListAsync();
+            // Lấy danh sách và phân trang
+            var (data, pager) = await _brandService.GetBrandlistAsync(page);
 
             ViewBag.Pager = pager;
 
             return View(data);
         }
-        // Tạo sản danh thương hiệu
+
+        // Tạo thương hiệu mới
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Create(int page = 1)
         {
+            // Trang hiện tại
+            ViewBag.Page = page;
+
             return View();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BrandModel brand)
+        public async Task<IActionResult> Create(BrandModel brand, int page = 1)
         {
             // Kiểm tra thông tin thương hiệu
             if (!ModelState.IsValid)
             {
                 TempData["Error"] = "Vui lòng kiểm tra lại thông tin thương hiệu !!!";
+                ViewBag.Page = page;
                 return View(brand);
             }
 
-            // Lấy ra slug dựa vào tên thương hiệu
-            brand.Slug = _bs.GenerateSlug(brand.Name);
-
-            // Kiểm tra xem thương hiệu này tồn tại chưa
-            if (!await _bs.IsSlugUnique(brand.Slug))
+            // Thêm thương hiệu và kiểm tra
+            var result = await _brandService.CreateBrandAsync(brand);
+            if (!result.Success)
             {
-                TempData["Error"] = "Thương hiệu này đã tồn tại !!!";
+                TempData["Error"] = result.Message;
+                ViewBag.Page = page;
                 return View(brand);
             }
+            TempData["Success"] = result.Message;
 
-            // Lưu lại thương hiệu
-            await _bs.SaveBrand(brand, "Create");
-
-            TempData["Success"] = "Thêm thương hiệu thành công!!!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { page });
         }
 
-        // Chỉnh sửa thương hiệu
+        // Cập nhật thương hiệu
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Update(int id, int page = 1)
         {
             // Tìm thương hiệu đã chọn
-            var brand = await _dataContext.Brands.FindAsync(id);
+            var brand = await _brandService.GetUpdateBrandAsync(id);
 
-            // Quay lại trang create giữ nguyên lại dữ liệu
-            return View("Create", brand);
+            // Trang hiện tại
+            ViewBag.Page = page;
+
+            return View(brand);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(BrandModel brand)
+        public async Task<IActionResult> Update(BrandModel brand, int page = 1)
         {
             // Kiểm tra thông tin thương hiệu
             if (!ModelState.IsValid)
             {
                 TempData["Error"] = "Vui lòng kiểm tra lại thông tin thương hiệu !!!";
-                return View("Create", brand);
+                ViewBag.Page = page;
+                return View(brand);
             }
 
-            // Lấy ra slug dựa vào tên thương hiệu
-            brand.Slug = _bs.GenerateSlug(brand.Name);
-
-            // Lấy slug cũ nhưng không làm EF tracking đối tượng tránh trường hợp update bị xung đột
-            var oldSlug = await _dataContext.Brands
-                .AsNoTracking()
-                .Where(c => c.Id == brand.Id)
-                .Select(c => c.Slug)
-                .FirstOrDefaultAsync();
-
-            // Kiểm tra xem thương hiệu này tồn tại chưa
-            if (brand.Slug != oldSlug && !await _bs.IsSlugUnique(brand.Slug))
+            // Chỉnh sửa thương hiệu và kiểm tra
+            var result = await _brandService.UpdateBrandAsync(brand);
+            if (!result.Success)
             {
-                TempData["Error"] = "Thương hiệu đã tồn tại !!!";
-                return View("Create", brand);
+                TempData["Error"] = result.Message;
+                ViewBag.Page = page;
+                return View(brand);
             }
+            TempData["Success"] = result.Message;
 
-            // Cập nhật mới thương hiệu
-            await _bs.SaveBrand(brand, "Edit");
-
-            TempData["Success"] = "Chỉnh sửa thương hiệu thành công!!!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { page });
         }
 
         // Xóa thương hiệu
         public async Task<IActionResult> Delete(int id)
         {
             // Xóa thương hiệu
-            if (await _bs.DeleteBrand(id))
-                TempData["Success"] = "Xóa thương hiệu thành công!!!";
-            else
-                TempData["Error"] = "Đã có lỗi khi xóa";
-            return RedirectToAction("Index");
+            var result = await _brandService.DeleteBrandAsync(id);
+
+            return Json(new { result.Success, result.Message });
+        }
+
+        // Tải lại table cập nhật dữ liệu mới ( ajax )
+        public async Task<IActionResult> GetTable(int page = 1)
+        {
+            var (data, pager) = await _brandService.GetBrandlistAsync(page);
+
+            ViewBag.Pager = pager;
+
+            return PartialView("_BrandTablePartial", data);
         }
     }
 }
