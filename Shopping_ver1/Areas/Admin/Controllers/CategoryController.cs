@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Shopping_ver1.Helpers;
 using Shopping_ver1.Models;
-using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
 
 namespace Shopping_ver1.Areas.Admin.Controllers
@@ -12,121 +9,112 @@ namespace Shopping_ver1.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
-        private readonly DataContext _dataContext;
-        private readonly ICategoryService _cs;
+        private readonly ICategoryService _categoryService;
 
-        public CategoryController(DataContext context, ICategoryService cs)
+        public CategoryController(ICategoryService categoryService)
         {
-            _dataContext = context;
-            _cs = cs;
+            _categoryService = categoryService;
         }
+
+        // Danh sách các thể loại
         public async Task<IActionResult> Index(int page = 1)
         {
-            // Tổng số Items
-            var totalItems = await _dataContext.Categories.CountAsync();
-
-            // Tạo đối tượng phân trang
-            var pager = new Paginate(totalItems, page);
-
-            // Danh sách items
-            var data = await _dataContext.Categories
-                .OrderByDescending(p => p.Id)
-                .Skip(pager.Skip) // Bỏ qua số lượng phần tử
-                .Take(pager.PageSize) // Lấy số lượng phần tử tiếp đó
-                .ToListAsync();
+            // Lấy danh sách và phân trang
+            var (data, pager) = await _categoryService.GetlistItemAsync(page);
 
             ViewBag.Pager = pager;
 
             return View(data);
         }
-        // Tạo sản danh mục mới
+
+        // Tạo thể loại mới
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Create(int page = 1)
         {
+            // Trang hiện tại
+            ViewBag.Page = page;
+
             return View();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CategoryModel category)
+        public async Task<IActionResult> Create(CategoryModel category, int page = 1)
         {
-            // Kiểm tra thông tin danh mục
+            // Kiểm tra thông tin thể loại
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Vui lòng kiểm tra lại thông tin danh mục !!!";
+                TempData["Error"] = "Vui lòng kiểm tra lại thông tin thể loại !!!";
+                ViewBag.Page = page;
                 return View(category);
             }
 
-            // Lấy ra slug dựa vào tên danh mục
-            category.Slug = _cs.GenerateSlug(category.Name);
-
-            // Kiểm tra xem danh mục này tồn tại chưa
-            if (!await _cs.IsSlugUnique(category.Slug))
+            // Thêm thể loại và kiểm tra
+            var result = await _categoryService.CreateAsync(category);
+            if (!result.Success)
             {
-                TempData["Error"] = "Danh mục này đã tồn tại !!!";
+                TempData["Error"] = result.Message;
+                ViewBag.Page = page;
                 return View(category);
             }
+            TempData["Success"] = result.Message;
 
-            // Lưu lại danh mục
-            await _cs.SaveCategory(category, "Create");
-
-            TempData["Success"] = "Thêm danh mục thành công!!!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { page });
         }
 
-        // Chỉnh sửa danh mục
+        // Cập nhật thể loại
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Update(int id, int page = 1)
         {
-            // Tìm danh mục đã chọn
-            var category = await _dataContext.Categories.FindAsync(id);
+            // Tìm thể loại đã chọn
+            var category = await _categoryService.GetUpdateItemAsync(id);
 
-            // Quay lại trang create giữ nguyên lại dữ liệu
-            return View("Create", category);
+            // Trang hiện tại
+            ViewBag.Page = page;
+
+            return View(category);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(CategoryModel category)
+        public async Task<IActionResult> Update(CategoryModel category, int page = 1)
         {
-            // Kiểm tra thông tin danh mục
+            // Kiểm tra thông tin thể loại
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Vui lòng kiểm tra lại thông tin danh mục !!!";
-                return View("Create", category);
+                TempData["Error"] = "Vui lòng kiểm tra lại thông tin thể loại !!!";
+                ViewBag.Page = page;
+                return View(category);
             }
 
-            // Lấy ra slug dựa vào tên danh mục
-            category.Slug = _cs.GenerateSlug(category.Name);
-
-            // Lấy slug cũ nhưng không làm EF tracking đối tượng tránh trường hợp update bị xung đột
-            var oldSlug = await _dataContext.Categories
-                .AsNoTracking()
-                .Where(c => c.Id == category.Id)
-                .Select(c => c.Slug)
-                .FirstOrDefaultAsync();
-
-            // Kiểm tra xem danh mục này tồn tại chưa
-            if (category.Slug != oldSlug && !await _cs.IsSlugUnique(category.Slug))
+            // Chỉnh sửa thể loại và kiểm tra
+            var result = await _categoryService.UpdateAsync(category);
+            if (!result.Success)
             {
-                TempData["Error"] = "danh mục đã tồn tại !!!";
-                return View("Create", category);
+                TempData["Error"] = result.Message;
+                ViewBag.Page = page;
+                return View(category);
             }
+            TempData["Success"] = result.Message;
 
-            // Cập nhật mới danh mục
-            await _cs.SaveCategory(category, "Edit");
-
-            TempData["Success"] = "Chỉnh sửa danh mục thành công!!!";
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { page });
         }
 
-        // Xóa danh mục
+        // Xóa thể loại
         public async Task<IActionResult> Delete(int id)
         {
-            // Xóa danh mục
-            if (await _cs.DeleteCategory(id))
-                TempData["Success"] = "Xóa danh mục thành công!!!";
-            else
-                TempData["Error"] = "Đã có lỗi khi xóa";
-            return RedirectToAction("Index");
+            // Xóa thể loại
+            var result = await _categoryService.DeleteAsync(id);
+
+            return Json(new { result.Success, result.Message });
+        }
+
+        // Tải lại table cập nhật dữ liệu mới ( ajax )
+        public async Task<IActionResult> GetTable(int page = 1)
+        {
+            var (data, pager) = await _categoryService.GetlistItemAsync(page);
+
+            ViewBag.Pager = pager;
+
+            return PartialView("_categoryTablePartial", data);
         }
     }
 }

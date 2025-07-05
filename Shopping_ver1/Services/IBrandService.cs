@@ -11,9 +11,9 @@ namespace Shopping_ver1.Services
         Task<OperationResult> CreateAsync(BrandModel brand);
         // Tìm kiếm thương hiệu chỉnh sửa
         Task<BrandModel?> GetUpdateItemAsync(int id);
-        // Tạo thương hiệu mới
+        // Cập nhật thương hiệu
         Task<OperationResult> UpdateAsync(BrandModel brand);
-        // Xóa danh mục
+        // Xóa thương hiệu
         Task<OperationResult> DeleteAsync(int id);
     }
 }

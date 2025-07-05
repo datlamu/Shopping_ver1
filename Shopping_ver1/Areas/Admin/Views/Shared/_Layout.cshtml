@@ -45,7 +45,7 @@
 						</div>
 						<div class="mainmenu pull-left">
 							<ul class="nav navbar-nav collapse navbar-collapse">
-								<li><a asp-controller="Home" asp-action="Index" class="active">Home</a></li>
+								<li><a asp-area="" asp-controller="Home" asp-action="Index" class="active">Home</a></li>
 								<li><a asp-controller="Product" asp-action="Index">Products</a></li>
 								<li><a asp-controller="Category" asp-action="Index">Categories</a></li>
 								<li><a asp-controller="Brand" asp-action="Index">Brands</a></li>
@@ -88,7 +88,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.0/dist/sweetalert2.all.min.js"></script>
 	@* Render nội dung của section có tên là "Scrips" nếu nó tồn tại *@
 	@await RenderSectionAsync("Scripts", required: false)
-	@* sử dụng NotificationPartial + SweetAlert2 *@
+	@* sử dụng _NotificationPartial + SweetAlert2 *@
 	<partial name="_NotificationPartial" />
 </body>
 </html>

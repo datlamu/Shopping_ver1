@@ -1,47 +1,46 @@
-﻿@model IEnumerable<CategoryModel>
-@{
-	// Số thứ tự
-	var index = 1;
-
-	// Lấy phân trang, fallback nếu null
-	var pager = ViewBag.Pager as Paginate ?? new Paginate();
-}
-<h3>Categories</h3>
-<a asp-controller="Category" asp-action="Create">Create New Category</a>
-<table class="table">
-	<thead>
-		<tr>
-			<th scope="col">#</th>
-			<th scope="col">Name</th>
-			<th scope="col">Description</th>
-			<th scope="col">Status</th>
-			<th scope="col">Manage</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var item in Model)
-		{
-			<tr>
-				<th scope="row">@(index++)</th>
-				<td>@item.Name</td>
-				<td>@item.Description</td>
-				<td>
-					@if (item.Status == 1)
-					{
-						<span class="text-success">Hiển thị</span>
-					}
-					else
-					{
-						<span class="text-danger">Ẩn</span>
-					}
-
-				</td>
-				<td>
-					<a class="btn btn-warning btn-sm" asp-controller="Category" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-					<a class="btn btn-danger btn-sm confirmDeletion" asp-controller="Category" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-				</td>
-			</tr>
+﻿<div id="TableContainer">
+	<partial name="_CategoryTablePartial" model="Model" />
+</div>
+@section Scripts {
+	<script>
+		// Tải lại bảng
+		function reloadTable(page = 1) {
+		// Chạy khi trang được load lại
+			$("#TableContainer").load("/Admin/Category/GetTable?page=" + page, function () {
+				attachEvents(); // Gắn lại sự kiện sau khi load xong
+			});
 		}
-	</tbody>
-</table>
-<partial name="_Paging" model="@pager" />
+
+		// Gắn sự kiện click vào các nút phân trang
+		$(document).on("click", ".page-ajax", function (e) {
+			e.preventDefault(); // Ngăn mặc định chuyển trang
+			const page = $(this).data("page");
+			reloadTable(page);
+		});
+
+		// Gắn sự kiện
+		function attachEvents() {
+		// Chạy khi button được click vào
+			$('.delete-ajax').off('click').on('click', function () {
+				let currentPage = parseInt($(".pagination li.active").text()) || 1;
+				// Url Action
+				var url = '/Admin/Category/Delete';
+				// Lấy id của thể loại
+				var	id = $(this).val();
+				let data = { id };
+
+				// Gọi Ajax
+				sendAjax({
+					url,
+					data,
+					onSuccess: function () {
+						reloadTable(currentPage);
+					}
+				});
+			});
+		}
+		$(document).ready(function () {
+			attachEvents();
+		});
+	</script>
+}

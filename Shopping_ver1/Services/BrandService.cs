@@ -34,6 +34,9 @@ public class BrandService : IBrandService
     // Format lại text trong Description
     private string SanitizeDescription(string description)
     {
+        if (string.IsNullOrWhiteSpace(description))
+            return string.Empty;
+
         var decoded = WebUtility.HtmlDecode(description);
         var noHtml = Regex.Replace(decoded, "<.*?>", string.Empty);
         return Regex.Replace(noHtml, @"\s+", " ").Trim();

@@ -1,0 +1,54 @@
+﻿@model IEnumerable<CategoryModel>
+@{
+	// Lấy phân trang, fallback nếu null
+	var pager = ViewBag.Pager as Paginate ?? new Paginate();
+	// Số thứ tự
+	var index = pager.Skip + 1;
+}
+<h3>Categorys</h3>
+<a asp-controller="Category" asp-action="Create" asp-route-page="@pager.CurrentPage">Create New Category</a>
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">#</th>
+			<th scope="col">Name</th>
+			<th scope="col">Description</th>
+			<th scope="col">Status</th>
+			<th scope="col">Manage</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<th scope="row">@(index++)</th>
+				<td>@item.Name</td>
+				<td>@item.Description</td>
+				<td>
+					@if (item.Status == 1)
+					{
+						<span class="text-success">Hiển thị</span>
+					}
+					else
+					{
+						<span class="text-danger">Ẩn</span>
+					}
+
+				</td>
+				<td>
+					<a class="btn btn-warning btn-sm"
+					   asp-controller="Category"
+					   asp-action="Update"
+					   asp-route-id="@item.Id"
+					   asp-route-page="@pager.CurrentPage">
+						Update
+					</a>
+					<button class="btn btn-danger btn-sm confirmDeletion delete-ajax" value="@item.Id">Delete</button>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+<partial name="_Paging" model="@pager" />
+
+

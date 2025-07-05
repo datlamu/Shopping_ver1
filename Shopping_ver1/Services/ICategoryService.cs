@@ -1,16 +1,19 @@
-﻿using Shopping_ver1.Models;
+﻿using Shopping_ver1.Helpers;
+using Shopping_ver1.Models;
 
 namespace Shopping_ver1.Services
 {
     public interface ICategoryService
     {
-        // Tạo slug từ tên danh mục
-        string GenerateSlug(string name);
-        // Kiểm tra slug có bị trùng trong database
-        Task<bool> IsSlugUnique(string slug);
-        // Lưu thông tin danh mục vào database
-        Task SaveCategory(CategoryModel category, string action);
-        // Xóa danh mục
-        Task<bool> DeleteCategory(int id);
+        // Lấy danh sách thể loại
+        Task<(List<CategoryModel> data, Paginate pager)> GetlistItemAsync(int page);
+        // Tạo thể loại mới
+        Task<OperationResult> CreateAsync(CategoryModel category);
+        // Tìm kiếm thể loại chỉnh sửa
+        Task<CategoryModel?> GetUpdateItemAsync(int id);
+        // Cập nhật thể loại
+        Task<OperationResult> UpdateAsync(CategoryModel category);
+        // Xóa thể loại
+        Task<OperationResult> DeleteAsync(int id);
     }
 }
