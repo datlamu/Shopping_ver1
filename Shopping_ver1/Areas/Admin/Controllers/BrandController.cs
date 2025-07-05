@@ -20,7 +20,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         public async Task<IActionResult> Index(int page = 1)
         {
             // Lấy danh sách và phân trang
-            var (data, pager) = await _brandService.GetBrandlistAsync(page);
+            var (data, pager) = await _brandService.GetlistItemAsync(page);
 
             ViewBag.Pager = pager;
 
@@ -49,7 +49,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             }
 
             // Thêm thương hiệu và kiểm tra
-            var result = await _brandService.CreateBrandAsync(brand);
+            var result = await _brandService.CreateAsync(brand);
             if (!result.Success)
             {
                 TempData["Error"] = result.Message;
@@ -66,7 +66,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         public async Task<IActionResult> Update(int id, int page = 1)
         {
             // Tìm thương hiệu đã chọn
-            var brand = await _brandService.GetUpdateBrandAsync(id);
+            var brand = await _brandService.GetUpdateItemAsync(id);
 
             // Trang hiện tại
             ViewBag.Page = page;
@@ -86,7 +86,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             }
 
             // Chỉnh sửa thương hiệu và kiểm tra
-            var result = await _brandService.UpdateBrandAsync(brand);
+            var result = await _brandService.UpdateAsync(brand);
             if (!result.Success)
             {
                 TempData["Error"] = result.Message;
@@ -102,7 +102,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             // Xóa thương hiệu
-            var result = await _brandService.DeleteBrandAsync(id);
+            var result = await _brandService.DeleteAsync(id);
 
             return Json(new { result.Success, result.Message });
         }
@@ -110,7 +110,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         // Tải lại table cập nhật dữ liệu mới ( ajax )
         public async Task<IActionResult> GetTable(int page = 1)
         {
-            var (data, pager) = await _brandService.GetBrandlistAsync(page);
+            var (data, pager) = await _brandService.GetlistItemAsync(page);
 
             ViewBag.Pager = pager;
 

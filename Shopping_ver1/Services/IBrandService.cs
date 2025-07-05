@@ -5,15 +5,15 @@ namespace Shopping_ver1.Services
 {
     public interface IBrandService
     {
-        // Tìm kiếm thương hiệu chỉnh sửa
-        Task<BrandModel?> GetUpdateBrandAsync(int id);
         // Lấy danh sách thương hiệu
-        Task<(List<BrandModel> data, Paginate pager)> GetBrandlistAsync(int page);
+        Task<(List<BrandModel> data, Paginate pager)> GetlistItemAsync(int page);
         // Tạo thương hiệu mới
-        Task<OperationResult> CreateBrandAsync(BrandModel brand);
+        Task<OperationResult> CreateAsync(BrandModel brand);
+        // Tìm kiếm thương hiệu chỉnh sửa
+        Task<BrandModel?> GetUpdateItemAsync(int id);
         // Tạo thương hiệu mới
-        Task<OperationResult> UpdateBrandAsync(BrandModel brand);
+        Task<OperationResult> UpdateAsync(BrandModel brand);
         // Xóa danh mục
-        Task<OperationResult> DeleteBrandAsync(int id);
+        Task<OperationResult> DeleteAsync(int id);
     }
 }

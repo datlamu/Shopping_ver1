@@ -40,7 +40,7 @@ public class BrandService : IBrandService
     }
 
     // Lấy danh sách thương hiệu và 
-    public async Task<(List<BrandModel> data, Paginate pager)> GetBrandlistAsync(int page)
+    public async Task<(List<BrandModel> data, Paginate pager)> GetlistItemAsync(int page)
     {
         try
         {
@@ -64,14 +64,8 @@ public class BrandService : IBrandService
         }
     }
 
-    // Tìm kiếm thương hiệu chỉnh sửa
-    public async Task<BrandModel?> GetUpdateBrandAsync(int id)
-    {
-        return await _dataContext.Brands.FindAsync(id);
-    }
-
     // Tạo thương hiệu mới
-    public async Task<OperationResult> CreateBrandAsync(BrandModel brand)
+    public async Task<OperationResult> CreateAsync(BrandModel brand)
     {
         try
         {
@@ -98,8 +92,14 @@ public class BrandService : IBrandService
         }
     }
 
+    // Tìm kiếm thương hiệu chỉnh sửa
+    public async Task<BrandModel?> GetUpdateItemAsync(int id)
+    {
+        return await _dataContext.Brands.FindAsync(id);
+    }
+
     // Chỉnh sửa thương hiệu
-    public async Task<OperationResult> UpdateBrandAsync(BrandModel brand)
+    public async Task<OperationResult> UpdateAsync(BrandModel brand)
     {
         try
         {// Lấy ra slug dựa vào tên thương hiệu
@@ -133,7 +133,7 @@ public class BrandService : IBrandService
     }
 
     // Xóa thương hiệu
-    public async Task<OperationResult> DeleteBrandAsync(int id)
+    public async Task<OperationResult> DeleteAsync(int id)
     {
         try
         {
