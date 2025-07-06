@@ -8,6 +8,11 @@
 		// Chạy khi trang được load lại
 			$("#TableContainer").load("/Admin/Product/GetTable?page=" + page, function () {
 				attachEvents(); // Gắn lại sự kiện sau khi load xong
+				// Khởi tạo lại DataTable
+				if ($.fn.DataTable.isDataTable('#myTable')) {
+					$('#myTable').DataTable().destroy();
+				}
+				$('#myTable').DataTable();
 			});
 		}
 
@@ -41,6 +46,8 @@
 		}
 		$(document).ready(function () {
 			attachEvents();
+			// Khởi tạo DataTable lần đầu
+			$('#myTable').DataTable();
 		});
 	</script>
 }
