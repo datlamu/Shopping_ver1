@@ -1,41 +1,26 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Shopping_ver1.Helpers;
 using Shopping_ver1.Models;
-using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
 
 namespace Shopping_ver1.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin")]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)] // Ngăn không lưu cache
     public class ProductController : Controller
     {
-        private readonly DataContext _dataContext;
-        private readonly IProductService _ps;
-        public ProductController(DataContext context, IProductService productService)
+        private readonly IProductService _productService;
+        public ProductController(IProductService productService)
         {
-            _dataContext = context;
-            _ps = productService;
+            _productService = productService;
         }
+
+        // Danh sách sản phẩm
         public async Task<IActionResult> Index(int page = 1)
         {
-            // Tổng số Items
-            var totalItems = await _dataContext.Products.CountAsync();
-
-            // Tạo đối tượng phân trang
-            var pager = new Paginate(totalItems, page);
-
-            // Danh sách items
-            var data = await _dataContext.Products
-                .OrderByDescending(p => p.Id)
-                .Include(p => p.Category)
-                .Include(p => p.Brand)
-                .Skip(pager.Skip) // Bỏ qua số lượng phần tử
-                .Take(pager.PageSize) // Lấy số lượng phần tử tiếp đó
-                .ToListAsync();
+            // Lấy danh sách và phân trang
+            var (data, pager) = await _productService.GetlistItemAsync(page);
 
             ViewBag.Pager = pager;
 
@@ -47,26 +32,24 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         public async Task<IActionResult> Create()
         {
             // Lấy ra danh sách category và brand
-            var categories = await _dataContext.Categories.ToListAsync();
-            var brands = await _dataContext.Brands.ToListAsync();
+            var (categories, brands) = await _productService.GetCategoryAndBrandListAsync();
 
-            // Đưa danh sách vào VewBag với ( value = Id, text = Name)
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
-            ViewBag.Brands = new SelectList(brands, "Id", "Name");
+            // Đưa danh sách vào ViewBag
+            ViewBag.Categories = categories;
+            ViewBag.Brands = brands;
 
-            return View();
+            return View(new ProductModel());
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductModel product)
         {
             // Lấy ra danh sách category và brand
-            var categories = await _dataContext.Categories.ToListAsync();
-            var brands = await _dataContext.Brands.ToListAsync();
+            var (categories, brands) = await _productService.GetCategoryAndBrandListAsync(product.CategoryId, product.BrandId);
 
-            // Đưa danh sách vào VewBag với ( value = Id, text = Name)
-            ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
-            ViewBag.Brands = new SelectList(brands, "Id", "Name", product.BrandId);
+            // Đưa danh sách vào ViewBag
+            ViewBag.Categories = categories;
+            ViewBag.Brands = brands;
 
             // Kiểm tra thông tin sản phẩm
             if (!ModelState.IsValid)
@@ -75,103 +58,82 @@ namespace Shopping_ver1.Areas.Admin.Controllers
                 return View(product);
             }
 
-            // Lấy ra slug dựa vào tên sản phẩm
-            product.Slug = _ps.GenerateSlug(product.Name);
-
-            // Kiểm tra xem sản phẩm này tồn tại chưa
-            if (!await _ps.IsSlugUnique(product.Slug))
+            // Tạo sản phẩm mới và kiểm tra
+            var result = await _productService.CreateAsync(product);
+            if (!result.Success)
             {
-                TempData["Error"] = "Sản phẩm này đã tồn tại !!!";
+                TempData["Error"] = result.Message;
                 return View(product);
             }
+            TempData["Success"] = result.Message;
 
-            // Chắc chắn chắn chọn ảnh và đảm bảo không phải ảnh rác hoặc lỗi 
-            if (product.ImageUpload == null || product.ImageUpload.Length == 0)
-            {
-                ModelState.AddModelError("ImageUpload", "Vui lòng chọn ảnh sản phẩm");
-                return View(product);
-            }
-
-            // Lưu ảnh và và tạo mới sản phẩm
-            var imageName = await _ps.SaveImage(product.ImageUpload);
-            await _ps.SaveProduct(product, imageName, "Create");
-
-            TempData["Success"] = "Thêm sản phẩm thành công!!!";
             return RedirectToAction("Index");
         }
 
         // Chỉnh sửa sản phẩm
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Update(int id)
         {
             // Tìm sản phầm đã chọn
-            var product = await _dataContext.Products.FindAsync(id);
+            var product = await _productService.GetUpdateItemAsync(id);
 
             // Lấy ra danh sách category và brand
-            var categories = await _dataContext.Categories.ToListAsync();
-            var brands = await _dataContext.Brands.ToListAsync();
+            var (categories, brands) = await _productService.GetCategoryAndBrandListAsync(product.CategoryId, product.BrandId);
 
-            // Đưa danh sách vào vewbag và chọn ra item defaul dựa theo dữ liệu trước đó
-            ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
-            ViewBag.Brands = new SelectList(brands, "Id", "Name", product.BrandId);
+            // Đưa danh sách vào ViewBag
+            ViewBag.Categories = categories;
+            ViewBag.Brands = brands;
 
             // Quay lại trang create giữ nguyên lại dữ liệu
-            return View("Create", product);
+            return View(product);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ProductModel product)
+        public async Task<IActionResult> Update(ProductModel product)
         {
+            // Lấy ra danh sách category và brand
+            var (categories, brands) = await _productService.GetCategoryAndBrandListAsync(product.CategoryId, product.BrandId);
+
+            // Đưa danh sách vào ViewBag
+            ViewBag.Categories = categories;
+            ViewBag.Brands = brands;
+
             // Kiểm tra thông tin sản phẩm
             if (!ModelState.IsValid)
             {
                 TempData["Error"] = "Vui lòng kiểm tra lại thông tin sản phẩm !!!";
-                return View("Create", product);
+                return View(product);
             }
 
-            // Lấy ra slug dựa vào tên sản phẩm
-            product.Slug = _ps.GenerateSlug(product.Name);
-
-            // Lấy slug cũ nhưng không làm EF tracking đối tượng tránh trường hợp update bị xung đột
-            var oldSlug = await _dataContext.Products
-                .AsNoTracking()
-                .Where(p => p.Id == product.Id)
-                .Select(p => p.Slug)
-                .FirstOrDefaultAsync();
-
-            // Kiểm tra xem sản phẩm này tồn tại chưa
-            if (product.Slug != oldSlug && !await _ps.IsSlugUnique(product.Slug))
+            // Cập nhật và kiểm tra
+            var result = await _productService.UpdateAsync(product);
+            if (!result.Success)
             {
-                TempData["Error"] = "Sản phẩm đã tồn tại !!!";
-                return View("Create", product);
+                TempData["Error"] = result.Message;
+                return View(product);
             }
+            TempData["Success"] = result.Message;
 
-            // Kiểm tra trường hợp upload ảnh mới nhưng là ảnh rác hoặc lỗi 
-            if (product.ImageUpload != null && product.ImageUpload.Length == 0)
-            {
-                ModelState.AddModelError("ImageUpload", "Ảnh bị lỗi");
-                return View("Create", product);
-            }
-
-            // Cập nhật mới sản phẩm
-            string imageName = product.Image;
-            if (product.ImageUpload != null)
-                imageName = await _ps.SaveImage(product.ImageUpload);
-            await _ps.SaveProduct(product, imageName, "Edit");
-
-            TempData["Success"] = "Chỉnh sửa sản phẩm thành công!!!";
             return RedirectToAction("Index");
         }
 
         // Xóa sản phẩm
         public async Task<IActionResult> Delete(int id)
         {
-            // Xóa sản phẩm
-            if (await _ps.DeleteProduct(id))
-                TempData["Success"] = "Xóa sản phẩm thành công!!!";
-            else
-                TempData["Erorr"] = "Đã có lỗi khi xóa";
-            return RedirectToAction("Index");
+            // Sản phẩm
+            var result = await _productService.DeleteAsync(id);
+
+            return Json(new { result.Success, result.Message });
+        }
+
+        // Tải lại table cập nhật dữ liệu mới ( ajax )
+        public async Task<IActionResult> GetTable(int page = 1)
+        {
+            var (data, pager) = await _productService.GetlistItemAsync(page);
+
+            ViewBag.Pager = pager;
+
+            return PartialView("_ProductTablePartial", data);
         }
     }
 }

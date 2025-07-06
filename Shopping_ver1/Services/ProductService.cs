@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Shopping_ver1.Helpers;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
@@ -29,7 +31,18 @@ public class ProductService : IProductService
     // Kiểm tra slug có bị trùng trong cơ sở dữ liệu
     public async Task<bool> IsSlugUnique(string slug)
     {
-        return !await _dataContext.Products.AnyAsync(p => p.Slug == slug);
+        return !await _dataContext.Products.AnyAsync(c => c.Slug == slug);
+    }
+
+    // Format lại text trong Description
+    private string SanitizeDescription(string description)
+    {
+        if (string.IsNullOrWhiteSpace(description))
+            return string.Empty;
+
+        var decoded = WebUtility.HtmlDecode(description);
+        var noHtml = Regex.Replace(decoded, "<.*?>", string.Empty);
+        return Regex.Replace(noHtml, @"\s+", " ").Trim();
     }
 
     // Xử lý ảnh sau đó trả về tên của ảnh đó
@@ -59,34 +72,140 @@ public class ProductService : IProductService
         return imageName;
     }
 
-    // Lưu sản phẩm vào database
-    public async Task SaveProduct(ProductModel product, string imageName, string action)
+    // Lấy danh sách thể loại và thương hiệu
+    public async Task<(SelectList Categories, SelectList Brands)> GetCategoryAndBrandListAsync(int? categoryId = null, int? brandId = null)
     {
-        product.Image = imageName;
-        // Format lại text trong Description
-        // Bước 1: Decode các thực thể HTML như &nbsp;, &amp;, &lt;, v.v.
-        product.Description = WebUtility.HtmlDecode(product.Description);
+        var categories = await _dataContext.Categories.ToListAsync();
+        var brands = await _dataContext.Brands.ToListAsync();
 
-        // Bước 2: Loại bỏ toàn bộ thẻ HTML nếu còn sót
-        product.Description = Regex.Replace(product.Description, "<.*?>", string.Empty);
+        var categorySelectList = new SelectList(categories, "Id", "Name", categoryId);
+        var brandSelectList = new SelectList(brands, "Id", "Name", brandId);
 
-        // Bước 3 (tuỳ chọn): Loại bỏ khoảng trắng đầu/cuối và chuẩn hoá khoảng trắng
-        product.Description = Regex.Replace(product.Description, @"\s+", " ").Trim();
-
-        if (action == "Create")
-            await _dataContext.Products.AddAsync(product);
-        else if (action == "Edit")
-            _dataContext.Products.Update(product);
-
-        await _dataContext.SaveChangesAsync();
+        return (categorySelectList, brandSelectList);
     }
-    public async Task<bool> DeleteProduct(int id)
+
+    // Lấy danh sách sản phẩm
+    public async Task<(List<ProductModel> data, Paginate pager)> GetlistItemAsync(int page)
+    {
+        try
+        {
+            // Tổng số Items
+            var totalItems = await _dataContext.Products.CountAsync();
+            // Tạo đối tượng phân trang
+            var pager = new Paginate(totalItems, page, 2);
+
+            // Danh sách items
+            var data = await _dataContext.Products
+                .OrderByDescending(p => p.Id)
+                .Include(p => p.Category)
+                .Include(p => p.Brand)
+                .Skip(pager.Skip)       // Bỏ qua số lượng phần tử
+                .Take(pager.PageSize)   // Lấy số lượng phần tử tiếp đó
+                .ToListAsync();
+
+            return (data, pager);
+        }
+        catch
+        {
+            return (new List<ProductModel>(), new Paginate());
+        }
+    }
+
+    // Tạo sản phẩm mới
+    public async Task<OperationResult> CreateAsync(ProductModel product)
+    {
+        try
+        {
+            // Lấy ra slug dựa vào tên sản phẩm
+            product.Slug = GenerateSlug(product.Name);
+
+            // Kiểm tra xem sản phẩm này tồn tại chưa
+            var result = await IsSlugUnique(product.Slug);
+            if (!result)
+                return new OperationResult(false, "Sản phẩm này đã tồn tại !!!");
+
+            // Chắc chắn chắn chọn ảnh và đảm bảo không phải ảnh rác hoặc lỗi 
+            if (product.ImageUpload == null || product.ImageUpload.Length == 0)
+                return new OperationResult(false, "Vui lòng chọn ảnh cho sản phẩm");
+
+            // Lưu ảnh
+            product.Image = await SaveImage(product.ImageUpload);
+
+            // Format lại text trong Description
+            product.Description = SanitizeDescription(product.Description);
+
+            // Tạo mới và lưu lại
+            await _dataContext.Products.AddAsync(product);
+            await _dataContext.SaveChangesAsync();
+
+            return new OperationResult(true, "Thêm sản phẩm mới thành công!!!");
+        }
+        catch
+        {
+            return new OperationResult(false, "Thêm sản phẩm thất bại!!!");
+        }
+    }
+
+    // Tìm kiếm sản phẩm chỉnh sửa
+    public async Task<ProductModel?> GetUpdateItemAsync(int id)
+    {
+        return await _dataContext.Products.FindAsync(id);
+    }
+
+    // Cập nhật sản phẩm
+    public async Task<OperationResult> UpdateAsync(ProductModel product)
+    {
+        try
+        {
+            // Lấy ra slug dựa vào tên sản phẩm
+            product.Slug = GenerateSlug(product.Name);
+
+            // Lấy slug cũ để kiểm tra
+            var oldSlug = await _dataContext.Products
+                .AsNoTracking()
+                .Where(c => c.Id == product.Id)
+                .Select(c => c.Slug)
+                .FirstOrDefaultAsync();
+
+            // Kiểm tra xem sản phẩm này tồn tại chưa
+            var result = await IsSlugUnique(product.Slug);
+            if (product.Slug != oldSlug && !result)
+                return new OperationResult(false, "Sản phẩm này đã tồn tại !!!");
+
+            // Chắc chắn chắn chọn ảnh và đảm bảo không phải ảnh rác hoặc lỗi 
+            if (product.Image == null)
+            {
+                if (product.ImageUpload == null || product.ImageUpload.Length == 0)
+                    return new OperationResult(false, "Vui lòng chọn ảnh sản phẩm");
+
+                // Lưu ảnh
+                product.Image = await SaveImage(product.ImageUpload);
+            }
+
+            // Format lại text trong Description
+            product.Description = SanitizeDescription(product.Description);
+
+            // Cập nhật và lưu lại
+            _dataContext.Products.Update(product);
+            await _dataContext.SaveChangesAsync();
+
+            return new OperationResult(true, "Cập nhật sản phẩm mới thành công!!!");
+        }
+        catch
+        {
+            return new OperationResult(false, "Cập nhật sản phẩm thất bại!!!");
+        }
+    }
+
+    // Xóa sản phẩm
+    public async Task<OperationResult> DeleteAsync(int id)
     {
         try
         {
             // Tìm sản phẩm
             var product = await _dataContext.Products.FindAsync(id);
-            if (product == null) return false;
+            if (product == null)
+                return new OperationResult(false, "Không tìm thấy sản phẩm");
 
             // Xóa ảnh trong wroot
             if (product.Image != "default.png")
@@ -100,11 +219,13 @@ public class ProductService : IProductService
             _dataContext.Products.Remove(product);
             await _dataContext.SaveChangesAsync();
 
-            return true;
+            return new OperationResult(true, "Xóa sản phẩm thành công");
+
         }
         catch
         {
-            return false;
+            return new OperationResult(false, "Xóa sản phẩm thất bại");
+
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿@model ProductModel
 
-<h3>List Product</h3>
-<form asp-action="Create" asp-area="Admin" method="post" enctype="multipart/form-data">
+<h3>List Products</h3>
+<form asp-action="Update" asp-area="Admin" method="post" enctype="multipart/form-data">
 	@Html.AntiForgeryToken()
 	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 	<div class="form-group">
@@ -44,16 +44,18 @@
 		<input type="hidden" asp-for="Image" />
 	</div>
 	<div class="form-group">
-		<button class="btn btn-success">Create</button>
+		<button class="btn btn-success">Update</button>
 	</div>
+	<input asp-for="Id" type="hidden" />
 </form>
-<a asp-controller="Product" asp-action="Index">Back to list product</a>
+<a asp-controller="Product" asp-action="Index">Back to list products</a>
 
 @* RenderPartial *@
 @section Scripts {
 	@{
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
+
 	@* Hiển thị ảnh khi chọn file *@
 	<script src="~/backend/js/site.js"></script>
 }

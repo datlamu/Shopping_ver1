@@ -114,7 +114,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
 
             ViewBag.Pager = pager;
 
-            return PartialView("_categoryTablePartial", data);
+            return PartialView("_CategoryTablePartial", data);
         }
     }
 }
