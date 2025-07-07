@@ -1,6 +1,52 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-<4>produce</4>
-@{
+﻿@model IEnumerable<ProductModel>
+<div class="col-sm-3">
+	@Html.Partial("_SidebarPartial")
+</div>
+
+<div class="col-sm-9 padding-right">
+	<div class="features_items">
+		<!--features_items-->
+		<h2 class="title text-center">Features Items</h2>
+		@foreach (var item in Model)
+		{
+			<div class="col-sm-4">
+				<div class="product-image-wrapper">
+					<div class="single-products">
+						<div class="productinfo text-center">
+							<a asp-controller="Product" asp-action="Details" asp-route-id="@item.Id">
+								<img src="~/media/products/@item.Image" alt="@item.Name" width="100%" />
+								<h2>@item.Price.ToString("#,0", System.Globalization.CultureInfo.InvariantCulture).Replace(",", ".") VNĐ</h2>
+								<p>@item.Name</p>
+							</a>
+							<button class="btn btn-default add-to-cart" value="@item.Id"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+						</div>
+					</div>
+					<div class="choose">
+						<ul class="nav nav-pills nav-justified">
+							<li><a href="#"><i class="fa fa-plus-square"></i>Add to wishlist</a></li>
+							<li><a href="#"><i class="fa fa-plus-square"></i>Add to compare</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		}
+	</div><!--features_items-->
+</div>
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			// Chay khi button được click vào
+			$('.add-to-cart').click(function () {
+
+				// Url Action
+				var url = '/Cart/Add';
+				// Lấy status và productId
+				var	id = $(this).val();
+				let data = { id };
+
+				// Gọi Ajax
+				sendAjax({ url, data });
+			});
+		});
+	</script>
 }

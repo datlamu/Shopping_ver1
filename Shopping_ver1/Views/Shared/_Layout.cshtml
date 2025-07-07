@@ -94,7 +94,7 @@
 								{
 									<li><a href="#"><i class="fa fa-star"></i> Wishlist</a></li>
 									<li><a href="checkout.html"><i class="fa fa-crosshairs"></i> Checkout</a></li>
-									<li><a href="#"><i class="fa fa-user"></i> @User.Identity.Name</a></li>
+									<li><a asp-area="admin" asp-controller="Product" asp-action="Index"><i class="fa fa-user"></i> @User.Identity.Name</a></li>
 									<li><a asp-controller="Account" asp-action="Logout"><i class="fa fa-lock"></i>Logout</a></li>
 								}
 								else
@@ -147,9 +147,12 @@
 						</div>
 					</div>
 					<div class="col-sm-3">
-						<div class="search_box pull-right">
-							<input type="text" placeholder="Search" />
-						</div>
+						<form asp-controller="Product" asp-action="Search" method="get">
+							<div class="search_box pull-right">
+								<input name="searchItem" type="text" placeholder="Tìm kiếm" value="@ViewData["Keyword"]" />
+								<button class="btn btn-warning" type="submit"><i class="fa fa-search"></i></button>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
