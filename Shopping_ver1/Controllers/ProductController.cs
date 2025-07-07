@@ -1,19 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Shopping_ver1.Repository;
+using Shopping_ver1.Services;
 
 namespace Shopping_ver1.Controllers
 {
     public class ProductController : Controller
     {
-        private readonly DataContext _dataContext;
-        public ProductController(DataContext context)
+        private readonly IProductService _productService;
+
+        public ProductController(IProductService productService)
         {
-            _dataContext = context;
+            _productService = productService;
         }
         public async Task<IActionResult> Index()
         {
-            var product = await _dataContext.Products.ToListAsync();
+            var product = await _productService.GetlistItemAsync();
+
             return View(product);
         }
 
@@ -21,36 +22,38 @@ namespace Shopping_ver1.Controllers
         [HttpGet]
         public async Task<IActionResult> Search(string? searchItem)
         {
+            // Nếu trống thì trả về trang cũ
             if (string.IsNullOrWhiteSpace(searchItem))
                 return RedirectToAction("Index");
 
-            var lowerSearch = searchItem.ToLower();
+            // Tìm kiếm các sản phẩm
+            var products = await _productService.SearchItem(searchItem);
 
-            var products = await _dataContext.Products
-                .Include(p => p.Brand)
-                .Include(p => p.Category)
-                .Where(p =>
-                    p.Name.ToLower().Contains(lowerSearch) ||
-                    p.Description.ToLower().Contains(lowerSearch) ||
-                    p.Brand.Name.ToLower().Contains(lowerSearch) ||
-                    p.Brand.Description.ToLower().Contains(lowerSearch) ||
-                    p.Category.Name.ToLower().Contains(lowerSearch) ||
-                    p.Category.Description.ToLower().Contains(lowerSearch)
-                )
-                .ToListAsync();
-
+            // Lưu lại từ khóa để gán lại cho trang sau
             ViewData["Keyword"] = searchItem;
 
             return View("Index", products);
         }
 
         // Chi tiết sản phẩm
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null) return RedirectToAction("Index");
-            var productById = await _dataContext.Products.Where(p => p.Id == id).FirstOrDefaultAsync();
-            return View(productById);
+            // Kiểm tra id
+            if (id == null)
+                return RedirectToAction("Index");
+
+            // Tìm sản phẩm và kiểm tra
+            var product = await _productService.FindProductsAsync(id.Value);
+            if (product == null)
+                return NotFound();
+
+            // Tìm sản phẩm liên quan theo thể loại
+            var relatedProducts = await _productService.relatedItemsAsync(product.CategoryId, product.Id);
+
+            ViewBag.RelatedProducts = relatedProducts;
+
+            return View(product);
         }
     }
 }

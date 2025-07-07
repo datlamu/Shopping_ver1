@@ -75,7 +75,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         public async Task<IActionResult> Update(int id)
         {
             // Tìm sản phầm đã chọn
-            var product = await _productService.GetUpdateItemAsync(id);
+            var product = await _productService.FindProductsAsync(id);
 
             // Lấy ra danh sách category và brand
             var (categories, brands) = await _productService.GetCategoryAndBrandListAsync(product.CategoryId, product.BrandId);

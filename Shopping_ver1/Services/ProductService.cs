@@ -84,7 +84,7 @@ public class ProductService : IProductService
         return (categorySelectList, brandSelectList);
     }
 
-    // Lấy danh sách sản phẩm
+    // Lấy danh sách sản phẩm và phân trang
     public async Task<(List<ProductModel> data, Paginate pager)> GetlistItemAsync(int page)
     {
         try
@@ -109,6 +109,50 @@ public class ProductService : IProductService
         {
             return (new List<ProductModel>(), new Paginate());
         }
+    }
+
+    // Lấy danh sách sản phẩm
+    public async Task<List<ProductModel>> GetlistItemAsync()
+    {
+        return await _dataContext.Products.ToListAsync();
+    }
+
+    // Tìm kiếm
+    public async Task<List<ProductModel>> SearchItem(string search)
+    {
+        try
+        {
+            // Tìm kiếm các sản phẩm
+            var products = await _dataContext.Products
+                .Include(p => p.Brand)
+                .Include(p => p.Category)
+                .Where(p =>
+                    EF.Functions.Like(p.Name, $"%{search}%") ||
+                    EF.Functions.Like(p.Description, $"%{search}%") ||
+                    EF.Functions.Like(p.Brand.Name, $"%{search}%") ||
+                    EF.Functions.Like(p.Brand.Description, $"%{search}%") ||
+                    EF.Functions.Like(p.Category.Name, $"%{search}%") ||
+                    EF.Functions.Like(p.Category.Description, $"%{search}%")
+                )
+                .ToListAsync();
+
+            return products;
+        }
+        catch
+        {
+            return new List<ProductModel>();
+        }
+    }
+
+    // Sản phẩm liên quan
+    public async Task<List<ProductModel>> relatedItemsAsync(int categoryId, int productId)
+    {
+        // Tìm sản phẩm liên quan theo thể loại
+        var relatedProducts = await _dataContext.Products
+            .Where(p => p.CategoryId == categoryId && p.Id != productId)
+            .ToListAsync();
+
+        return relatedProducts;
     }
 
     // Tạo sản phẩm mới
@@ -146,8 +190,8 @@ public class ProductService : IProductService
         }
     }
 
-    // Tìm kiếm sản phẩm chỉnh sửa
-    public async Task<ProductModel?> GetUpdateItemAsync(int id)
+    // Tìm kiếm sản phẩm
+    public async Task<ProductModel?> FindProductsAsync(int id)
     {
         return await _dataContext.Products.FindAsync(id);
     }
@@ -163,8 +207,8 @@ public class ProductService : IProductService
             // Lấy slug cũ để kiểm tra
             var oldSlug = await _dataContext.Products
                 .AsNoTracking()
-                .Where(c => c.Id == product.Id)
-                .Select(c => c.Slug)
+                .Where(p => p.Id == product.Id)
+                .Select(p => p.Slug)
                 .FirstOrDefaultAsync();
 
             // Kiểm tra xem sản phẩm này tồn tại chưa
