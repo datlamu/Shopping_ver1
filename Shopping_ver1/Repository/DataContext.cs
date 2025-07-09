@@ -13,5 +13,6 @@ namespace Shopping_ver1.Repository
         public DbSet<CategoryModel> Categories { get; set; }
         public DbSet<OrderModel> Orders { get; set; }
         public DbSet<OrderDetailModel> OrderDetails { get; set; }
+        public DbSet<RatingModel> Ratings { get; set; }
     }
 }

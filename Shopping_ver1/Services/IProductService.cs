@@ -24,5 +24,8 @@ namespace Shopping_ver1.Services
         Task<OperationResult> UpdateAsync(ProductModel product);
         // Xóa sản phẩm
         Task<OperationResult> DeleteAsync(int id);
+        // Đánh giá sản phẩm
+        Task<OperationResult> ItemReview(RatingModel rating);
+
     }
 }

@@ -72,10 +72,10 @@
 			<!--category-tab-->
 			<div class="col-sm-12">
 				<ul class="nav nav-tabs">
-					<li class="active"><a href="#details" data-toggle="tab">Details</a></li>
+					<li><a href="#details" data-toggle="tab">Details</a></li>
 					<li><a href="#companyprofile" data-toggle="tab">Company Profile</a></li>
 					<li><a href="#tag" data-toggle="tab">Tag</a></li>
-					<li><a href="#reviews" data-toggle="tab">Reviews (5)</a></li>
+					<li class="active"><a href="#reviews" data-toggle="tab">Đánh giá (5)</a></li>
 				</ul>
 			</div>
 			<div class="tab-content">
@@ -195,17 +195,8 @@
 						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
 						<p><b>Write Your Review</b></p>
 
-						<form action="#">
-							<span>
-								<input type="text" placeholder="Your Name" />
-								<input type="email" placeholder="Email Address" />
-							</span>
-							<textarea name=""></textarea>
-							<b>Rating: </b> <img src="images/product-details/rating.png" alt="" />
-							<button type="button" class="btn btn-default pull-right">
-								Submit
-							</button>
-						</form>
+						<partial name="_ReviewFormPartial" model="new RatingModel { ProductId = Model.Id }" />
+
 					</div>
 				</div>
 
@@ -256,3 +247,28 @@
 
 	</div>
 </div>
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			const container = document.querySelector(".starContainer");
+
+			if (!container) return;
+
+			const stars = container.querySelectorAll(".fa-star");
+			const ratingInput = container.querySelector(".ratingInput");
+
+			stars.forEach(star => {
+				star.addEventListener("click", function () {
+					const rating = parseInt(this.dataset.value); // lấy từ data-value
+					ratingInput.value = rating;
+
+					stars.forEach(s => {
+						const val = parseInt(s.dataset.value);
+						s.classList.toggle("checked", val <= rating); // dùng toggle điều chỉnh đánh giá sao
+					});
+				});
+			});
+		});
+	</script>
+}

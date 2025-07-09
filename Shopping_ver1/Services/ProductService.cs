@@ -272,4 +272,23 @@ public class ProductService : IProductService
 
         }
     }
+
+    // Đánh giá sản phẩm
+    public async Task<OperationResult> ItemReview(RatingModel rating)
+    {
+        try
+        {
+            // Tìm sản phẩm
+            await _dataContext.Ratings.AddAsync(rating);
+            await _dataContext.SaveChangesAsync();
+
+            return new OperationResult(true, "Gửi đánh giá thành công!!!");
+
+        }
+        catch
+        {
+            return new OperationResult(false, "Gửi đánh giá thất bại");
+
+        }
+    }
 }

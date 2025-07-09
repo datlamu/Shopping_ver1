@@ -1342,28 +1342,27 @@ h2.title {
                 color: #FE980F;
             }
 
-#reviews p {
-    color: #363432;
+#reviews .starContainer {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-#reviews form span {
-    display: block;
+#reviews form span input {
+    background: #F0F0E9;
+    border: 0 none;
+    color: #A6A6A1;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    outline: medium none;
+    padding: 8px;
+    width: 48%;
 }
 
-    #reviews form span input {
-        background: #F0F0E9;
-        border: 0 none;
-        color: #A6A6A1;
-        font-family: 'Roboto', sans-serif;
-        font-size: 14px;
-        outline: medium none;
-        padding: 8px;
-        width: 48%;
+    #reviews form span input:last-child {
+        margin-left: 3%;
     }
-
-        #reviews form span input:last-child {
-            margin-left: 3%;
-        }
 
 #reviews textarea {
     background: #F0F0E9;
@@ -1386,6 +1385,17 @@ h2.title {
     color: #FFFFFF;
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
+}
+
+.fa-star {
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+    color: #ccc; /* Màu mặc định là xám */
+}
+
+.checked {
+    color: orange; /* Khi có class checked thì đổi màu */
 }
 
 

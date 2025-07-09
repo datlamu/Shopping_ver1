@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Shopping_ver1.Models;
 using Shopping_ver1.Services;
 
 namespace Shopping_ver1.Controllers
@@ -54,6 +55,29 @@ namespace Shopping_ver1.Controllers
             ViewBag.RelatedProducts = relatedProducts;
 
             return View(product);
+        }
+
+        // Đánh giá sản phẩm
+        [HttpPost]
+        public async Task<IActionResult> ProductReview(RatingModel rating)
+        {
+            // Kiểm tra thông tin nhập vào
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Vui lòng kiểm tra lại thông tin đánh giá !!!";
+                return View("Details", rating.ProductId);
+            }
+
+            // Gửi đánh giá và kiểm tra
+            var result = await _productService.ItemReview(rating);
+            if (!result.Success)
+            {
+                TempData["Error"] = result.Message;
+                return View("Details", rating.ProductId);
+            }
+            TempData["Success"] = result.Message;
+
+            return Redirect(Request.Headers["Referer"]);
         }
     }
 }
