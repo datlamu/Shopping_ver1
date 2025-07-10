@@ -1,0 +1,40 @@
+﻿@model IEnumerable<SliderModel>
+@{
+	var i = 0;
+}
+
+<section id="slider">
+	<!--slider-->
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-12">
+				<div id="slider-carousel" class="carousel slide" data-ride="carousel">
+					<ol class="carousel-indicators">
+						@for (int j = 0; j < Model.Count(); j++)
+						{
+							<li data-target="#slider-carousel" data-slide-to="@j" class="@(j == 0 ? "active" : "")"></li>
+						}
+					</ol>
+
+					<div class="carousel-inner">
+						@foreach (var item in Model)
+						{
+							<div class="item @(i == 0 ? "active" : "")">
+								<img src="~/media/sliders/@item.Image" class="girl img-fluid img-responsive" />
+							</div>
+							i++;
+						}
+					</div>
+
+					<a href="#slider-carousel" class="left control-carousel hidden-xs" data-slide="prev">
+						<i class="fa fa-angle-left"></i>
+					</a>
+					<a href="#slider-carousel" class="right control-carousel hidden-xs" data-slide="next">
+						<i class="fa fa-angle-right"></i>
+					</a>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</section><!--/slider-->

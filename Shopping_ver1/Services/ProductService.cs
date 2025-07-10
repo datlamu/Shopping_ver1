@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Helpers;
+using Shopping_ver1.Migrations;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
@@ -217,7 +218,7 @@ public class ProductService : IProductService
                 return new OperationResult(false, "Sản phẩm này đã tồn tại !!!");
 
             // Chắc chắn chắn chọn ảnh và đảm bảo không phải ảnh rác hoặc lỗi 
-            if (product.Image == null)
+            if (product.ImageUpload != null)
             {
                 if (product.ImageUpload == null || product.ImageUpload.Length == 0)
                     return new OperationResult(false, "Vui lòng chọn ảnh sản phẩm");

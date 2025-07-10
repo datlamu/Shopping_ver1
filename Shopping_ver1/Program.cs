@@ -33,6 +33,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<ISliderService, SliderService>();
 
 // *6 Add Identity
 builder.Services.AddIdentity<UserModel, IdentityRole>()

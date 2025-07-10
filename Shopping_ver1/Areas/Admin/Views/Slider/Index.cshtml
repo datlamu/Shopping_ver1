@@ -1,0 +1,53 @@
+﻿<div id="TableContainer">
+	<partial name="_SliderTablePartial" model="Model" />
+</div>
+@section Scripts {
+	<script>
+		// Tải lại bảng
+		function reloadTable(page = 1) {
+		// Chạy khi trang được load lại
+			$("#TableContainer").load("/Admin/Slider/GetTable?page=" + page, function () {
+				attachEvents(); // Gắn lại sự kiện sau khi load xong
+				// Khởi tạo lại DataTable
+				if ($.fn.DataTable.isDataTable('#myTable')) {
+					$('#myTable').DataTable().destroy();
+				}
+				$('#myTable').DataTable();
+			});
+		}
+
+		// Gắn sự kiện click vào các nút phân trang
+		$(document).on("click", ".page-ajax", function (e) {
+			e.preventDefault(); // Ngăn mặc định chuyển trang
+			const page = $(this).data("page");
+			reloadTable(page);
+		});
+
+		// Gắn sự kiện
+		function attachEvents() {
+		// Chạy khi button được click vào
+			$('.delete-ajax').off('click').on('click', function () {
+				let currentPage = parseInt($(".pagination li.active").text()) || 1;
+				// Url Action
+				var url = '/Admin/Slider/Delete';
+				// Lấy id của sản phẩm
+				var	id = $(this).val();
+				let data = { id };
+
+				// Gọi Ajax
+				sendAjax({
+					url,
+					data,
+					onSuccess: function () {
+						reloadTable(currentPage);
+					}
+				});
+			});
+		}
+		$(document).ready(function () {
+			attachEvents();
+			// Khởi tạo DataTable lần đầu
+			$('#myTable').DataTable();
+		});
+	</script>
+}

@@ -1,0 +1,50 @@
+﻿@model SliderModel
+
+<h3>List Sliders</h3>
+<form asp-action="Update" asp-area="Admin" method="post" enctype="multipart/form-data">
+	@Html.AntiForgeryToken()
+	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+	<div class="form-group">
+		<label>Name</label>
+		<input asp-for="Name" class="form-control" />
+		<span asp-validation-for="Name" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<label>Description</label>
+		<textarea asp-for="Description" class="form-control"></textarea>
+		<span asp-validation-for="Description" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<label>Status</label>
+		<select asp-for="Status" class="form-control">
+			<option value="1">Hiển thị</option>
+			<option value="0">Ẩn</option>
+		</select>
+		<span asp-validation-for="Status" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<label>Image</label>
+		<input asp-for="ImageUpload" type="file" class="form-control" onchange="previewImage(this)" />
+		<span class="text-danger">
+			@Html.ValidationMessage("ImageUpload", null, new { @class = "text-danger" })
+		</span>
+		<br />
+		<img id="preview-img" src="~/media/sliders/@(string.IsNullOrEmpty(Model?.Image) ? "default.png" : Model.Image)" alt="Ảnh sản phẩm" width="120" />
+		<input type="hidden" asp-for="Image" />
+	</div>
+	<div class="form-group">
+		<button class="btn btn-success">Update</button>
+	</div>
+	<input asp-for="Id" type="hidden" />
+</form>
+<a asp-controller="Slider" asp-action="Index">Back to list Sliders</a>
+
+@* RenderPartial *@
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+
+	@* Hiển thị ảnh khi chọn file *@
+	<script src="~/backend/js/site.js"></script>
+}
