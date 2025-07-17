@@ -1,9 +1,6 @@
-﻿using System.Net;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Shopping_ver1.Helpers;
-using Shopping_ver1.Migrations;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
@@ -33,17 +30,6 @@ public class ProductService : IProductService
     public async Task<bool> IsSlugUnique(string slug)
     {
         return !await _dataContext.Products.AnyAsync(c => c.Slug == slug);
-    }
-
-    // Format lại text trong Description
-    private string SanitizeDescription(string description)
-    {
-        if (string.IsNullOrWhiteSpace(description))
-            return string.Empty;
-
-        var decoded = WebUtility.HtmlDecode(description);
-        var noHtml = Regex.Replace(decoded, "<.*?>", string.Empty);
-        return Regex.Replace(noHtml, @"\s+", " ").Trim();
     }
 
     // Xử lý ảnh sau đó trả về tên của ảnh đó
@@ -85,37 +71,10 @@ public class ProductService : IProductService
         return (categorySelectList, brandSelectList);
     }
 
-    // Lấy danh sách sản phẩm và phân trang
-    public async Task<(List<ProductModel> data, Paginate pager)> GetlistItemAsync(int page)
-    {
-        try
-        {
-            // Tổng số Items
-            var totalItems = await _dataContext.Products.CountAsync();
-            // Tạo đối tượng phân trang
-            var pager = new Paginate(totalItems, page, 2);
-
-            // Danh sách items
-            var data = await _dataContext.Products
-                .OrderByDescending(p => p.Id)
-                .Include(p => p.Category)
-                .Include(p => p.Brand)
-                .Skip(pager.Skip)       // Bỏ qua số lượng phần tử
-                .Take(pager.PageSize)   // Lấy số lượng phần tử tiếp đó
-                .ToListAsync();
-
-            return (data, pager);
-        }
-        catch
-        {
-            return (new List<ProductModel>(), new Paginate());
-        }
-    }
-
     // Lấy danh sách sản phẩm
     public async Task<List<ProductModel>> GetlistItemAsync()
     {
-        return await _dataContext.Products.ToListAsync();
+        return await _dataContext.Products.Include(p => p.Category).Include(p => p.Brand).ToListAsync();
     }
 
     // Tìm kiếm
@@ -176,9 +135,6 @@ public class ProductService : IProductService
             // Lưu ảnh
             product.Image = await SaveImage(product.ImageUpload);
 
-            // Format lại text trong Description
-            product.Description = SanitizeDescription(product.Description);
-
             // Tạo mới và lưu lại
             await _dataContext.Products.AddAsync(product);
             await _dataContext.SaveChangesAsync();
@@ -192,7 +148,7 @@ public class ProductService : IProductService
     }
 
     // Tìm kiếm sản phẩm
-    public async Task<ProductModel?> FindProductsAsync(int id)
+    public async Task<ProductModel> FindProductsAsync(int id)
     {
         return await _dataContext.Products.FindAsync(id);
     }
@@ -226,9 +182,6 @@ public class ProductService : IProductService
                 // Lưu ảnh
                 product.Image = await SaveImage(product.ImageUpload);
             }
-
-            // Format lại text trong Description
-            product.Description = SanitizeDescription(product.Description);
 
             // Cập nhật và lưu lại
             _dataContext.Products.Update(product);

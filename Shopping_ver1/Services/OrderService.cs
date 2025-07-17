@@ -14,47 +14,16 @@ public class OrderService : IOrderService
     }
 
     // Lấy danh sách đơn hàng
-    public async Task<(List<OrderModel> data, Paginate pager)> GetOrderlistAsync(int page)
+    public async Task<List<OrderModel>> GetOrderlistAsync()
     {
-        try
-        {
-            // Tổng số Items
-            var totalItems = await _dataContext.Orders.CountAsync();
-            // Tạo đối tượng phân trang
-            var pager = new Paginate(totalItems, page);
-
-            // Danh sách items
-            var data = await _dataContext.Orders
-                .OrderByDescending(p => p.Id)
-                .Skip(pager.Skip)       // Bỏ qua số lượng phần tử
-                .Take(pager.PageSize)   // Lấy số lượng phần tử tiếp đó
-                .ToListAsync();
-
-            return (data, pager);
-        }
-        catch
-        {
-            return (new List<OrderModel>(), new Paginate());
-        }
+        return await _dataContext.Orders.ToListAsync();
     }
 
     // Chi tiết đơn hàng
     public async Task<List<OrderDetailModel>> GetOrderDetailAsync(string orderCode)
     {
-        try
-        {
-            // Chi tiết của đơn ( dựa vào orderCode )
-            var data = await _dataContext.OrderDetails
-                .Include(o => o.Product)
-                .Where(od => od.OrderCode == orderCode)
-                .ToListAsync();
-
-            return data;
-        }
-        catch
-        {
-            return new List<OrderDetailModel>();
-        }
+        // Chi tiết của đơn ( dựa vào orderCode )
+        return await _dataContext.OrderDetails.Include(o => o.Product).Where(od => od.OrderCode == orderCode).ToListAsync();
     }
 
     // Cập nhật thông tin đơn hàng
@@ -82,12 +51,12 @@ public class OrderService : IOrderService
     }
 
     // Xóa đơn hàng
-    public async Task<OperationResult> DeleteOrderAsync(string orderCode)
+    public async Task<OperationResult> DeleteOrderAsync(int id)
     {
         try
         {
             // Lấy đơn hàng và kiểm tra
-            var order = await _dataContext.Orders.FirstOrDefaultAsync(o => o.OrderCode == orderCode);
+            var order = await _dataContext.Orders.FindAsync(id);
             if (order == null)
             {
                 return new OperationResult(false, "Không tìm thấy đơn hàng này !");
@@ -95,7 +64,7 @@ public class OrderService : IOrderService
 
             // Chi tiết đơn hàng liên quan
             var orderDetails = await _dataContext.OrderDetails
-                .Where(od => od.OrderCode == orderCode)
+                .Where(od => od.OrderCode == order.OrderCode)
                 .ToListAsync();
 
             // Thực hiện xóa và lưu

@@ -17,12 +17,13 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         }
 
         // Danh sách sản phẩm
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int? page)
         {
-            // Lấy danh sách và phân trang
-            var (data, pager) = await _productService.GetlistItemAsync(page);
+            // Lấy danh sách item
+            var data = await _productService.GetlistItemAsync();
 
-            ViewBag.Pager = pager;
+            // Trang hiện tại
+            ViewBag.Page = page ?? 0;
 
             return View(data);
         }
@@ -72,7 +73,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
 
         // Chỉnh sửa sản phẩm
         [HttpGet]
-        public async Task<IActionResult> Update(int id)
+        public async Task<IActionResult> Update(int id, int? page)
         {
             // Tìm sản phầm đã chọn
             var product = await _productService.FindProductsAsync(id);
@@ -83,13 +84,15 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Đưa danh sách vào ViewBag
             ViewBag.Categories = categories;
             ViewBag.Brands = brands;
+            ViewBag.Page = page ?? 0;
+
 
             // Quay lại trang create giữ nguyên lại dữ liệu
             return View(product);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(ProductModel product)
+        public async Task<IActionResult> Update(ProductModel product, int? page)
         {
             // Lấy ra danh sách category và brand
             var (categories, brands) = await _productService.GetCategoryAndBrandListAsync(product.CategoryId, product.BrandId);
@@ -97,6 +100,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Đưa danh sách vào ViewBag
             ViewBag.Categories = categories;
             ViewBag.Brands = brands;
+            ViewBag.Page = page ?? 0;
 
             // Kiểm tra thông tin sản phẩm
             if (!ModelState.IsValid)
@@ -114,26 +118,15 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             }
             TempData["Success"] = result.Message;
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { page = page });
         }
 
         // Xóa sản phẩm
         public async Task<IActionResult> Delete(int id)
         {
-            // Sản phẩm
             var result = await _productService.DeleteAsync(id);
 
             return Json(new { result.Success, result.Message });
-        }
-
-        // Tải lại table cập nhật dữ liệu mới ( ajax )
-        public async Task<IActionResult> GetTable(int page = 1)
-        {
-            var (data, pager) = await _productService.GetlistItemAsync(page);
-
-            ViewBag.Pager = pager;
-
-            return PartialView("_ProductTablePartial", data);
         }
     }
 }

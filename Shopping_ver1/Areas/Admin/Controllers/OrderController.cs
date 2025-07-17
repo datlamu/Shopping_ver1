@@ -14,20 +14,28 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             _orderService = orderService;
         }
         // Danh sách đơn hàng
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int? page)
         {
-            var (data, pager) = await _orderService.GetOrderlistAsync(page);
+            // Lấy danh sách item
+            var data = await _orderService.GetOrderlistAsync();
 
-            ViewBag.Pager = pager;
+            // Trang hiện tại
+            ViewBag.Page = page ?? 0;
 
             return View(data);
         }
 
         // Chi tiết đơn hàng
-        public async Task<IActionResult> OrderDetail(string orderCode, int status)
+        public async Task<IActionResult> OrderDetail(string orderCode, int status, int? page)
         {
             // Chi tiết đơn hàng
             var data = await _orderService.GetOrderDetailAsync(orderCode);
+
+            // Trang hiện tại
+            ViewBag.Page = page ?? 0;
+
+            // Lưu orderCode
+            ViewBag.OrderCode = orderCode;
 
             // Lưu trạng thái đơn hàng vào ViewBag
             ViewBag.OrderStatus = status;
@@ -51,25 +59,16 @@ namespace Shopping_ver1.Areas.Admin.Controllers
 
         // Xóa đơn hàng 
         [HttpPost]
-        public async Task<IActionResult> Delete(string orderCode)
+        public async Task<IActionResult> Delete(int id)
         {
             // Xóa và kiểm tra
-            var result = await _orderService.DeleteOrderAsync(orderCode);
+            var result = await _orderService.DeleteOrderAsync(id);
 
             return Json(new
             {
                 result.Success,
                 result.Message
             });
-        }
-        // Tải lại table cập nhật dữ liệu mới ( ajax )
-        public async Task<IActionResult> GetOrderTable(int page = 1)
-        {
-            var (data, pager) = await _orderService.GetOrderlistAsync(page);
-
-            ViewBag.Pager = pager;
-
-            return PartialView("_OrderTablePartial", data);
         }
     }
 }

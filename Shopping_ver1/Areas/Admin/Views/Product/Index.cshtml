@@ -1,37 +1,83 @@
-﻿<div id="TableContainer">
-	<partial name="_ProductTablePartial" model="Model" />
+﻿@model IEnumerable<ProductModel>
+@{
+	ViewData["Title"] = "Danh sách sản phẩm";
+	var index = 1;
+}
+<!-- DataTables Example -->
+<div class="card shadow mb-4">
+	<div class="card-header py-3 d-flex justify-content-between align-items-center">
+		<h6 class="m-0 font-weight-bold text-primary">Bảng sản phẩm</h6>
+		<a class="btn btn-success btn-sm" asp-area="Admin" asp-controller="Product" asp-action="Create">
+			<i class="fas fa-plus"></i>
+		</a>
+	</div>
+
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table" id="dataTable" width="100%" cellspacing="0">
+				<thead>
+					<tr class="bg-primary text-gray-300">
+						<th class="align-middle no-thead-border">STT</th>
+						<th class="align-middle">Tên</th>
+						<th class="align-middle">Mô tả</th>
+						<th class="align-middle">Giá</th>
+						<th class="align-middle">Ảnh</th>
+						<th class="align-middle">Thể loại</th>
+						<th class="align-middle">Thương hiệu</th>
+						<th class="align-middle">Tùy chọn</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td class="align-middle">@(index++)</td>
+							<td class="align-middle">@item.Name</td>
+							<td class="align-middle">@item.Description</td>
+							<td class="align-middle">@FormatCurrency.ToVnCurrency(item.Price)</td>
+							<td class="align-middle"><img src="~/media/products/@item.Image" width="100" /></td>
+							<td class="align-middle">@item.Category?.Name</td>
+							<td class="align-middle">@item.Brand?.Name</td>
+							<td class="align-middle">
+								<button class="btn btn-warning btn-sm btn-update" value="@item.Id"><i class="fas fa-edit"></i></button>
+								<button class="btn btn-danger btn-sm btn-delete" value="@item.Id"><i class="fas fa-trash-alt"></i></button>
+							</td>
+						</tr>
+					}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
 </div>
 @section Scripts {
 	<script>
-		// Tải lại bảng
-		function reloadTable(page = 1) {
-		// Chạy khi trang được load lại
-			$("#TableContainer").load("/Admin/Product/GetTable?page=" + page, function () {
-				attachEvents(); // Gắn lại sự kiện sau khi load xong
-				// Khởi tạo lại DataTable
-				if ($.fn.DataTable.isDataTable('#myTable')) {
-					$('#myTable').DataTable().destroy();
-				}
-				$('#myTable').DataTable();
+		let table;
+		const currentPage = @((ViewBag.Page ?? 0) - 1);
+		$(document).ready(function () {
+			table = setupDataTable({
+				enableExport: true,
+				exportColumns: [0, 1, 2, 3, 5, 6],
+				buttonsToShow: ['copy', 'csv', 'excel', 'pdf', 'print']
 			});
-		}
 
-		// Gắn sự kiện click vào các nút phân trang
-		$(document).on("click", ".page-ajax", function (e) {
-			e.preventDefault(); // Ngăn mặc định chuyển trang
-			const page = $(this).data("page");
-			reloadTable(page);
-		});
+			// Set page
+			if (!isNaN(currentPage) && currentPage >= 0) {
+				table.page(currentPage).draw('page');
+			}
 
-		// Gắn sự kiện
-		function attachEvents() {
-		// Chạy khi button được click vào
-			$('.delete-ajax').off('click').on('click', function () {
-				let currentPage = parseInt($(".pagination li.active").text()) || 1;
-				// Url Action
+			// attachEvents Update
+			$('#dataTable').on('click', '.btn-update', function () {
+				var id = $(this).val();
+				var currentPage = table.page() + 1;
+				window.location.href = `/Admin/Product/Update/${id}?page=${currentPage}`;
+			});
+
+			// attachEvents Delete
+			$('#dataTable').on('click', '.btn-delete', function () {
+				var row = $(this).closest('tr');
 				var url = '/Admin/Product/Delete';
-				// Lấy id của sản phẩm
-				var	id = $(this).val();
+				var id = $(this).val();
 				let data = { id };
 
 				// Gọi Ajax
@@ -39,15 +85,16 @@
 					url,
 					data,
 					onSuccess: function () {
-						reloadTable(currentPage);
+						// Xóa hàng đã chọn và giữ nguyên trang
+						table.row(row).remove().draw(false);
 					}
 				});
 			});
-		}
-		$(document).ready(function () {
-			attachEvents();
-			// Khởi tạo DataTable lần đầu
-			$('#myTable').DataTable();
 		});
 	</script>
+	<style>
+		#dataTable thead th {
+			border-bottom: none !important;
+		}
+	</style>
 }

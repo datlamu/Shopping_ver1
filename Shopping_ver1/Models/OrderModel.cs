@@ -6,7 +6,7 @@
         public string OrderCode { get; set; }
         public string UserName { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
-        public int Status { get; set; } = 1;
+        public int Status { get; set; } = 0;
 
         public OrderModel() { }
         public OrderModel(string orderCode, string userName)

@@ -1,46 +1,115 @@
-﻿<div id="orderTableContainer">
-	<partial name="_OrderTablePartial" model="Model" />
+﻿@model IEnumerable<OrderModel>
+@{
+	ViewData["Title"] = "Đơn hàng";
+	var index = 1;
+}
+<!-- DataTables Example -->
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h6 class="m-0 font-weight-bold text-primary">Bảng đơn hàng</h6>
+	</div>
+
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table" id="dataTable" width="100%" cellspacing="0">
+				<thead>
+					<tr class="bg-primary text-gray-300">
+						<th class="align-middle no-thead-border">STT</th>
+						<th class="align-middle">Tên</th>
+						<th class="align-middle">Mã đơn hàng</th>
+						<th class="align-middle">Ngày đặt</th>
+						<th class="align-middle">Trạng thái</th>
+						<th class="align-middle">Tùy chọn</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td class="align-middle">@(index++)</td>
+							<td class="align-middle">@item.UserName</td>
+							<td class="align-middle">@item.OrderCode</td>
+							<td class="align-middle">@item.CreateDate, @(item.Status == 1 ? "selected" : "")</td>
+							<td>
+								<select class="form-control align-middle select-update-order" data-ordercode="@item.OrderCode">
+									<option value="1">Đã xử lý</option>
+									<!option value="0" @(item.Status == 0 ? "selected" : "")>Đang xử lý</!option>
+								</select>
+							</td>
+							<td class="align-middle">
+								<button class="btn btn-warning btn-sm btn-order-detail" value="@item.OrderCode" data-status="@item.Status">
+									<i class="fas fa-receipt"></i>
+								</button>
+								<button class="btn btn-danger btn-sm btn-delete" value="@item.Id"><i class="fas fa-trash-alt"></i></button>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>
 @section Scripts {
 	<script>
-		// Tải lại bảng
-		function reloadOrderTable(page = 1) {
-		// Chạy khi trang được load lại
-			$("#orderTableContainer").load("/Admin/Order/GetOrderTable?page=" + page, function () {
-				attachOrderEvents(); // Gắn lại sự kiện sau khi load xong
+		let table;
+		const currentPage = @((ViewBag.Page ?? 0) - 1);
+		$(document).ready(function () {
+			table = setupDataTable({
+				enableExport: true,
+				exportColumns: [0, 1, 2, 3, 4],
+				buttonsToShow: ['copy', 'csv', 'excel', 'pdf', 'print']
 			});
-		}
 
-		// Gắn sự kiện click vào các nút phân trang
-		$(document).on("click", ".page-ajax", function (e) {
-			e.preventDefault(); // Ngăn mặc định chuyển trang
-			const page = $(this).data("page");
-			reloadOrderTable(page);
-		});
+			// Set page
+			if (!isNaN(currentPage) && currentPage >= 0) {
+				table.page(currentPage).draw('page');
+			}
 
-		// Gắn sự kiện giỏ hàng
-		function attachOrderEvents() {
-		// Chạy khi button được click vào
-			$('.delete-orderitem').off('click').on('click', function () {
-				let currentPage = parseInt($(".pagination li.active").text()) || 1;
+			// attachEvents OrderDetail
+			$('#dataTable').on('click', '.btn-order-detail', function () {
+				var orderCode = $(this).val();
+				var status = $(this).data('status');
+				var currentPage = table.page() + 1;
+
+				window.location.href = `/Admin/Order/OrderDetail?orderCode=${orderCode}&status=${status}&page=${currentPage}`;
+			});
+
+			// attachEvents Update
+			$('.select-update-order').change(function () {
+
 				// Url Action
+				var url = '/Admin/Order/UpdateOrder';
+				// Lấy status và ordercode
+				var	status = $(this).val();
+				var orderCode = $(this).data('ordercode');
+				let data = { status, orderCode};
+
+				// Gọi Ajax
+				sendAjax({ url, data});
+			});
+
+			// attachEvents Delete
+			$('#dataTable').on('click', '.btn-delete', function () {
+				var row = $(this).closest('tr');
 				var url = '/Admin/Order/Delete';
-				// Lấy id của sản phẩm
-				var	orderCode = $(this).val();
-				let data = { orderCode };
+				var id = $(this).val();
+				let data = { id };
 
 				// Gọi Ajax
 				sendAjax({
 					url,
 					data,
 					onSuccess: function () {
-						reloadOrderTable(currentPage);
+						// Xóa dòng mà và ở lại trang đó
+						table.row(row).remove().draw(false);
 					}
 				});
 			});
-		}
-		$(document).ready(function () {
-			attachOrderEvents();
 		});
 	</script>
+	<style>
+		#dataTable thead th {
+			border-bottom: none !important;
+		}
+	</style>
 }

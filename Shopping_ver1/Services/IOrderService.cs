@@ -7,7 +7,7 @@ namespace Shopping_ver1.Services
     {
 
         // Danh sách đơn hàng
-        Task<(List<OrderModel> data, Paginate pager)> GetOrderlistAsync(int page);
+        Task<List<OrderModel>> GetOrderlistAsync();
 
         // Chi tiết đơn hàng
         Task<List<OrderDetailModel>> GetOrderDetailAsync(string orderCode);
@@ -16,7 +16,7 @@ namespace Shopping_ver1.Services
         Task<OperationResult> UpdateOrderAsync(string orderCode, int status);
 
         // Xóa đơn hàng
-        Task<OperationResult> DeleteOrderAsync(string orderCode);
+        Task<OperationResult> DeleteOrderAsync(int id);
 
     }
 }
