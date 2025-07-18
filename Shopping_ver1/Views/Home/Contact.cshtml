@@ -1,0 +1,13 @@
+﻿<div id="ContactContainer">
+	<partial name="_ContactPartial" model="Model" />
+</div>
+@section Scripts {
+	<script>
+		// Chỉ tải lại nội dung liên hệ
+		$(document).on("click", ".page-ajax", function (e) {
+			e.preventDefault();
+			const page = $(this).data("page");
+			$("#ContactContainer").load("/Home/ContactPartial?page=" + page);
+		});
+	</script>
+}

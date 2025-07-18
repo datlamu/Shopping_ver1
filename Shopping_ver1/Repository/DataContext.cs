@@ -15,5 +15,6 @@ namespace Shopping_ver1.Repository
         public DbSet<OrderDetailModel> OrderDetails { get; set; }
         public DbSet<RatingModel> Ratings { get; set; }
         public DbSet<SliderModel> Sliders { get; set; }
+        public DbSet<ContactModel> Contacts { get; set; }
     }
 }
