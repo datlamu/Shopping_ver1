@@ -43,28 +43,9 @@ public class CategoryService : ICategoryService
     }
 
     // Lấy danh sách thể loại và phân trang
-    public async Task<(List<CategoryModel> data, Paginate pager)> GetlistItemAsync(int page)
+    public async Task<List<CategoryModel>> GetlistItemAsync()
     {
-        try
-        {
-            // Tổng số Items
-            var totalItems = await _dataContext.Categories.CountAsync();
-            // Tạo đối tượng phân trang
-            var pager = new Paginate(totalItems, page);
-
-            // Danh sách items
-            var data = await _dataContext.Categories
-                .OrderByDescending(p => p.Id)
-                .Skip(pager.Skip)       // Bỏ qua số lượng phần tử
-                .Take(pager.PageSize)   // Lấy số lượng phần tử tiếp đó
-                .ToListAsync();
-
-            return (data, pager);
-        }
-        catch
-        {
-            return (new List<CategoryModel>(), new Paginate());
-        }
+        return await _dataContext.Categories.ToListAsync();
     }
 
     // Tạo thể loại mới
@@ -96,7 +77,7 @@ public class CategoryService : ICategoryService
     }
 
     // Tìm kiếm thể loại chỉnh sửa
-    public async Task<CategoryModel?> GetUpdateItemAsync(int id)
+    public async Task<CategoryModel> GetUpdateItemAsync(int id)
     {
         return await _dataContext.Categories.FindAsync(id);
     }

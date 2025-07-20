@@ -666,7 +666,6 @@ ul.sub-menu {
     font-family: 'Roboto', sans-serif;
     font-size: 18px;
     font-weight: 700;
-    margin: 0 auto 30px;
     text-align: center;
     text-transform: uppercase;
     position: relative;
@@ -841,7 +840,6 @@ h2.title {
     font-family: 'Roboto', sans-serif;
     font-size: 18px;
     font-weight: 700;
-    margin: 0 15px;
     text-transform: uppercase;
     margin-bottom: 30px;
     position: relative;

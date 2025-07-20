@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Shopping_ver1.Migrations;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
@@ -179,6 +180,13 @@ public class ProductService : IProductService
                 if (product.ImageUpload == null || product.ImageUpload.Length == 0)
                     return new OperationResult(false, "Vui lòng chọn ảnh sản phẩm");
 
+                // Xóa ảnh trong wroot
+                if (product.Image != "default.png")
+                {
+                    string path = Path.Combine(_env.WebRootPath, "media/products", product.Image);
+                    if (File.Exists(path))
+                        File.Delete(path);
+                }
                 // Lưu ảnh
                 product.Image = await SaveImage(product.ImageUpload);
             }

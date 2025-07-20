@@ -42,49 +42,30 @@ public class BrandService : IBrandService
         return Regex.Replace(noHtml, @"\s+", " ").Trim();
     }
 
-    // Lấy danh sách thương hiệu và 
-    public async Task<(List<BrandModel> data, Paginate pager)> GetlistItemAsync(int page)
+    // Lấy danh sách thương hiệu và phân trang
+    public async Task<List<BrandModel>> GetlistItemAsync()
     {
-        try
-        {
-            // Tổng số Items
-            var totalItems = await _dataContext.Brands.CountAsync();
-            // Tạo đối tượng phân trang
-            var pager = new Paginate(totalItems, page);
-
-            // Danh sách items
-            var data = await _dataContext.Brands
-                .OrderByDescending(p => p.Id)
-                .Skip(pager.Skip)       // Bỏ qua số lượng phần tử
-                .Take(pager.PageSize)   // Lấy số lượng phần tử tiếp đó
-                .ToListAsync();
-
-            return (data, pager);
-        }
-        catch
-        {
-            return (new List<BrandModel>(), new Paginate());
-        }
+        return await _dataContext.Brands.ToListAsync();
     }
 
     // Tạo thương hiệu mới
-    public async Task<OperationResult> CreateAsync(BrandModel brand)
+    public async Task<OperationResult> CreateAsync(BrandModel Brand)
     {
         try
         {
             // Lấy ra slug dựa vào tên thương hiệu
-            brand.Slug = GenerateSlug(brand.Name);
+            Brand.Slug = GenerateSlug(Brand.Name);
 
             // Kiểm tra thương hiệu này tồn tại chưa
-            var result = await IsSlugUnique(brand.Slug);
+            var result = await IsSlugUnique(Brand.Slug);
             if (!result)
-                return new OperationResult(false, "Thương hiệu này đã tồn tại !!!");
+                return new OperationResult(false, "thương hiệu này đã tồn tại !!!");
 
             // Format lại text trong Description
-            brand.Description = SanitizeDescription(brand.Description);
+            Brand.Description = SanitizeDescription(Brand.Description);
 
             // Thêm và lưu lại thương hiệu
-            await _dataContext.Brands.AddAsync(brand);
+            await _dataContext.Brands.AddAsync(Brand);
             await _dataContext.SaveChangesAsync();
 
             return new OperationResult(true, "Thêm thương hiệu mới thành công!!!");
@@ -96,35 +77,35 @@ public class BrandService : IBrandService
     }
 
     // Tìm kiếm thương hiệu chỉnh sửa
-    public async Task<BrandModel?> GetUpdateItemAsync(int id)
+    public async Task<BrandModel> GetUpdateItemAsync(int id)
     {
         return await _dataContext.Brands.FindAsync(id);
     }
 
     // Chỉnh sửa thương hiệu
-    public async Task<OperationResult> UpdateAsync(BrandModel brand)
+    public async Task<OperationResult> UpdateAsync(BrandModel Brand)
     {
         try
         {// Lấy ra slug dựa vào tên thương hiệu
-            brand.Slug = GenerateSlug(brand.Name);
+            Brand.Slug = GenerateSlug(Brand.Name);
 
             // Lấy slug cũ nhưng không làm EF tracking đối tượng tránh trường hợp update bị xung đột
             var oldSlug = await _dataContext.Brands
                 .AsNoTracking()
-                .Where(c => c.Id == brand.Id)
+                .Where(c => c.Id == Brand.Id)
                 .Select(c => c.Slug)
                 .FirstOrDefaultAsync();
 
             // Kiểm tra xem thương hiệu này tồn tại chưa
-            var result = await IsSlugUnique(brand.Slug);
-            if (brand.Slug != oldSlug && !result)
-                return new OperationResult(false, "Thương hiệu này đã tồn tại !!!");
+            var result = await IsSlugUnique(Brand.Slug);
+            if (Brand.Slug != oldSlug && !result)
+                return new OperationResult(false, "thương hiệu này đã tồn tại !!!");
 
             // Format lại text trong Description
-            brand.Description = SanitizeDescription(brand.Description);
+            Brand.Description = SanitizeDescription(Brand.Description);
 
             // Chỉnh sửa thương hiệu
-            _dataContext.Brands.Update(brand);
+            _dataContext.Brands.Update(Brand);
             await _dataContext.SaveChangesAsync();
 
             return new OperationResult(true, "Chỉnh sửa thương hiệu thành công!!!");
@@ -141,12 +122,12 @@ public class BrandService : IBrandService
         try
         {
             // Tìm thương hiệu
-            var brand = await _dataContext.Brands.FindAsync(id);
-            if (brand == null)
+            var Brand = await _dataContext.Brands.FindAsync(id);
+            if (Brand == null)
                 return new OperationResult(false, "Không tìm thấy thương hiệu này!!!");
 
             // Xóa và lưu lại
-            _dataContext.Brands.Remove(brand);
+            _dataContext.Brands.Remove(Brand);
             await _dataContext.SaveChangesAsync();
 
             return new OperationResult(true, "Xóa thương hiệu thành công!!!");

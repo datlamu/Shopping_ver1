@@ -17,34 +17,31 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         }
 
         // Danh sách các thể loại
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int? page)
         {
             // Lấy danh sách và phân trang
-            var (data, pager) = await _categoryService.GetlistItemAsync(page);
+            var data = await _categoryService.GetlistItemAsync();
 
-            ViewBag.Pager = pager;
+            // Trang hiện tại
+            ViewBag.Page = page ?? 0;
 
             return View(data);
         }
 
         // Tạo thể loại mới
         [HttpGet]
-        public IActionResult Create(int page = 1)
+        public IActionResult Create()
         {
-            // Trang hiện tại
-            ViewBag.Page = page;
-
-            return View();
+            return View(new BrandModel());
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CategoryModel category, int page = 1)
+        public async Task<IActionResult> Create(CategoryModel category)
         {
             // Kiểm tra thông tin thể loại
             if (!ModelState.IsValid)
             {
                 TempData["Error"] = "Vui lòng kiểm tra lại thông tin thể loại !!!";
-                ViewBag.Page = page;
                 return View(category);
             }
 
@@ -53,35 +50,35 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             if (!result.Success)
             {
                 TempData["Error"] = result.Message;
-                ViewBag.Page = page;
                 return View(category);
             }
             TempData["Success"] = result.Message;
 
-            return RedirectToAction("Index", new { page });
+            return RedirectToAction("Index");
         }
 
         // Cập nhật thể loại
         [HttpGet]
-        public async Task<IActionResult> Update(int id, int page = 1)
+        public async Task<IActionResult> Update(int id, int? page)
         {
             // Tìm thể loại đã chọn
             var category = await _categoryService.GetUpdateItemAsync(id);
 
             // Trang hiện tại
-            ViewBag.Page = page;
+            ViewBag.Page = page ?? 0;
 
             return View(category);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(CategoryModel category, int page = 1)
+        public async Task<IActionResult> Update(CategoryModel category, int? page)
         {
+            ViewBag.Page = page ?? 0;
+
             // Kiểm tra thông tin thể loại
             if (!ModelState.IsValid)
             {
                 TempData["Error"] = "Vui lòng kiểm tra lại thông tin thể loại !!!";
-                ViewBag.Page = page;
                 return View(category);
             }
 
@@ -90,12 +87,11 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             if (!result.Success)
             {
                 TempData["Error"] = result.Message;
-                ViewBag.Page = page;
                 return View(category);
             }
             TempData["Success"] = result.Message;
 
-            return RedirectToAction("Index", new { page });
+            return RedirectToAction("Index", new { page = page ?? 0 });
         }
 
         // Xóa thể loại
@@ -105,16 +101,6 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             var result = await _categoryService.DeleteAsync(id);
 
             return Json(new { result.Success, result.Message });
-        }
-
-        // Tải lại table cập nhật dữ liệu mới ( ajax )
-        public async Task<IActionResult> GetTable(int page = 1)
-        {
-            var (data, pager) = await _categoryService.GetlistItemAsync(page);
-
-            ViewBag.Pager = pager;
-
-            return PartialView("_CategoryTablePartial", data);
         }
     }
 }

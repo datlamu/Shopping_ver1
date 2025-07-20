@@ -55,29 +55,10 @@ public class SliderService : ISliderService
         return imageName;
     }
 
-    // Lấy danh sách Slider và phân trang
-    public async Task<(List<SliderModel> data, Paginate pager)> GetlistItemAsync(int page)
+    // Lấy danh sách Slider
+    public async Task<List<SliderModel>> GetlistItemAsync()
     {
-        try
-        {
-            // Tổng số Items
-            var totalItems = await _dataContext.Sliders.CountAsync();
-            // Tạo đối tượng phân trang
-            var pager = new Paginate(totalItems, page, 10);
-
-            // Danh sách items
-            var data = await _dataContext.Sliders
-                .OrderByDescending(p => p.Id)
-                .Skip(pager.Skip)       // Bỏ qua số lượng phần tử
-                .Take(pager.PageSize)   // Lấy số lượng phần tử tiếp đó
-                .ToListAsync();
-
-            return (data, pager);
-        }
-        catch
-        {
-            return (new List<SliderModel>(), new Paginate());
-        }
+        return await _dataContext.Sliders.ToListAsync();
     }
 
     // Tạo Slider mới
@@ -108,7 +89,7 @@ public class SliderService : ISliderService
     }
 
     // Tìm kiếm Slider
-    public async Task<SliderModel?> FindSlidersAsync(int id)
+    public async Task<SliderModel?> FindItemsAsync(int id)
     {
         return await _dataContext.Sliders.FindAsync(id);
     }
@@ -118,11 +99,11 @@ public class SliderService : ISliderService
     {
         try
         {
-            // Nếu thay ảnh mới sẽ xét đk đảm bảo không phải ảnh rác hoặc lỗi 
+            // Chắc chắn chắn chọn ảnh và đảm bảo không phải ảnh rác hoặc lỗi 
             if (slider.ImageUpload != null)
             {
-                if (slider.ImageUpload.Length == 0)
-                    return new OperationResult(false, "Ảnh bị lỗi!!!");
+                if (slider.ImageUpload == null || slider.ImageUpload.Length == 0)
+                    return new OperationResult(false, "Vui lòng chọn ảnh");
 
                 // Xóa ảnh trong wroot
                 if (slider.Image != "default.png")
@@ -131,11 +112,9 @@ public class SliderService : ISliderService
                     if (File.Exists(path))
                         File.Delete(path);
                 }
-
                 // Lưu ảnh
                 slider.Image = await SaveImage(slider.ImageUpload);
             }
-
             // Format lại text trong Description
             slider.Description = SanitizeDescription(slider.Description);
 

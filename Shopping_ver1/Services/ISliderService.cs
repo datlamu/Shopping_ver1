@@ -7,11 +7,11 @@ namespace Shopping_ver1.Services
     public interface ISliderService
     {
         // Lấy danh sách Slider và phân trang
-        Task<(List<SliderModel> data, Paginate pager)> GetlistItemAsync(int page);
+        Task<List<SliderModel>> GetlistItemAsync();
         // Tạo Slider mới
         Task<OperationResult> CreateAsync(SliderModel slider);
         // Tìm kiếm Slider
-        Task<SliderModel?> FindSlidersAsync(int id);
+        Task<SliderModel?> FindItemsAsync(int id);
         // Cập nhật Slider
         Task<OperationResult> UpdateAsync(SliderModel slider);
         // Xóa Slider

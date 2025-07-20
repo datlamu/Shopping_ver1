@@ -17,12 +17,12 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         }
 
         // Danh sách Slider
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int? page)
         {
             // Lấy danh sách và phân trang
-            var (data, pager) = await _SliderService.GetlistItemAsync(page);
+            var data = await _SliderService.GetlistItemAsync();
 
-            ViewBag.Pager = pager;
+            ViewBag.Page = page ?? 0;
 
             return View(data);
         }
@@ -58,18 +58,22 @@ namespace Shopping_ver1.Areas.Admin.Controllers
 
         // Chỉnh sửa Slider
         [HttpGet]
-        public async Task<IActionResult> Update(int id)
+        public async Task<IActionResult> Update(int id, int? page)
         {
             // Tìm Slider đã chọn
-            var Slider = await _SliderService.FindSlidersAsync(id);
+            var Slider = await _SliderService.FindItemsAsync(id);
+
+            ViewBag.Page = page ?? 0;
 
             // Quay lại trang create giữ nguyên lại dữ liệu
             return View(Slider);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(SliderModel Slider)
+        public async Task<IActionResult> Update(SliderModel Slider, int? page)
         {
+            ViewBag.Page = page ?? 0;
+
             // Kiểm tra thông tin Slider
             if (!ModelState.IsValid)
             {
@@ -86,26 +90,15 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             }
             TempData["Success"] = result.Message;
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { page = page ?? 0 });
         }
 
         // Xóa Slider
         public async Task<IActionResult> Delete(int id)
         {
-            // Slider
             var result = await _SliderService.DeleteAsync(id);
 
             return Json(new { result.Success, result.Message });
-        }
-
-        // Tải lại table cập nhật dữ liệu mới ( ajax )
-        public async Task<IActionResult> GetTable(int page = 1)
-        {
-            var (data, pager) = await _SliderService.GetlistItemAsync(page);
-
-            ViewBag.Pager = pager;
-
-            return PartialView("_SliderTablePartial", data);
         }
     }
 }
