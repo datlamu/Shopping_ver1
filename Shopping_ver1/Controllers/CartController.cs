@@ -35,9 +35,9 @@ namespace Shopping_ver1.Controllers
 
         // Tăng số lượng sản phẩm trong giỏ hàng
         [HttpPost]
-        public IActionResult Increase(int id)
+        public async Task<IActionResult> Increase(int id)
         {
-            var result = _cartservice.Increase(id);
+            var result = await _cartservice.Increase(id);
 
             return Json(new
             {

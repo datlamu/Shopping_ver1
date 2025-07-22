@@ -10,7 +10,7 @@ namespace Shopping_ver1.Services
         // Thêm sản phẩm vào giỏ hàng
         Task<OperationResult> AddAsync(int id);
         // Tăng số lượng sản phẩm trong giỏ hàng
-        OperationResult Increase(int id);
+        Task<OperationResult> Increase(int id);
         // Giảm số lượng sản phẩm trong giỏ hàng
         OperationResult Decrease(int id);
         // Xóa sản phẩm trong giỏ hàng

@@ -20,12 +20,12 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         public async Task<IActionResult> Index(int? page)
         {
             // Lấy danh sách item
-            var data = await _productService.GetlistItemAsync();
+            var products = await _productService.GetlistItemAsync();
 
             // Trang hiện tại
             ViewBag.Page = page ?? 0;
 
-            return View(data);
+            return View(products);
         }
 
         // Tạo sản phẩm mới
@@ -86,8 +86,6 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             ViewBag.Brands = brands;
             ViewBag.Page = page ?? 0;
 
-
-            // Quay lại trang create giữ nguyên lại dữ liệu
             return View(product);
         }
         [HttpPost]
@@ -118,7 +116,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             }
             TempData["Success"] = result.Message;
 
-            return RedirectToAction("Index", new { page = page });
+            return RedirectToAction("Index", new { page = page ?? 0 });
         }
 
         // Xóa sản phẩm

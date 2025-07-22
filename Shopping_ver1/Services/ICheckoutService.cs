@@ -5,6 +5,7 @@ namespace Shopping_ver1.Services
     public interface ICheckoutService
     {
         // Thanh toán
-        Task<string> CheckoutAsync(string userEmail, List<CartItemModel> cartItems);
+        //Task<string> CheckoutAsync(string userEmail, List<CartItemModel> cartItems);
+        Task<OperationResult> CheckoutAsync(string userEmail, List<CartItemModel> cartItems);
     }
 }

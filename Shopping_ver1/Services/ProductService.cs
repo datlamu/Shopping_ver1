@@ -75,7 +75,11 @@ public class ProductService : IProductService
     // Lấy danh sách sản phẩm
     public async Task<List<ProductModel>> GetlistItemAsync()
     {
-        return await _dataContext.Products.Include(p => p.Category).Include(p => p.Brand).ToListAsync();
+        return await _dataContext.Products
+            .Include(p => p.Brand)
+            .Include(p => p.Category)
+            .Include(p => p.Inventory)
+            .ToListAsync();
     }
 
     // Tìm kiếm
@@ -136,8 +140,13 @@ public class ProductService : IProductService
             // Lưu ảnh
             product.Image = await SaveImage(product.ImageUpload);
 
-            // Tạo mới và lưu lại
+            // Thêm sản phẩm mới
             await _dataContext.Products.AddAsync(product);
+            await _dataContext.SaveChangesAsync();
+
+            // Đưa sản phẩm vào tồn kho
+            var inventory = new InventoryModel() { ProductId = product.Id };
+            await _dataContext.Inventories.AddAsync(inventory);
             await _dataContext.SaveChangesAsync();
 
             return new OperationResult(true, "Thêm sản phẩm mới thành công!!!");
@@ -151,7 +160,7 @@ public class ProductService : IProductService
     // Tìm kiếm sản phẩm
     public async Task<ProductModel> FindProductsAsync(int id)
     {
-        return await _dataContext.Products.FindAsync(id);
+        return await _dataContext.Products.Include(p => p.Inventory).FirstOrDefaultAsync(p => p.Id == id);
     }
 
     // Cập nhật sản phẩm
@@ -191,8 +200,13 @@ public class ProductService : IProductService
                 product.Image = await SaveImage(product.ImageUpload);
             }
 
-            // Cập nhật và lưu lại
+            // Cập nhật sản phẩm
             _dataContext.Products.Update(product);
+
+            // Cập nhật số lượng tồn kho
+            _dataContext.Attach(product.Inventory);
+            _dataContext.Entry(product.Inventory).Property(i => i.QuantityInStock).IsModified = true;
+
             await _dataContext.SaveChangesAsync();
 
             return new OperationResult(true, "Cập nhật sản phẩm mới thành công!!!");
@@ -209,7 +223,7 @@ public class ProductService : IProductService
         try
         {
             // Tìm sản phẩm
-            var product = await _dataContext.Products.FindAsync(id);
+            var product = await _dataContext.Products.Include(p => p.Inventory).FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
                 return new OperationResult(false, "Không tìm thấy sản phẩm");
 
@@ -221,17 +235,17 @@ public class ProductService : IProductService
                     File.Delete(path);
             }
 
-            // Xóa và lưu lại
+            // Xóa tồn kho và sản phẩm
+            _dataContext.Inventories.Remove(product.Inventory);
             _dataContext.Products.Remove(product);
+
             await _dataContext.SaveChangesAsync();
 
             return new OperationResult(true, "Xóa sản phẩm thành công");
-
         }
         catch
         {
             return new OperationResult(false, "Xóa sản phẩm thất bại");
-
         }
     }
 

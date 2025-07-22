@@ -22,7 +22,7 @@ namespace Shopping_ver1.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var product = await _dataContext.Products.ToListAsync();
+            var product = await _dataContext.Products.Include(p => p.Inventory).ToListAsync();
             return View(product);
         }
 

@@ -6,12 +6,14 @@ using Shopping_ver1.Services;
 public class CartService : ICartService
 {
     private readonly DataContext _dataContext;
+    private readonly IProductService _productService;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CartService(DataContext context, IHttpContextAccessor httpContextAccessor)
+    public CartService(DataContext context, IHttpContextAccessor httpContextAccessor, IProductService productService)
     {
         _dataContext = context;
         _httpContextAccessor = httpContextAccessor;
+        _productService = productService;
     }
 
     // Lấy danh sách đơn hàng
@@ -69,7 +71,7 @@ public class CartService : ICartService
     }
 
     // Tăng số lượng sản phẩm trong giỏ hàng
-    public OperationResult Increase(int id)
+    public async Task<OperationResult> Increase(int id)
     {
         // Lấy giỏ hàng từ session
         var session = _httpContextAccessor.HttpContext.Session;
@@ -81,7 +83,12 @@ public class CartService : ICartService
         var cartItem = cart.FirstOrDefault(c => c.ProductId == id);
         if (cartItem == null)
             return new OperationResult(false, "Sản phẩm không tồn tại trong giỏ hàng.");
-        cartItem.Quantity += 1;
+
+        var product = await _productService.FindProductsAsync(id);
+        if (cartItem.Quantity < product.Inventory.QuantityInStock)
+            cartItem.Quantity += 1;
+        else
+            return new OperationResult(false, $"Hiện chỉ còn {product.Inventory.QuantityInStock} sản phẩm trong kho");
 
         // Cập nhật giỏ hàng vào session
         session.SetJson("Cart", cart);

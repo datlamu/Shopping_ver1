@@ -20,6 +20,7 @@
 						<th class="align-middle no-thead-border">STT</th>
 						<th class="align-middle">Tên</th>
 						<th class="align-middle">Mô tả</th>
+						<th class="align-middle">Số lượng</th>
 						<th class="align-middle">Giá</th>
 						<th class="align-middle">Ảnh</th>
 						<th class="align-middle">Thể loại</th>
@@ -34,6 +35,7 @@
 							<td class="align-middle">@(index++)</td>
 							<td class="align-middle">@item.Name</td>
 							<td class="align-middle">@item.Description</td>
+							<td class="align-middle">@item.Inventory.QuantityInStock</td>
 							<td class="align-middle">@FormatCurrency.ToVnCurrency(item.Price)</td>
 							<td class="align-middle"><img src="~/media/products/@item.Image" width="100" /></td>
 							<td class="align-middle">@item.Category?.Name</td>
@@ -57,7 +59,7 @@
 		$(document).ready(function () {
 			table = setupDataTable({
 				enableExport: true,
-				exportColumns: [0, 1, 2, 3, 5, 6],
+				exportColumns: [0, 1, 2, 3, 4, 6,7],
 				buttonsToShow: ['copy', 'csv', 'excel', 'pdf', 'print']
 			});
 

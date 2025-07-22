@@ -48,21 +48,23 @@
 			<div class="col-sm-7">
 				<div class="product-information">
 					<!--/product-information-->
-					<h2>@Model.Name</h2>
-					<p>Web ID: 1089772</p>
-					<span>
-						<span>@FormatCurrency.ToVnCurrency(Model.Price)</span>
-						<label>Quantity:</label>
-						<input type="text" value="3" />
-						<button type="button" class="btn btn-fefault cart">
+					<h2>Tên: @Model.Name</h2>
+					<p><b>Giá tiền: </b>@FormatCurrency.ToVnCurrency(Model.Price)</p>
+					<p><b>Mô tả: </b>@Model.Description</p>
+					<p><b>Thương hiệu: </b>@Model.Brand.Name</p>
+					<p><b>Thể loại: </b>@Model.Category.Name</p>
+					@if (Model.Inventory.QuantityInStock > 0)
+					{
+						<p><b>Kho: </b>Còn @Model.Inventory.QuantityInStock sản phẩm</p>
+						<button type="button" class="btn btn-fefault cart" style="margin-left: 0">
 							<i class="fa fa-shopping-cart"></i>
-							Add to cart
+							Thêm giỏ hàng
 						</button>
-					</span>
-					<p><b>Availability:</b> In Stock</p>
-					<p><b>Condition:</b> New</p>
-					<p><b>Brand:</b> @Model.Brand.Name</p>
-					<p><b>Category:</b> @Model.Category.Name</p>
+					}
+					else
+					{
+						<p><b>Kho: </b>Hết hàng</p>
+					}
 					<a href=""><img src="images/product-details/share.png" class="share img-responsive" alt="" /></a>
 				</div><!--/product-information-->
 			</div>

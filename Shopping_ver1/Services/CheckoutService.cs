@@ -1,6 +1,9 @@
-﻿using Shopping_ver1.Models;
+﻿using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services;
+
 
 public class CheckoutService : ICheckoutService
 {
@@ -14,29 +17,93 @@ public class CheckoutService : ICheckoutService
     }
 
     // Thanh toán
-    public async Task<string> CheckoutAsync(string userEmail, List<CartItemModel> cartItems)
+    //public async Task<string> CheckoutAsync(string userEmail, List<CartItemModel> cartItems)
+    //{
+    //    // Thêm đơn hàng
+    //    var orderCode = Guid.NewGuid().ToString();
+    //    var orderItem = new OrderModel(orderCode, userEmail);
+    //    await _context.Orders.AddAsync(orderItem);
+
+    //    // Thêm chi tiết đơn đơn hàng
+    //    foreach (var item in cartItems)
+    //    {
+    //        var orderDetails = new OrderDetailModel(orderItem, item);
+    //        await _context.OrderDetails.AddAsync(orderDetails);
+
+    //        // Lấy tồn kho
+    //        var inventory = await _context.Inventories.FirstOrDefaultAsync(i => i.ProductId == item.ProductId);
+    //        if (inventory != null)
+    //        {
+    //            // Kiểm tra tồn kho đủ
+    //            if (inventory.QuantityInStock >= item.Quantity)
+    //                inventory.QuantityInStock -= item.Quantity;
+    //        }
+    //    }
+    //    // Lưu lại database
+    //    await _context.SaveChangesAsync();
+
+    //    // Đặt hàng thành công ( test email )
+    //    var toEmail = "172100119@dntu.edu.vn";
+    //    var subject = "Đặt hàng thành công !";
+    //    var body = $"Cảm ơn bạn đã ủng hộ, Mã đơn hàng của bạn là: {orderCode}!";
+    //    await _emailService.SendEmailAsync(toEmail, subject, body);
+
+    //    return orderCode;
+    //}
+
+    public async Task<OperationResult> CheckoutAsync(string userEmail, List<CartItemModel> cartItems)
     {
-        // Thêm đơn hàng
-        var orderCode = Guid.NewGuid().ToString();
-        var orderItem = new OrderModel(orderCode, userEmail);
-        _context.Add(orderItem);
-
-        // Thêm chi tiết đơn đơn hàng
-        foreach (var item in cartItems)
+        try
         {
-            var orderDetails = new OrderDetailModel(orderItem, item);
-            _context.Add(orderDetails);
+            // Lấy tồn kho từ giỏ hàng
+            var productIds = cartItems.Select(c => c.ProductId).ToList();
+            var inventories = await _context.Inventories
+                .Where(i => productIds.Contains(i.ProductId))
+                .ToDictionaryAsync(i => i.ProductId);
+
+            // Kiểm tra tồn kho
+            foreach (var item in cartItems)
+            {
+                if (!inventories.TryGetValue(item.ProductId, out var inventory) || inventory.QuantityInStock < item.Quantity)
+                {
+                    return new OperationResult(false, $"Sản phẩm {item.ProductName} không đủ hàng !!!");
+                }
+            }
+
+            // Thêm đơn hàng
+            var orderCode = Guid.NewGuid().ToString();
+            var order = new OrderModel(orderCode, userEmail);
+            await _context.Orders.AddAsync(order);
+
+            // Thêm chi tiết đơn đơn hàng
+            var orderDetails = cartItems.Select(ci => new OrderDetailModel(order, ci)).ToList();
+            await _context.OrderDetails.AddRangeAsync(orderDetails);
+
+            // Cập nhật tồn kho
+            foreach (var item in cartItems)
+            {
+                inventories[item.ProductId].QuantityInStock -= item.Quantity;
+            }
+
+            // Lưu database
+            await _context.SaveChangesAsync();
+
+            // Gửi email 
+            //var toEmail = userEmail;
+            var toEmail = "172100119@dntu.edu.vn"; // test email
+            var subject = "Đặt hàng thành công !";
+            var body = $"Cảm ơn bạn đã ủng hộ, Mã đơn hàng của bạn là: {orderCode}!";
+            _ = Task.Run(async () =>
+            {
+                await _emailService.SendEmailAsync(toEmail, subject, body);
+            });
+
+            // Đặt hàng thành công
+            return new OperationResult(true, $"Đặt hàng thành công! Mã đơn hàng của bạn là: {orderCode}");
         }
-
-        // Lưu lại database
-        await _context.SaveChangesAsync();
-
-        // Đặt hàng thành công ( test email )
-        var toEmail = "172100119@dntu.edu.vn";
-        var subject = "Đặt hàng thành công !";
-        var body = $"Cảm ơn bạn đã ủng hộ, Mã đơn hàng của bạn là: {orderCode}!";
-        await _emailService.SendEmailAsync(toEmail, subject, body);
-
-        return orderCode;
+        catch
+        {
+            return new OperationResult(false, $"Có lỗi khi đặt hàng !!!");
+        }
     }
 }

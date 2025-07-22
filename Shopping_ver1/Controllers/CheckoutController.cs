@@ -8,12 +8,10 @@ namespace Shopping_ver1.Controllers
 {
     public class CheckoutController : Controller
     {
-        private readonly ICheckoutService _cks;
-        private readonly IEmailService _emailService;
-        public CheckoutController(ICheckoutService cks, IEmailService emailService)
+        private readonly ICheckoutService _checkoutService;
+        public CheckoutController(ICheckoutService checkoutService)
         {
-            _cks = cks;
-            _emailService = emailService;
+            _checkoutService = checkoutService;
         }
         // Thực hiện thanh toán
         public async Task<IActionResult> Index()
@@ -35,13 +33,18 @@ namespace Shopping_ver1.Controllers
             }
 
             // Thực hiện thanh toán
-            var orderCode = await _cks.CheckoutAsync(userEmail, carts);
+            var result = await _checkoutService.CheckoutAsync(userEmail, carts);
+            if (!result.Success)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction("Index", "Cart");
+            }
 
             // Xóa giỏ hàng khỏi session
             HttpContext.Session.Remove("Cart");
 
-            // Thông báo và quay lại trang giỏ hàng
-            TempData["Success"] = $"Đặt hàng thành công! Mã đơn hàng: {orderCode}";
+            // Đặt hàng thành công
+            TempData["Success"] = result.Message;
             return RedirectToAction("Index", "Cart");
         }
     }
