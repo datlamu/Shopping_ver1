@@ -1,21 +1,19 @@
 ﻿@model ProductModel
 @{
 	var related = ViewBag.RelatedProducts as List<ProductModel> ?? new List<ProductModel>();
-	int count = related.Count;
 
-	// Bổ sung thêm nếu không chia hết 3
-	int remainder = count % 3;
-	if (remainder > 0 && count >= 3)
-		for (int i = 0; i < 3 - remainder; i++)
-			related.Add(related[i]); // Lặp lại từ đầu
-
-	int totalGroups = related.Count / 3;
+	// Nhóm 3 sản phẩm liên quan
+	int itemsPerGroup = 3;
+	var grouped = related
+		.Select((p, index) => new { Product = p, Index = index })
+		.GroupBy(x => x.Index / itemsPerGroup)
+		.Select(g => g.Select(x => x.Product).ToList())
+		.ToList();
 }
 <div class="row">
 	<div class="col-sm-3">
 		<partial name="_SidebarPartial" />
 	</div>
-
 	<div class="col-sm-9 padding-right">
 		<div class="product-details">
 			<!--product-details-->
@@ -206,19 +204,17 @@
 		</div><!--/category-tab-->
 
 		<div class="recommended_items">
-			<!--recommended_items-->
 			<h2 class="title text-center">Các sản phẩm liên quan</h2>
 
 			<div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
 				<div class="carousel-inner">
 					<div class="carousel-inner">
-						@for (int i = 0; i < totalGroups; i++)
+						@for (int i = 0; i < grouped.Count; i++)
 						{
+							var group = grouped[i];
 							<div class="item @(i == 0 ? "active" : "")">
-								@for (int j = 0; j < 3; j++)
+								@foreach (var product in group)
 								{
-									var product = related[i * 3 + j];
-
 									<div class="col-sm-4">
 										<div class="product-image-wrapper">
 											<div class="single-products">
@@ -238,12 +234,15 @@
 						}
 					</div>
 				</div>
-				<a class="left recommended-item-control" href="#recommended-item-carousel" data-slide="prev">
-					<i class="fa fa-angle-left"></i>
-				</a>
-				<a class="right recommended-item-control" href="#recommended-item-carousel" data-slide="next">
-					<i class="fa fa-angle-right"></i>
-				</a>
+				@if (related.Count > 3)
+				{
+					<a class="left recommended-item-control" href="#recommended-item-carousel" data-slide="prev">
+						<i class="fa fa-angle-left"></i>
+					</a>
+					<a class="right recommended-item-control" href="#recommended-item-carousel" data-slide="next">
+						<i class="fa fa-angle-right"></i>
+					</a>
+				}
 			</div>
 		</div><!--/recommended_items-->
 

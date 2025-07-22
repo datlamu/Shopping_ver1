@@ -17,40 +17,6 @@ public class CheckoutService : ICheckoutService
     }
 
     // Thanh toán
-    //public async Task<string> CheckoutAsync(string userEmail, List<CartItemModel> cartItems)
-    //{
-    //    // Thêm đơn hàng
-    //    var orderCode = Guid.NewGuid().ToString();
-    //    var orderItem = new OrderModel(orderCode, userEmail);
-    //    await _context.Orders.AddAsync(orderItem);
-
-    //    // Thêm chi tiết đơn đơn hàng
-    //    foreach (var item in cartItems)
-    //    {
-    //        var orderDetails = new OrderDetailModel(orderItem, item);
-    //        await _context.OrderDetails.AddAsync(orderDetails);
-
-    //        // Lấy tồn kho
-    //        var inventory = await _context.Inventories.FirstOrDefaultAsync(i => i.ProductId == item.ProductId);
-    //        if (inventory != null)
-    //        {
-    //            // Kiểm tra tồn kho đủ
-    //            if (inventory.QuantityInStock >= item.Quantity)
-    //                inventory.QuantityInStock -= item.Quantity;
-    //        }
-    //    }
-    //    // Lưu lại database
-    //    await _context.SaveChangesAsync();
-
-    //    // Đặt hàng thành công ( test email )
-    //    var toEmail = "172100119@dntu.edu.vn";
-    //    var subject = "Đặt hàng thành công !";
-    //    var body = $"Cảm ơn bạn đã ủng hộ, Mã đơn hàng của bạn là: {orderCode}!";
-    //    await _emailService.SendEmailAsync(toEmail, subject, body);
-
-    //    return orderCode;
-    //}
-
     public async Task<OperationResult> CheckoutAsync(string userEmail, List<CartItemModel> cartItems)
     {
         try
