@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Shopping_ver1.Helpers;
 using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Repository;
-using Shopping_ver1.Services;
+using Shopping_ver1.Services.Abstract;
 
 namespace Shopping_ver1.Areas.Admin.Controllers
 {
@@ -25,14 +24,8 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             _dataContext = dataContext;
         }
         // Danh sách các user
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int? page)
         {
-            // Tổng số Items
-            var totalItems = await _dataContext.Categories.CountAsync();
-
-            // Tạo đối tượng phân trang
-            var pager = new Paginate(totalItems, page);
-
             // Danh sách items - Linq
             var data = await (
                 from u in _dataContext.Users
@@ -44,18 +37,16 @@ namespace Shopping_ver1.Areas.Admin.Controllers
                     RoleName = r.Name
                 }
             )
-            .Skip(pager.Skip) // Bỏ qua số lượng phần tử
-            .Take(pager.PageSize) // Lấy số lượng phần tử tiếp đó
             .ToListAsync();
 
-            ViewBag.Pager = pager;
+            ViewBag.Page = page ?? 0;
 
             return View(data);
         }
 
         // Tạo user mới
         [HttpGet]
-        public async Task<IActionResult> CreateUser()
+        public async Task<IActionResult> Create()
         {
             // Lấy danh sách role
             var roles = await _roleManager.Roles.ToListAsync();
@@ -71,9 +62,9 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         }
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> CreateUser(RegisterViewModel user)
+        public async Task<IActionResult> Create(RegisterViewModel user)
         {
-            // Kiểm tra dữ liệu
+            // Kiểm tra thông tin
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Vui lòng kiểm tra lại thông tin !!!");
@@ -84,7 +75,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Lấy ra Role từ roleId
             var role = await _roleManager.FindByIdAsync(user.RoleId);
 
-            // Thực hiện đăng ký và kiểm tra
+            // Đăng ký tài khoản
             var result = await _userService.RegisterAsync(user, role.Name);
             if (!result.Succeeded)
             {
@@ -99,25 +90,30 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         }
         // Chỉnh sửa thông tin user
         [HttpGet]
-        public async Task<IActionResult> EditUser(string id)
+        public async Task<IActionResult> Update(string id, int? page)
         {
             var user = await _userService.GetEditUserViewModelAsync(id);
+
             if (user == null)
             {
-                TempData["Error"] = "Không tìm thấy thông tin user!";
+                TempData["Error"] = "Không tìm thấy thông tin người dùng này!";
                 return NotFound();
             }
+
+            ViewBag.Page = page ?? 0;
+
             return View(user);
         }
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> EditUser(EditUserViewModel editUser)
+        public async Task<IActionResult> Update(EditUserViewModel editUser, int? page)
         {
+            ViewBag.Page = page ?? 0;
+
             // Kiểm tra dữ liệu
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Vui lòng kiểm tra lại thông tin !!!");
-                editUser.Roles = await GetRolesAsync();
                 return View(editUser);
             }
 
@@ -126,13 +122,12 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             if (!result.Success)
             {
                 ModelState.AddModelError(string.Empty, result.Message);
-                editUser.Roles = await GetRolesAsync();
                 return View(editUser);
             }
 
             // Chỉnh sửa thành công
             TempData["Success"] = result.Message;
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { page = page ?? 0 });
         }
 
         // Lấy roles
@@ -143,11 +138,11 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         }
 
         // Xóa user
-        public async Task<IActionResult> DeleteUser(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             var result = await _userService.DeleteUserAsync(id);
-            TempData[result.Success ? "Success" : "Error"] = result.Message;
-            return RedirectToAction("Index");
+
+            return Json(new { result.Success, result.Message });
         }
     }
 }

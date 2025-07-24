@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Shopping_ver1.Models;
 using Shopping_ver1.Models.ViewModels;
 
-namespace Shopping_ver1.Services
+namespace Shopping_ver1.Services.Abstract
 {
     public interface IUserService
     {
@@ -18,7 +19,7 @@ namespace Shopping_ver1.Services
         Task<(bool Success, string Message)> EditUserAsync(EditUserViewModel model);
 
         // Xóa user
-        Task<(bool Success, string Message)> DeleteUserAsync(string userId);
+        Task<OperationResult> DeleteUserAsync(string userId);
 
         // Đăng xuất
         Task LogoutAsync();

@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
-using Shopping_ver1.Services;
+using Shopping_ver1.Services.Abstract;
+using Shopping_ver1.Services.Implement;
 
 var builder = WebApplication.CreateBuilder(args);
 

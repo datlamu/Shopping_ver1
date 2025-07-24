@@ -27,10 +27,10 @@
 						<th class="align-middle">Thương hiệu</th>
 						<th class="align-middle">Tùy chọn</th>
 					</tr>
-					</thea>
+				</thead>
 				<tbody>
-						@foreach (var item in Model)
-						{
+					@foreach (var item in Model)
+					{
 						<tr>
 							<td class="align-middle">@(index++)</td>
 							<td class="align-middle">@item.Name</td>
@@ -45,7 +45,7 @@
 								<button class="btn btn-danger btn-sm btn-delete" value="@item.Id"><i class="fas fa-trash-alt"></i></button>
 							</td>
 						</tr>
-						}
+					}
 				</tbody>
 
 			</table>

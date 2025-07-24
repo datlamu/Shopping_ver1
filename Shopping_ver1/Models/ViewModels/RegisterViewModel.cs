@@ -6,7 +6,7 @@ namespace Shopping_ver1.Models.ViewModels
     public class RegisterViewModel
     {
         [Required(ErrorMessage = "Hãy nhập Username")]
-        public string UserName { get; set; }
+        public string Username { get; set; }
         [Required(ErrorMessage = "Hãy nhập Email"), EmailAddress]
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
@@ -16,12 +16,5 @@ namespace Shopping_ver1.Models.ViewModels
         public IEnumerable<SelectListItem> Roles { get; set; }
 
         public RegisterViewModel() { }
-        public RegisterViewModel(UserModel user)
-        {
-            UserName = user.UserName;
-            Email = user.Email;
-            PhoneNumber = user.PhoneNumber;
-        }
-
     }
 }

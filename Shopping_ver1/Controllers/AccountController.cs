@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shopping_ver1.Models.ViewModels;
-using Shopping_ver1.Services;
+using Shopping_ver1.Services.Abstract;
 
 namespace Shopping_ver1.Controllers
 {
@@ -8,18 +8,16 @@ namespace Shopping_ver1.Controllers
     {
         // Service
         private readonly IUserService _userService;
-        private readonly IEmailService _emailService;
 
         // Inject Service
-        public AccountController(IUserService userService, IEmailService emailService)
+        public AccountController(IUserService userService)
         {
             _userService = userService;
-            _emailService = emailService;
         }
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Login");
         }
 
         // Đăng nhập tài khoản
@@ -64,17 +62,15 @@ namespace Shopping_ver1.Controllers
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel user)
         {
-            // Kiểm tra dữ liệu
+            // Kiểm tra thông tin
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Vui lòng kiểm tra lại thông tin !!!");
                 return View(user);
             }
 
-            // Kết quả đăng ký
+            // Đăng ký tài khoản
             var result = await _userService.RegisterAsync(user);
-
-            // Đăng ký thất bại
             if (!result.Succeeded)
             {
                 ModelState.AddModelError(string.Empty, "Đăng ký thất bại, vui lòng xem lại thông tin đăng ký");
@@ -92,6 +88,10 @@ namespace Shopping_ver1.Controllers
             await _userService.LogoutAsync();
             TempData["Success"] = "Đăng xuất thành công!";
             return Redirect(returnUrl);
+        }
+        public ActionResult ForgotPassword()
+        {
+            return View();
         }
 
     }

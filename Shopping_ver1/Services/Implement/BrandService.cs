@@ -1,10 +1,9 @@
 ﻿using System.Net;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
-using Shopping_ver1.Helpers;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
-using Shopping_ver1.Services;
+using Shopping_ver1.Services.Abstract;
 
 public class BrandService : IBrandService
 {

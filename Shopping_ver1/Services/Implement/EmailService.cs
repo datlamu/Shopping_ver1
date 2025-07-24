@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 using Shopping_ver1.Models;
-using Shopping_ver1.Services;
 using System.Net.Mail;
 using System.Net;
+using Shopping_ver1.Services.Abstract;
 
 public class EmailService : IEmailService
 {

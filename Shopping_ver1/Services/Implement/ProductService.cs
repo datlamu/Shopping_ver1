@@ -1,10 +1,9 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Shopping_ver1.Migrations;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
-using Shopping_ver1.Services;
+using Shopping_ver1.Services.Abstract;
 
 public class ProductService : IProductService
 {

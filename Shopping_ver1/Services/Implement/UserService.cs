@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Models;
 using Shopping_ver1.Models.ViewModels;
+using Shopping_ver1.Services.Abstract;
 
-namespace Shopping_ver1.Services
+namespace Shopping_ver1.Services.Implement
 {
     public class UserService : IUserService
     {
@@ -30,7 +31,15 @@ namespace Shopping_ver1.Services
         // Đăng nhập
         public async Task<SignInResult> LoginAsync(LoginViewModel user)
         {
-            var result = await _signInManager.PasswordSignInAsync(user.UserName, user.Password, false, false);
+            // Tìm người dùng theo email
+            var existingUser = await _userManager.FindByEmailAsync(user.Email);
+            if (existingUser == null)
+            {
+                // Nếu không tìm thấy email => thất bại
+                return SignInResult.Failed;
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(existingUser.UserName, user.Password, false, false);
 
             // Đăng nhập thành công ( test email )
             if (result.Succeeded)
@@ -50,7 +59,7 @@ namespace Shopping_ver1.Services
             // Tạo user model
             var userModel = new UserModel
             {
-                UserName = user.UserName,
+                UserName = user.Username,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber
             };
@@ -99,7 +108,7 @@ namespace Shopping_ver1.Services
 
             // Lấy thông tin thay đổi
             user.Email = model.Email;
-            user.UserName = model.UserName;
+            user.UserName = model.Username;
             user.PhoneNumber = model.PhoneNumber;
 
             // Cập nhật
@@ -128,16 +137,16 @@ namespace Shopping_ver1.Services
         }
 
         // Xóa user
-        public async Task<(bool Success, string Message)> DeleteUserAsync(string userId)
+        public async Task<OperationResult> DeleteUserAsync(string id)
         {
             // Kiểm tra Id
-            if (string.IsNullOrEmpty(userId))
-                return (false, "ID không hợp lệ!");
+            if (string.IsNullOrEmpty(id))
+                return new OperationResult(false, "ID không hợp lệ!");
 
             // Kiểm tra User
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
-                return (false, "Không tìm thấy thông tin user này!");
+                return new OperationResult(false, "Không tìm thấy thông tin user này!");
 
             // Lấy xóa Role của User
             var roles = await _userManager.GetRolesAsync(user);
@@ -145,16 +154,16 @@ namespace Shopping_ver1.Services
             {
                 var removeResult = await _userManager.RemoveFromRolesAsync(user, roles);
                 if (!removeResult.Succeeded)
-                    return (false, "Xóa role của người dùng thất bại!");
+                    return new OperationResult(false, "Xóa role của người dùng thất bại!");
             }
 
             // Xóa User
             var deleteResult = await _userManager.DeleteAsync(user);
             if (!deleteResult.Succeeded)
-                return (false, "Xóa người dùng thất bại!");
+                return new OperationResult(false, "Xóa người dùng thất bại!");
 
             // Kết quả nếu thành công
-            return (true, "Xóa thành công!");
+            return new OperationResult(true, "Xóa thành công!");
         }
 
         // Đăng xuất

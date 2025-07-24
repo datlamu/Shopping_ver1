@@ -1,7 +1,6 @@
-﻿using Shopping_ver1.Helpers;
-using Shopping_ver1.Models;
+﻿using Shopping_ver1.Models;
 
-namespace Shopping_ver1.Services
+namespace Shopping_ver1.Services.Abstract
 {
     public interface IOrderService
     {

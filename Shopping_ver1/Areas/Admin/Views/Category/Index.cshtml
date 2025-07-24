@@ -23,30 +23,30 @@
 						<th class="align-middle">Trạng thái</th>
 						<th class="align-middle">Tùy chọn</th>
 					</tr>
-					</thea>
+				</thead>
 				<tbody>
-						@foreach (var item in Model)
-						{
+					@foreach (var item in Model)
+					{
 						<tr>
 							<td class="align-middle">@(index++)</td>
 							<td class="align-middle">@item.Name</td>
 							<td class="align-middle">@item.Description</td>
 							<td class="align-middle">
-									@if (item.Status == 1)
-									{
+								@if (item.Status == 1)
+								{
 									<span class="text-success">Hiển thị</span>
-									}
-									else
-									{
+								}
+								else
+								{
 									<span class="text-danger">Ẩn</span>
-									}
+								}
 							</td>
 							<td class="align-middle">
 								<button class="btn btn-warning btn-sm btn-update" value="@item.Id"><i class="fas fa-edit"></i></button>
 								<button class="btn btn-danger btn-sm btn-delete" value="@item.Id"><i class="fas fa-trash-alt"></i></button>
 							</td>
 						</tr>
-						}
+					}
 				</tbody>
 
 			</table>

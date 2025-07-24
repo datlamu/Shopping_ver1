@@ -6,7 +6,7 @@ namespace Shopping_ver1.Models.ViewModels
     public class EditUserViewModel
     {
         public string Id { get; set; }
-        public string UserName { get; set; }
+        public string Username { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public string RoleId { get; set; }
@@ -17,7 +17,7 @@ namespace Shopping_ver1.Models.ViewModels
         public EditUserViewModel(UserModel user, string roleId, IEnumerable<SelectListItem> roles)
         {
             Id = user.Id;
-            UserName = user.UserName;
+            Username = user.UserName;
             Email = user.Email;
             PhoneNumber = user.PhoneNumber;
             RoleId = roleId;

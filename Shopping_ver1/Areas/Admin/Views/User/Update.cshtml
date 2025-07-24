@@ -1,0 +1,50 @@
+﻿@model EditUserViewModel
+@{
+	Layout = "~/Views/Shared/_AccountLayout.cshtml";
+	ViewData["Title"] = "Cập nhật thông tin người dùng";
+}
+
+<div class="card o-hidden border-0 shadow-lg my-5">
+	<div class="card-body p-0">
+		<!-- Nested Row within Card Body -->
+		<div class="row">
+			<div class="col-lg-5 d-none d-lg-block p-0">
+				<img src="~/media/logos/viewAccount.jpg" class="w-100 h-100" style="object-fit: cover;" />
+			</div>
+			<div class="col-lg-7">
+				<div class="p-5">
+					<div class="text-center">
+						<h1 class="h4 text-gray-900 mb-4">Cập nhật thông tin người dùng!</h1>
+					</div>
+					<form asp-area="Admin" asp-controller="User" asp-action="Update" method="post" class="user">
+
+						@Html.AntiForgeryToken()
+						<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+						<input asp-for="Id" type="hidden" />
+						<input type="hidden" name="page" value="@ViewBag.Page" />
+
+						<div class="form-group">
+							<input asp-for="Username" class="form-control form-control-user" placeholder="Username">
+							<span asp-validation-for="Username" class="text-danger" />
+						</div>
+						<div class="form-group">
+							<input asp-for="Email" type="email" class="form-control form-control-user" placeholder="Email Address">
+							<span asp-validation-for="Email" class="text-danger" />
+						</div>
+						<div class="form-group">
+							<select asp-for="RoleId" class="form-control" asp-items="@Model.Roles">
+							</select>
+							<span asp-validation-for="RoleId" class="text-danger" />
+						</div>
+						<button class="btn btn-primary btn-user btn-block">Cập nhật</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

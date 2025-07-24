@@ -1,4 +1,4 @@
-﻿namespace Shopping_ver1.Services
+﻿namespace Shopping_ver1.Services.Abstract
 {
     public interface IEmailService
     {

@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using Shopping_ver1.Helpers;
-using Shopping_ver1.Models;
+﻿using Shopping_ver1.Models;
 
-namespace Shopping_ver1.Services
+namespace Shopping_ver1.Services.Abstract
 {
     public interface ISliderService
     {
@@ -11,7 +9,7 @@ namespace Shopping_ver1.Services
         // Tạo Slider mới
         Task<OperationResult> CreateAsync(SliderModel slider);
         // Tìm kiếm Slider
-        Task<SliderModel?> FindItemsAsync(int id);
+        Task<SliderModel> FindItemsAsync(int id);
         // Cập nhật Slider
         Task<OperationResult> UpdateAsync(SliderModel slider);
         // Xóa Slider
