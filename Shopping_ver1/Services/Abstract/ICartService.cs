@@ -13,6 +13,8 @@ namespace Shopping_ver1.Services.Abstract
         Task<OperationResult> Increase(int id);
         // Giảm số lượng sản phẩm trong giỏ hàng
         OperationResult Decrease(int id);
+        // Giảm số lượng sản phẩm trong giỏ hàng
+        OperationResult UpdateQuantityCart(int id, int quantity);
         // Xóa sản phẩm trong giỏ hàng
         OperationResult Remove(int id);
         // Làm mới giỏ hàng

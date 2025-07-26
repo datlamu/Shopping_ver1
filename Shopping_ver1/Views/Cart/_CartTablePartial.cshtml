@@ -12,12 +12,12 @@
 			<table class="table table-condensed" style="margin-bottom: 0;">
 				<thead>
 					<tr class="cart_menu">
-						<td class="image">Item</td>
-						<td class="description">Description</td>
-						<td class="price">Price</td>
-						<td class="quantity">Quantity</td>
-						<td class="total">Total</td>
-						<td>Manage</td>
+						<td class="description">Tên</td>
+						<td class="image">Ảnh</td>
+						<td class="price">Giá</td>
+						<td class="quantity">Số lượng</td>
+						<td class="total">Thành tiền</td>
+						<td>Tùy chọn</td>
 					</tr>
 				</thead>
 				<tbody>
@@ -26,22 +26,26 @@
 						foreach (var item in Model.CartItems)
 						{
 							<tr>
+								<td class="cart_description">
+									<h4>@item.ProductName</h4>
+								</td>
 								<td class="cart_product">
 									<a href=""><img src="~/media/products/@item.Image" width="200px" alt=""></a>
 								</td>
-								<td class="cart_description">
-									<h4><a href="">@item.ProductName</a></h4>
-								</td>
 								<td class="cart_price">
-									<p>@item.Price</p>
+									<p>@FormatCurrency.ToVnCurrency(item.Price)</p>
 								</td>
 								<td class="">
-									<button class="btn btn-success btn-sm decrease-cartitem" value="@item.ProductId"> - </button>
-									<input class="cart_quantity_input" type="text" name="quantity" value="@item.Quantity" autocomplete="off" size="2">
-									<button class="btn btn-primary btn-sm increase-cartitem" value="@item.ProductId"> + </button>
+									<button class="btn btn-success btn-sm decrease-cartitem" value="@item.ProductId">
+										<i class="fa fa-minus"></i>
+									</button>
+									<input class="cart_quantity_input mx-1 text-center" type="text" name="quantity" value="@item.Quantity" autocomplete="off" size="2">
+									<button class="btn btn-primary btn-sm increase-cartitem" value="@item.ProductId">
+										<i class="fa fa-plus"></i>
+									</button>
 								</td>
 								<td class="cart_total">
-									<p class="cart_total_price">@item.Total</p>
+									<p class="cart_total_price">@FormatCurrency.ToVnCurrency(@item.Total)</p>
 								</td>
 								<td class="cart_delete">
 									<button class="btn btn-danger btn-sm remove-cartitem" value="@item.ProductId"><i class="fa fa-times"></i></button>
@@ -50,15 +54,15 @@
 						}
 						<tr>
 							<td class="cart_total" colspan="6" align="right">
-								<p class="cart_total_price">Grand Total: @Model.GrandTotal</p>
+								<p class="cart_total_price">Tổng đơn hàng: @FormatCurrency.ToVnCurrency(Model.GrandTotal)</p>
 							</td>
 						</tr>
 						<tr>
 							<td colspan="6" align="right">
-								<button class="btn btn-danger btn-sm clear-cart">Clear</button>
+								<button class="btn btn-danger btn-sm clear-cart">Giỏ hàng mới</button>
 								@if (User.Identity?.IsAuthenticated ?? false)
 								{
-									<a class="btn btn-primary btn-sm" asp-controller="Checkout" asp-action="Index">Checkout</a>
+									<a class="btn btn-primary btn-sm" asp-controller="Checkout" asp-action="Index">Thanh toán</a>
 								}
 							</td>
 						</tr>
@@ -67,7 +71,7 @@
 					{
 						<tr>
 							<td class="cart_total">
-								<p class="cart_total_price"><h4>Your Cart is Empty</h4></p>
+								<p class="cart_total_price"><h4>Không có sản phẩm nào trong giỏ hàng</h4></p>
 							</td>
 						</tr>
 					}

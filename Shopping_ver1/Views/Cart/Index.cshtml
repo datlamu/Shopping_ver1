@@ -46,6 +46,26 @@
 					}
 				});
 			});
+
+			$('.cart_quantity_input').off('change').on('change', function () {
+				let input = $(this);
+				let quantity = parseInt(input.val());
+				let row = input.closest('tr');
+				let productId = row.find('.increase-cartitem').val();
+
+				var url = '/Cart/UpdateQuantity';
+				let data = { productId, quantity };
+
+				// Gọi Ajax
+				sendAjax({
+					url,
+					data,
+					onSuccess: function () {
+						reloadCartTable();
+					}
+				});
+			});
+
 			$('.remove-cartitem').off('click').on('click', function () {
 
 				// Url Action

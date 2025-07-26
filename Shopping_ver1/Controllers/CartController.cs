@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Shopping_ver1.Models;
 using Shopping_ver1.Services.Abstract;
 
 namespace Shopping_ver1.Controllers
@@ -51,6 +52,19 @@ namespace Shopping_ver1.Controllers
         public IActionResult Decrease(int id)
         {
             var result = _cartservice.Decrease(id);
+
+            return Json(new
+            {
+                success = result.Success,
+                message = result.Message
+            });
+        }
+
+        // Cập nhật số lượng giỏ hàng
+        [HttpPost]
+        public IActionResult UpdateQuantity(int productId, int quantity)
+        {
+            var result = _cartservice.UpdateQuantityCart(productId, quantity);
 
             return Json(new
             {

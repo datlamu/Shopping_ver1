@@ -1,0 +1,157 @@
+﻿@model IEnumerable<ShippingModel>
+@{
+	ViewData["Title"] = "Phí vận chuyển";
+	var index = 1;
+}
+<style>
+	#dataTable thead th {
+		border-bottom: none !important;
+	}
+</style>
+<!-- DataTables Example -->
+<div class="card shadow mb-4">
+	<div class="card-header py-3 d-flex justify-content-between align-items-center">
+		<h6 class="m-0 font-weight-bold text-primary">Danh sách</h6>
+		<a class="btn btn-success btn-sm" asp-area="Admin" asp-controller="Shipping" asp-action="Create">
+			<i class="fas fa-plus"></i>
+		</a>
+	</div>
+
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover" id="dataTable" width="100%" cellspacing="0">
+				<thead class="thead-dark">
+					<tr class="bg-primary text-gray-300">
+						<th class="align-middle no-thead-border">STT</th>
+						<th class="align-middle">Khu vực</th>
+						<th class="align-middle">Ngày tạo</th>
+						<th class="align-middle">Giá</th>
+						<th class="align-middle">Tùy chọn</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td class="align-middle">@(index++)</td>
+							<td class="align-middle" style="width: 450px;">@item.City - @item.District - @item.Ward</td>
+							<td class="align-middle">@item.Datecreated.ToString("dd/MM/yyyy HH:mm:ss")</td>
+							<td class="align-middle">
+								<span class="price-text" style="width: 160px;">@FormatCurrency.ToVnCurrency(item.Price)</span>
+								<input class="form-control price-input d-none" style="width: 160px;" value="@item.Price" />
+							</td>
+							<td class="align-middle">
+								<div class="normal-actions">
+									<button class="btn btn-warning btn-sm btn-edit" data-id="@item.Id">
+										<i class="fas fa-edit"></i>
+									</button>
+									<button class="btn btn-danger btn-sm btn-delete" data-id="@item.Id">
+										<i class="fas fa-trash-alt"></i>
+									</button>
+								</div>
+
+								<div class="edit-actions d-none">
+									<button class="btn btn-success btn-sm btn-save" data-id="@item.Id">
+										<i class="fas fa-check"></i>
+									</button>
+									<button class="btn btn-secondary btn-sm btn-cancel">
+										<i class="fas fa-times"></i>
+									</button>
+								</div>
+							</td>
+
+						</tr>
+					}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+@section Scripts {
+	<script src="~/backend/js/currency.js"></script>
+	<script>
+		let table;
+		$(document).ready(function () {
+			// Export file
+			table = setupDataTable({
+				enableExport: true,
+				exportColumns: [0, 1, 2],
+				buttonsToShow: ['copy', 'csv', 'excel', 'pdf', 'print']
+			});
+
+			// Đổi qua mode edit
+			$('#dataTable').on('click', '.btn-edit', function () {
+				const row = $(this).closest('tr');
+				row.find('.price-text').addClass('d-none');
+				row.find('.price-input').removeClass('d-none');
+				row.find('.normal-actions').addClass('d-none');
+				row.find('.edit-actions').removeClass('d-none');
+			});
+
+			// Hủy bỏ mode edit
+			$('#dataTable').on('click', '.btn-cancel', function () {
+				const row = $(this).closest('tr');
+				row.find('.price-input').addClass('d-none');
+				row.find('.price-text').removeClass('d-none');
+				row.find('.edit-actions').addClass('d-none');
+				row.find('.normal-actions').removeClass('d-none');
+			});
+
+			// ajax update
+			$('#dataTable').on('click', '.btn-save', function () {
+				const row = $(this).closest('tr');
+				const id = $(this).data('id');
+				const newPrice = row.find('.price-input').val();
+
+				// Kiểm tra: có phải số và >= 0 không?
+				if (isNaN(newPrice) || newPrice === '' || Number(newPrice) < 0) {
+					Swal.fire({
+						position: 'top-end',
+						icon: 'error',
+						title: 'Vui lòng nhập số hợp lệ và phải lớn hơn hoặc bằng 0',
+						showConfirmButton: false,
+						timer: 1500
+					});
+				}
+				else{
+					var url = '/Admin/Shipping/Update';
+					let data = {id, newPrice};
+
+					// Gọi Ajax
+					sendAjax({
+						url,
+						data,
+						onSuccess : function () {
+							// Chuyển về mặc định khi thành công
+							row.find('.price-text').text(formatCurrencyVND(newPrice)).removeClass('d-none');
+							row.find('.price-input').addClass('d-none');
+							row.find('.edit-actions').addClass('d-none');
+							row.find('.normal-actions').removeClass('d-none');
+						},
+					});
+				}
+			});
+
+
+			// ajax xóa
+			$('#dataTable').on('click', '.btn-delete', function () {
+				var row = $(this).closest('tr');
+				var url = '/Admin/Shipping/Delete';
+				var id = $(this).val();
+				let data = { id };
+
+				// Gọi Ajax
+				sendAjax({
+					url,
+					data,
+					onSuccess: function () {
+						// Xóa hàng đã chọn và giữ nguyên trang
+						table.row(row).remove().draw(false);
+					}
+				});
+			});
+		});
+	</script>
+
+}

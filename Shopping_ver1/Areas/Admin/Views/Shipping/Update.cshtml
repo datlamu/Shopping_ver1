@@ -1,0 +1,113 @@
+﻿@model ShippingModel
+@{
+	ViewData["title"] = "Phí vận chuyển";
+}
+
+<h3>Tạo phí vận chuyển mới</h3>
+<form method="post" id="shipping-form">
+	@Html.AntiForgeryToken()
+
+	<label>Chọn khu vực</label>
+	<div class="form-group">
+		<select class="form-control" id="tinh" name="tinh" data-value="@Model.City">
+			<option value="0"></option>
+		</select>
+	</div>
+	<div class="form-group">
+		<select class="form-control" id="quan" name="quan">
+			<option value="0">@Model.District</option>
+		</select>
+	</div>
+	<div class="form-group">
+		<select class="form-control" id="phuong" name="phuong">
+			<option value="0">@Model.Ward</option>
+		</select>
+	</div>
+	<div class="form-group">
+		<label>Phí vận chuyển</label>
+		<input asp-for="Price" class="form-control" id="price-shipping" type="number" />
+		<span asp-validation-for="Price" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<button type="submit" class="btn btn-success">Tạo mới</button>
+	</div>
+</form>
+
+<a asp-area="Admin" asp-controller="Shipping" asp-action="Index">Quay lại danh sách</a>
+@* RenderPartial *@
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+		<script>
+			$(document).ready(function() {
+				$('#shipping-form').on('submit', function (e) {
+					e.preventDefault();
+
+					var city = $("#tinh").find('option:selected').text();
+					var district = $("#quan").find('option:selected').text();
+					var ward = $("#phuong").find('option:selected').text();
+					var price = $("#price-shipping").val();
+
+					if (city === 'Tỉnh Thành' || district === 'Quận huyện' || ward === 'Phường xã' || price.trim() === '')
+					{
+						Swal.fire({
+							position: 'top-end',
+							icon: 'error',
+							title: 'Vui lòng điền đủ thông tin',
+							showConfirmButton: false,
+							timer: 1500
+						});
+					}
+					else
+					{
+						var url = '/Admin/Shipping/Update';
+						let data = {city, district, ward, price};
+
+						// Gọi Ajax
+						sendAjax({
+							url,
+							data
+						});
+					}
+				});
+
+				//Lấy tỉnh thành
+				$.getJSON('https://esgoo.net/api-tinhthanh/1/0.htm',function(data_tinh){
+					if(data_tinh.error==0){
+					   $.each(data_tinh.data, function (key_tinh,val_tinh) {
+						  $("#tinh").append('<option value="'+val_tinh.id+'">'+val_tinh.full_name+'</option>');
+					   });
+					   $("#tinh").change(function(e){
+							var idtinh=$(this).val();
+							//Lấy quận huyện
+							$.getJSON('https://esgoo.net/api-tinhthanh/2/'+idtinh+'.htm',function(data_quan){
+								if(data_quan.error==0){
+								   $("#quan").html('<option value="0">Quận Huyện</option>');
+								   $("#phuong").html('<option value="0">Phường Xã</option>');
+								   $.each(data_quan.data, function (key_quan,val_quan) {
+									  $("#quan").append('<option value="'+val_quan.id+'">'+val_quan.full_name+'</option>');
+								   });
+								   //Lấy phường xã
+								   $("#quan").change(function(e){
+										var idquan=$(this).val();
+										$.getJSON('https://esgoo.net/api-tinhthanh/3/'+idquan+'.htm',function(data_phuong){
+											if(data_phuong.error==0){
+											   $("#phuong").html('<option value="0">Phường Xã</option>');
+											   $.each(data_phuong.data, function (key_phuong,val_phuong) {
+												  $("#phuong").append('<option value="'+val_phuong.id+'">'+val_phuong.full_name+'</option>');
+											   });
+											}
+										});
+								   });
+
+								}
+							});
+					   });
+
+					}
+				});
+			});
+		</script>
+	}
+}

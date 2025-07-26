@@ -36,6 +36,7 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<ISliderService, SliderService>();
 builder.Services.AddTransient<IContactService, ContactService>();
+builder.Services.AddTransient<IShippingService, ShippingService>();
 
 // *6 Add Identity
 builder.Services.AddIdentity<UserModel, IdentityRole>()

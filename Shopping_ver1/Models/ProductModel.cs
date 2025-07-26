@@ -16,7 +16,7 @@ namespace Shopping_ver1.Models
         public string Description { get; set; }
 
         [Required(ErrorMessage = "Yêu cầu nhập giá sản phẩm")]
-        [Range(0, double.MaxValue, ErrorMessage = "Giá phải lớn hơn 0")]
+        [Range(1, double.MaxValue, ErrorMessage = "Giá phải lớn hơn 0")]
         [Column(TypeName = "decimal(18,0)")]
         [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Giá chỉ được chứa số")]
         public decimal Price { get; set; }

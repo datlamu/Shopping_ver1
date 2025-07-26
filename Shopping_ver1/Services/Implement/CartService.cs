@@ -125,6 +125,27 @@ public class CartService : ICartService
         return new OperationResult(true, "Giảm số lượng sản phẩm này thành công!!!");
     }
 
+    // Giảm số lượng sản phẩm trong giỏ hàng
+    public OperationResult UpdateQuantityCart(int id, int quantity)
+    {
+        var session = _httpContextAccessor.HttpContext.Session;
+        if (session == null)
+            return new OperationResult(false, "Không thể truy cập session");
+
+        var cart = session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
+        var item = cart.FirstOrDefault(x => x.ProductId == id);
+        if (item == null)
+            return new OperationResult(false, "Sản phẩm không tồn tại trong giỏ");
+
+        if (quantity < 1)
+            return new OperationResult(false, "Số lượng phải lơn hơn 0");
+
+        item.Quantity = quantity;
+        session.SetJson("Cart", cart);
+
+        return new OperationResult(true, "Đã cập nhật số lượng");
+    }
+
     // Xóa sản phẩm trong giỏ hàng
     public OperationResult Remove(int id)
     {
