@@ -1,18 +1,25 @@
-﻿namespace Shopping_ver1.Models
-{
-    public class OrderModel
-    {
-        public int Id { get; set; }
-        public string OrderCode { get; set; }
-        public string UserName { get; set; }
-        public DateTime CreateDate { get; set; } = DateTime.Now;
-        public int Status { get; set; } = 0;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-        public OrderModel() { }
-        public OrderModel(string orderCode, string userName)
-        {
-            this.OrderCode = orderCode;
-            this.UserName = userName;
-        }
-    }
+public class OrderModel
+{
+    [Key]
+    public int Id { get; set; }
+
+    public string OrderCode { get; set; }
+
+    public string UserName { get; set; }
+
+    public DateTime CreateDate { get; set; } = DateTime.Now;
+
+    public int Status { get; set; } = 0;
+
+    public decimal TotalProductPrice { get; set; } = 0;
+
+    public decimal ShippingFee { get; set; } = 0;
+
+    public decimal TotalPayment { get; set; } = 0;
+
+    public string ShippingRegion { get; set; }
+
 }

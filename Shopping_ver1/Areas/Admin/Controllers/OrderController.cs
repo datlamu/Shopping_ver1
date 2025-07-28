@@ -26,7 +26,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         }
 
         // Chi tiết đơn hàng
-        public async Task<IActionResult> OrderDetail(string orderCode, int status, int? page)
+        public async Task<IActionResult> OrderDetail(string orderCode, int status, int? page, decimal total, decimal shipping)
         {
             // Chi tiết đơn hàng
             var data = await _orderService.GetOrderDetailAsync(orderCode);
@@ -34,11 +34,10 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Trang hiện tại
             ViewBag.Page = page ?? 0;
 
-            // Lưu orderCode
+            // Lưu orderCode, phí ship và tổng giá sản phẩm
             ViewBag.OrderCode = orderCode;
-
-            // Lưu trạng thái đơn hàng vào ViewBag
-            ViewBag.OrderStatus = status;
+            ViewBag.ShippingPrice = shipping;
+            ViewBag.TotalProductPrice = total;
 
             return View(data);
         }

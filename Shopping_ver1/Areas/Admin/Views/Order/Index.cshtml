@@ -3,6 +3,11 @@
 	ViewData["Title"] = "Đơn hàng";
 	var index = 1;
 }
+<style>
+	#dataTable thead th {
+		border-bottom: none !important;
+	}
+</style>
 <!-- DataTables Example -->
 <div class="card shadow mb-4">
 	<div class="card-header py-3">
@@ -37,7 +42,11 @@
 								</select>
 							</td>
 							<td class="align-middle">
-								<button class="btn btn-warning btn-sm btn-order-detail" value="@item.OrderCode" data-status="@item.Status">
+								<button class="btn btn-warning btn-sm btn-order-detail"
+										value="@item.OrderCode"
+										data-status="@item.Status"
+										data-total="@item.TotalProductPrice"
+										data-shipping="@item.ShippingFee">
 									<i class="fas fa-receipt"></i>
 								</button>
 								<button class="btn btn-danger btn-sm btn-delete" value="@item.Id">
@@ -62,30 +71,29 @@
 				buttonsToShow: ['copy', 'csv', 'excel', 'pdf', 'print']
 			});
 
-			// Set page
+			// Cập nhật trang hiện tại
 			if (!isNaN(currentPage) && currentPage >= 0) {
 				table.page(currentPage).draw('page');
 			}
 
-			// attachEvents OrderDetail
+			// Event click OrderDetail
 			$('#dataTable').on('click', '.btn-order-detail', function () {
 				var orderCode = $(this).val();
 				var status = $(this).data('status');
+				var total = $(this).data('total');
+				var shipping = $(this).data('shipping');
 				var currentPage = table.page() + 1;
-
-				window.location.href = `/Admin/Order/OrderDetail?orderCode=${orderCode}&status=${status}&page=${currentPage}`;
+				window.location.href = `/Admin/Order/OrderDetail?orderCode=${orderCode}&status=${status}&page=${currentPage}&total=${total}&shipping=${shipping}`;
 			});
 
-			// attachEvents Update
+			// Event click Update
 			$('.select-update-order').change(function () {
-
 				// Url Action
 				var url = '/Admin/Order/UpdateOrder';
 				// Lấy status và ordercode
 				var	status = $(this).val();
 				var orderCode = $(this).data('ordercode');
 				let data = { status, orderCode};
-
 				// Gọi Ajax
 				sendAjax({ url, data});
 			});
@@ -96,22 +104,16 @@
 				var url = '/Admin/Order/Delete';
 				var id = $(this).val();
 				let data = { id };
-
 				// Gọi Ajax
 				sendAjax({
 					url,
 					data,
 					onSuccess: function () {
-						// Xóa dòng mà và ở lại trang đó
+						// Xóa dòng mà và ở lại trang
 						table.row(row).remove().draw(false);
 					}
 				});
 			});
 		});
 	</script>
-	<style>
-		#dataTable thead th {
-			border-bottom: none !important;
-		}
-	</style>
 }

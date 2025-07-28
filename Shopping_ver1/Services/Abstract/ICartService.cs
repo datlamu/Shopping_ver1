@@ -19,5 +19,6 @@ namespace Shopping_ver1.Services.Abstract
         OperationResult Remove(int id);
         // Làm mới giỏ hàng
         OperationResult Clear();
+        Task<ShippingModel> GetShippingAsync(string city, string district, string ward);
     }
 }

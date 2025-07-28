@@ -16,7 +16,7 @@
 	</div>
 	<div class="form-group">
 		<label>Mô tả</label>
-		<textarea asp-for="Description" class="form-control"></textarea>
+		<textarea asp-for="Description" id="summernote" class="form-control"></textarea>
 		<span asp-validation-for="Description" class="text-danger" />
 	</div>
 	<div class="form-group">
@@ -68,4 +68,17 @@
 
 	@* Hiển thị ảnh khi chọn file *@
 	<script src="~/backend/js/site.js"></script>
+	<script>
+		$('#summernote').summernote({
+			height: 100,
+			placeholder: 'Nhập mô tả...',
+			toolbar: [
+				['style', ['bold', 'italic', 'underline', 'clear']],
+				['font', ['strikethrough']],
+				['para', ['ul', 'ol', 'paragraph']],
+				['insert', ['link', 'picture']],
+				['view', ['codeview']]
+			]
+		});
+	</script>
 }

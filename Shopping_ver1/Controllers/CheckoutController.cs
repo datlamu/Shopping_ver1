@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services.Abstract;
@@ -32,8 +33,17 @@ namespace Shopping_ver1.Controllers
                 return RedirectToAction("Index", "Cart");
             }
 
+            // Lấy phí vận chuyển
+            var shippingCookie = Request.Cookies["ShippingInfo"];
+            if (shippingCookie == null)
+            {
+                TempData["Error"] = "Bạn phải chọn đầy đủ thông tin để giao hàng!";
+                return RedirectToAction("Index", "Cart");
+            }
+            var shipping = JsonConvert.DeserializeObject<ShippingModel>(shippingCookie);
+
             // Thực hiện thanh toán
-            var result = await _checkoutService.CheckoutAsync(userEmail, carts);
+            var result = await _checkoutService.CheckoutAsync(userEmail, carts, shipping);
             if (!result.Success)
             {
                 TempData["Error"] = result.Message;

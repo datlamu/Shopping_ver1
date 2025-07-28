@@ -1,11 +1,16 @@
 ﻿@using Shopping_ver1.Models.ViewModels
 @model CartItemViewModel
+@{
+	decimal shippingPrice = ViewBag.Shipping?.Price ?? 0;
+	string city = ViewBag.Shipping?.City ?? "Tỉnh Thành";
+	string district = ViewBag.Shipping?.District ?? "Quận Huyện";
+	string ward = ViewBag.Shipping?.Ward ?? "Phường Xã";
+}
 <section id="cart_items">
 	<div class="container">
 		<div class="breadcrumbs">
 			<ol class="breadcrumb">
-				<li><a href="#">Home</a></li>
-				<li class="active">Shopping Cart</li>
+				<li class="active">Giỏ hàng</li>
 			</ol>
 		</div>
 		<div class="table-responsive cart_info">
@@ -53,8 +58,28 @@
 							</tr>
 						}
 						<tr>
+							<td>
+								<label>Chọn khu vực</label>
+								<div class="form-group">
+									<select class="form-control" id="tinh" name="tinh">
+										<option value="0">@city</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<select class="form-control" id="quan" name="quan">
+										<option value="0">@district</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<select class="form-control" id="phuong" name="phuong">
+										<option value="0">@ward</option>
+									</select>
+								</div>
+							</td>
 							<td class="cart_total" colspan="6" align="right">
 								<p class="cart_total_price">Tổng đơn hàng: @FormatCurrency.ToVnCurrency(Model.GrandTotal)</p>
+								<p class="cart_total_price">Phí vận chuyển: @FormatCurrency.ToVnCurrency(shippingPrice)</p>
+								<p class="cart_total_price">Tổng thanh toán: @FormatCurrency.ToVnCurrency(Model.GrandTotal + shippingPrice)</p>
 							</td>
 						</tr>
 						<tr>

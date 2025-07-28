@@ -16,7 +16,7 @@ public class CheckoutService : ICheckoutService
     }
 
     // Thanh toán
-    public async Task<OperationResult> CheckoutAsync(string userEmail, List<CartItemModel> cartItems)
+    public async Task<OperationResult> CheckoutAsync(string userEmail, List<CartItemModel> cartItems, ShippingModel shipping)
     {
         try
         {
@@ -35,9 +35,26 @@ public class CheckoutService : ICheckoutService
                 }
             }
 
+            // Tính tổng tiền sản phẩm
+            decimal totalProductPrice = cartItems.Sum(ci => ci.Total);
+            // Lấy phí ship
+            decimal shippingFee = shipping.Price;
+            // Tổng số tiền thanh toán
+            decimal totalPayment = totalProductPrice + shippingFee;
+            // Khu vực ship
+            string shippingRegion = $"{shipping.City}, {shipping.District}, {shipping.Ward}";
+
             // Thêm đơn hàng
             var orderCode = Guid.NewGuid().ToString();
-            var order = new OrderModel(orderCode, userEmail);
+            var order = new OrderModel()
+            {
+                OrderCode = orderCode,
+                UserName = userEmail,
+                TotalProductPrice = totalProductPrice,
+                ShippingFee = shippingFee,
+                TotalPayment = totalPayment,
+                ShippingRegion = shippingRegion
+            };
             await _context.Orders.AddAsync(order);
 
             // Thêm chi tiết đơn đơn hàng

@@ -1,4 +1,5 @@
-﻿using Shopping_ver1.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Shopping_ver1.Models;
 using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services.Abstract;
@@ -73,7 +74,7 @@ public class CartService : ICartService
     // Tăng số lượng sản phẩm trong giỏ hàng
     public async Task<OperationResult> Increase(int id)
     {
-        // Lấy giỏ hàng từ session
+        // Lấy session
         var session = _httpContextAccessor.HttpContext.Session;
         if (session == null)
             return new OperationResult(false, "Không thể truy cập session.");
@@ -181,5 +182,22 @@ public class CartService : ICartService
         session.Remove("Cart");
 
         return new OperationResult(true, "Đã xóa toàn bộ sản phẩm trong giỏ hàng!!!");
+    }
+
+    public async Task<ShippingModel> GetShippingAsync(string city, string district, string ward)
+    {
+        var esistingShopping = await _dataContext.Shippings
+                   .FirstOrDefaultAsync(s => s.City == city && s.District == district && s.Ward == ward);
+
+        decimal shippingPrice = 0;
+
+        if (esistingShopping != null)
+            shippingPrice = esistingShopping.Price;
+        else
+            shippingPrice = 50000;
+
+        var shipping = new ShippingModel(shippingPrice, city, district, ward);
+
+        return shipping;
     }
 }

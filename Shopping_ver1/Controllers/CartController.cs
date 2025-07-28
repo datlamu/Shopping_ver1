@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Shopping_ver1.Migrations;
 using Shopping_ver1.Models;
 using Shopping_ver1.Services.Abstract;
-
 namespace Shopping_ver1.Controllers
 {
     public class CartController : Controller
@@ -15,7 +16,16 @@ namespace Shopping_ver1.Controllers
         // Hiện sản phẩm trong giỏ hàng
         public IActionResult Index()
         {
-            // Lấy sản phẩm từ giỏ hàng
+            var shippingCookie = Request.Cookies["ShippingInfo"];
+
+            ShippingModel shipping;
+            if (shippingCookie != null)
+                shipping = JsonConvert.DeserializeObject<ShippingModel>(shippingCookie);
+            else
+                shipping = new ShippingModel();
+
+            ViewBag.Shipping = shipping;
+
             var listCartItem = _cartservice.GetListCartItem();
 
             return View(listCartItem);
@@ -102,8 +112,40 @@ namespace Shopping_ver1.Controllers
         // Tải lại table giỏ hàng để cập nhật dữ liệu mới ( ajax )
         public IActionResult GetCartTable()
         {
-            var model = _cartservice.GetListCartItem();
-            return PartialView("_CartTablePartial", model);
+            var shippingCookie = Request.Cookies["ShippingInfo"];
+
+            ShippingModel shipping;
+
+            if (shippingCookie != null)
+                shipping = JsonConvert.DeserializeObject<ShippingModel>(shippingCookie);
+            else
+                shipping = new ShippingModel();
+
+            ViewBag.Shipping = shipping;
+
+            var listCartItem = _cartservice.GetListCartItem();
+
+            return PartialView("_CartTablePartial", listCartItem);
+        }
+
+        // Tải lại table giỏ hàng để cập nhật dữ liệu mới ( ajax )
+        public async Task<IActionResult> GetShipping(string city, string district, string ward)
+        {
+            var shipping = await _cartservice.GetShippingAsync(city, district, ward);
+
+            var options = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(30),
+                Secure = true
+            };
+
+            // Serialize object thành JSON string
+            var jsonShipping = JsonConvert.SerializeObject(shipping);
+
+            Response.Cookies.Append("ShippingInfo", jsonShipping, options);
+
+            return Json(new { success = true, message = "tính phí ship thành công" });
         }
     }
 }

@@ -2,8 +2,6 @@
 @{
 	ViewData["Title"] = "Chi tiết đơn hàng";
 	var index = 1;
-	decimal total = 0;
-	decimal subtotal = 0;
 }
 <!-- Page Heading -->
 <!-- DataTables Example -->
@@ -11,7 +9,6 @@
 	<div class="card-header py-3 d-flex justify-content-between align-items-center">
 		<h6 class="m-0 font-weight-bold text-primary">Chi tiết đơn hàng: @ViewBag.OrderCode</h6>
 		<a class="btn btn-success" asp-area="Admin" asp-controller="Order" asp-action="Index" asp-route-page="@ViewBag.CurrentPage">Quay về danh sách đơn hàng</a>
-		<input type="hidden" class="getOrderCode" value="@ViewBag.OrderCode" />
 	</div>
 
 	<div class="card-body">
@@ -29,24 +26,27 @@
 				<tbody>
 					@foreach (var item in Model)
 					{
-						subtotal = item.Quantity * item.Price;
-						total += subtotal;
 						<tr>
 							<th scope="row">@(index++)</th>
 							<td>@item.Product.Name</td>
 							<td>@FormatCurrency.ToVnCurrency(@item.Price)</td>
 							<td>@item.Quantity</td>
-							<td>@FormatCurrency.ToVnCurrency(subtotal)</td>
+							<td>@FormatCurrency.ToVnCurrency(item.Quantity * item.Price)</td>
 						</tr>
 					}
 				</tbody>
 				<tfoot>
 					<tr>
-						<th colspan="4" class="text-end align-middle">
-						</th>
-						<th class="text-end align-middle">
-							Tổng tiền: @FormatCurrency.ToVnCurrency(total)
-						</th>
+						<td colspan="4" class="text-end align-middle" style="text-align: right">
+							<p><strong>Tổng tiền:</strong></p>
+							<p><strong>Phí ship:</strong></p>
+							<p><strong>Tổng thanh toán:</strong></p>
+						</td>
+						<td class="text-end align-middle">
+							<p>@FormatCurrency.ToVnCurrency(ViewBag.TotalProductPrice)</p>
+							<p>@FormatCurrency.ToVnCurrency(ViewBag.ShippingPrice)</p>
+							<p>@FormatCurrency.ToVnCurrency(ViewBag.ShippingPrice + ViewBag.TotalProductPrice)</p>
+						</td>
 					</tr>
 				</tfoot>
 			</table>
