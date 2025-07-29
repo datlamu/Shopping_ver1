@@ -3,11 +3,11 @@
 	<partial name="_SidebarPartial" />
 </div>
 
-
 <div class="col-sm-9 padding-right">
 	<div class="features_items">
 		<!--features_items-->
 		<h2 class="title text-center">Các sản phẩm</h2>
+		<partial name="_FilterProductPartial" />
 		@foreach (var item in Model)
 		{
 			<div class="col-sm-4">
@@ -44,14 +44,21 @@
 	<script>
 		$(document).ready(function () {
 			// Chay khi button được click vào
+			$('#sort_by').on('change', function () {
+				const sortBy = $(this).val();
+				if (sortBy !== "-----") {
+					const url = new URL(window.location.href);
+					url.searchParams.set('sort_by', sortBy);
+					window.location.href = url.toString();
+				}
+			});
+			// Chay khi button được click vào
 			$('.add-to-cart').click(function () {
-
 				// Url Action
 				var url = '/Cart/Add';
 				// Lấy status và productId
 				var	id = $(this).val();
 				let data = { id };
-
 				// Gọi Ajax
 				sendAjax({ url, data });
 			});

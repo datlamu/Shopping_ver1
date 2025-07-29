@@ -1,0 +1,17 @@
+﻿@{
+	var currentUrl = Url.ActionContext.HttpContext.Request.Path;
+}
+<div class="container" style="margin-bottom: 10px">
+	<div class="row">
+		<div class="col-md-2">
+			<h5>Sắp xếp theo</h5>
+			<select class="form-control" id="sort_by">
+				<option value="">-----</option>
+				<option value="price_increase">Giá tăng dần</option>
+				<option value="price_decrease">Giá giảm dần</option>
+				<option value="price_newest">Mới nhất</option>
+				<option value="price_oldest">Cũ</option>
+			</select>
+		</div>
+	</div>
+</div>

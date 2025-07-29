@@ -20,10 +20,21 @@ namespace Shopping_ver1.Controllers
             _contactService = contactService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sort_by = "")
         {
-            var product = await _dataContext.Products.Include(p => p.Inventory).ToListAsync();
-            return View(product);
+            // Truy vấn danh sách sản phẩm
+            var productsAQ = _dataContext.Products
+                .Include(p => p.Inventory)
+                .AsQueryable();
+
+            // Lọc sản phẩm
+            productsAQ = SortProducts(productsAQ, sort_by);
+
+            // Lấy sản phẩm từ database
+            var products = await productsAQ.ToListAsync();
+
+            return View("Index", products);
+
         }
 
         public async Task<IActionResult> Contact(int page = 1)
@@ -44,6 +55,76 @@ namespace Shopping_ver1.Controllers
 
             return PartialView("_ContactPartial", data);
         }
+
+        // Tìm sản phẩm theo thể loại
+        public async Task<IActionResult> Categories(string slug = "", string sort_by = "")
+        {
+            // Tìm thể loại
+            var category = _dataContext.Categories.FirstOrDefault(c => c.Slug == slug);
+            if (category == null) return RedirectToAction("Index");
+
+            // Truy vấn danh sách sản phẩm
+            var productsAQ = _dataContext.Products
+                .Include(p => p.Inventory)
+                .Where(p => p.CategoryId == category.Id)
+                .AsQueryable();
+
+            // Lọc sản phẩm
+            productsAQ = SortProducts(productsAQ, sort_by);
+
+            // Lấy sản phẩm từ database
+            var products = await productsAQ.ToListAsync();
+
+            return View("Index", products);
+        }
+
+        // Tìm sản phẩm theo thương hiệu
+        public async Task<IActionResult> Brands(string slug = "", string sort_by = "")
+        {
+            // Tìm thương hiệu
+            var brand = _dataContext.Brands.FirstOrDefault(c => c.Slug == slug);
+            if (brand == null)
+                return RedirectToAction("Index");
+
+            // Truy vấn danh sách sản phẩm
+            var productsAQ = _dataContext.Products
+                .Include(p => p.Inventory)
+                .Where(p => p.BrandId == brand.Id)
+                .AsQueryable();
+
+            // Lọc sản phẩm
+            productsAQ = SortProducts(productsAQ, sort_by);
+
+            // Lấy sản phẩm từ database
+            var products = await productsAQ.ToListAsync();
+
+            return View("Index", products);
+        }
+
+        // Lọc sản phẩm
+        private IQueryable<ProductModel> SortProducts(IQueryable<ProductModel> productsAQ, string sort_by)
+        {
+            switch (sort_by)
+            {
+                case "price_increase":
+                    productsAQ = productsAQ.OrderBy(p => p.Price);
+                    break;
+                case "price_decrease":
+                    productsAQ = productsAQ.OrderByDescending(p => p.Price);
+                    break;
+                case "newest":
+                    productsAQ = productsAQ.OrderByDescending(p => p.Id);
+                    break;
+                case "oldest":
+                    productsAQ = productsAQ.OrderBy(p => p.Id);
+                    break;
+                default:
+                    break;
+            }
+            return productsAQ;
+        }
+
+
         public IActionResult Privacy()
         {
             return View();

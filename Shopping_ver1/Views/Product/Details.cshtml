@@ -48,7 +48,7 @@
 					<!--/product-information-->
 					<h2>Tên: @Model.Name</h2>
 					<p><b>Giá tiền: </b>@FormatCurrency.ToVnCurrency(Model.Price)</p>
-					<p><b>Mô tả: </b>@Model.Description</p>
+					<p><b>Mô tả: </b>@Html.Raw(Model.Description)</p>
 					<p><b>Thương hiệu: </b>@Model.Brand.Name</p>
 					<p><b>Thể loại: </b>@Model.Category.Name</p>
 					@if (Model.Inventory.QuantityInStock > 0)
