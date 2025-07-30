@@ -7,20 +7,20 @@ namespace Shopping_ver1.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin")]
-    public class CategoryController : Controller
+    public class CouponController : Controller
     {
-        private readonly ICategoryService _categoryService;
+        private readonly ICouponService _couponService;
 
-        public CategoryController(ICategoryService categoryService)
+        public CouponController(ICouponService couponService)
         {
-            _categoryService = categoryService;
+            _couponService = couponService;
         }
 
-        // Danh sách các thể loại
+        // Danh sách các coupon
         public async Task<IActionResult> Index(int? page)
         {
             // Lấy danh sách và phân trang
-            var data = await _categoryService.GetlistItemAsync();
+            var data = await _couponService.GetAllAsync();
 
             // Trang hiện tại
             ViewBag.Page = page ?? 0;
@@ -28,77 +28,79 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             return View(data);
         }
 
-        // Tạo thể loại mới
+        // Tạo coupon mới
         [HttpGet]
         public IActionResult Create()
         {
-            return View(new CategoryModel());
+            return View(new CouponModel());
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CategoryModel category)
+        public async Task<IActionResult> Create(CouponModel coupon)
         {
-            // Kiểm tra thông tin thể loại
+            // Kiểm tra thông tin coupon
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Vui lòng kiểm tra lại thông tin thể loại !!!";
-                return View(category);
+                TempData["Error"] = "Vui lòng kiểm tra lại thông tin coupon !!!";
+                return View(coupon);
             }
 
-            // Thêm thể loại và kiểm tra
-            var result = await _categoryService.CreateAsync(category);
+            // Thêm coupon và kiểm tra
+            var result = await _couponService.CreateAsync(coupon);
             if (!result.Success)
             {
                 TempData["Error"] = result.Message;
-                return View(category);
+                return View(coupon);
             }
             TempData["Success"] = result.Message;
 
             return RedirectToAction("Index");
         }
 
-        // Cập nhật thể loại
+        // Cập nhật coupon
         [HttpGet]
         public async Task<IActionResult> Update(int id, int? page)
         {
-            // Tìm thể loại đã chọn
-            var category = await _categoryService.GetUpdateItemAsync(id);
+            // Tìm coupon đã chọn
+            var coupon = await _couponService.FindByIdAsync(id);
+            if (coupon == null)
+                return Json(new { Success = false, Message = "Không tìm thấy coupon này để cập nhật!!!" });
 
             // Trang hiện tại
             ViewBag.Page = page ?? 0;
 
-            return View(category);
+            return View(coupon);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(CategoryModel category, int? page)
+        public async Task<IActionResult> Update(CouponModel coupon, int? page)
         {
             ViewBag.Page = page ?? 0;
 
-            // Kiểm tra thông tin thể loại
+            // Kiểm tra thông tin coupon
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Vui lòng kiểm tra lại thông tin thể loại !!!";
-                return View(category);
+                TempData["Error"] = "Vui lòng kiểm tra lại thông tin coupon !!!";
+                return View(coupon);
             }
 
-            // Chỉnh sửa thể loại và kiểm tra
-            var result = await _categoryService.UpdateAsync(category);
+            // Chỉnh sửa coupon và kiểm tra
+            var result = await _couponService.UpdateAsync(coupon);
             if (!result.Success)
             {
                 TempData["Error"] = result.Message;
-                return View(category);
+                return View(coupon);
             }
             TempData["Success"] = result.Message;
 
             return RedirectToAction("Index", new { page = page ?? 0 });
         }
 
-        // Xóa thể loại
+        // Xóa coupon
         public async Task<IActionResult> Delete(int id)
         {
-            // Xóa thể loại
-            var result = await _categoryService.DeleteAsync(id);
+            // Xóa coupon
+            var result = await _couponService.DeleteAsync(id);
 
             return Json(new { result.Success, result.Message });
         }

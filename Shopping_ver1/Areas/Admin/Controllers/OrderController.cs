@@ -26,20 +26,28 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         }
 
         // Chi tiết đơn hàng
-        public async Task<IActionResult> OrderDetail(string orderCode, int status, int? page, decimal total, decimal shipping)
+        public async Task<IActionResult> OrderDetail(string orderCode, int? page)
         {
+            // Kiểm tra OrderCode
+            if (string.IsNullOrWhiteSpace(orderCode))
+            {
+                return NotFound("Mã đơn hàng không hợp lệ..");
+            }
+
             // Chi tiết đơn hàng
-            var data = await _orderService.GetOrderDetailAsync(orderCode);
+            var orderDetailVM = await _orderService.GetOrderDetailAsync(orderCode);
+
+            // Kiểm tra ViewModel có dữ liệu hay không
+            if (orderDetailVM == null || orderDetailVM.OrderDetail == null || !orderDetailVM.OrderDetail.Any())
+            {
+                // Có thể trả về trang thông báo hoặc redirect về danh sách đơn hàng
+                return NotFound("Không tìm thấy thông tin đơn hàng.");
+            }
 
             // Trang hiện tại
             ViewBag.Page = page ?? 0;
 
-            // Lưu orderCode, phí ship và tổng giá sản phẩm
-            ViewBag.OrderCode = orderCode;
-            ViewBag.ShippingPrice = shipping;
-            ViewBag.TotalProductPrice = total;
-
-            return View(data);
+            return View(orderDetailVM);
         }
 
         // Cập nhật đơn hàng
@@ -49,11 +57,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Cập nhật và trả kết quả cho ajax
             var result = await _orderService.UpdateOrderAsync(orderCode, status);
 
-            return Json(new
-            {
-                result.Success,
-                result.Message
-            });
+            return Json(new { result.Success, result.Message });
         }
 
         // Xóa đơn hàng 
@@ -63,11 +67,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Xóa và kiểm tra
             var result = await _orderService.DeleteOrderAsync(id);
 
-            return Json(new
-            {
-                result.Success,
-                result.Message
-            });
+            return Json(new { result.Success, result.Message });
         }
     }
 }

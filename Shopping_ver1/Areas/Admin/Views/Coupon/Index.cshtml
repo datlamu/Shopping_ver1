@@ -1,0 +1,136 @@
+﻿@model IEnumerable<CouponModel>
+@{
+	ViewData["Title"] = "Mã giảm giá";
+	var now = DateTime.Now;
+	var index = 1;
+}
+<style>
+	#dataTable thead th {
+		border-bottom: none !important;
+	}
+</style>
+<!-- DataTables Example -->
+<div class="card shadow mb-4">
+	<div class="card-header py-3 d-flex justify-content-between align-items-center">
+		<h6 class="m-0 font-weight-bold text-primary">Bảng danh sách Mã giảm giá</h6>
+		<a class="btn btn-success btn-sm" asp-area="Admin" asp-controller="Coupon" asp-action="Create">
+			<i class="fas fa-plus"></i>
+		</a>
+	</div>
+
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover" id="dataTable" width="100%" cellspacing="0">
+				<thead class="thead-dark">
+					<tr class="bg-primary text-gray-300">
+						<th class="align-middle no-thead-border">STT</th>
+						<th class="align-middle">Mã</th>
+						<th class="align-middle">Mô tả</th>
+						<th class="align-middle">Giảm</th>
+						<th class="align-middle">Đơn tối thiểu</th>
+						<th class="align-middle">Trạng thái</th>
+						<th class="align-middle">Thời gian</th>
+						<th class="align-middle">Tùy chọn</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td class="align-middle">@(index++)</td>
+							<td class="align-middle">@item.Code</td>
+							<td class="align-middle">@item.Description</td>
+							<td class="align-middle">
+								@if (item.DiscountType == "percentage")
+								{
+									@($"{item.DiscountValue:0.#}%")
+								}
+								else
+								{
+									@FormatCurrency.ToVnCurrency(item.DiscountValue)
+								}
+							</td>
+							<td class="align-middle">@FormatCurrency.ToVnCurrency(item.MinimumOrderAmount)</td>
+							<td class="align-middle">
+								@if (item.IsActive)
+								{
+									<span class="text-success">Đã kích hoạt</span>
+								}
+								else
+								{
+									<span class="text-danger">Chưa kích hoạt</span>
+								}
+							</td>
+							<td>
+								@if (item.StartDate > now)
+								{
+									<span class="text-warning">Chưa bắt đầu</span>
+								}
+								else
+								{
+									var daysLeft = (item.EndDate - now).Days;
+									if (daysLeft > 0)
+									{
+										<span class="text-success">Còn lại: @daysLeft ngày</span>
+									}
+									else
+									{
+										<span class="text-danger">Đã hết hạn</span>
+									}
+								}
+							</td>
+							<td class="align-middle">
+								<button class="btn btn-warning btn-sm btn-update" value="@item.Id"><i class="fas fa-edit"></i></button>
+								<button class="btn btn-danger btn-sm btn-delete" value="@item.Id"><i class="fas fa-trash-alt"></i></button>
+							</td>
+						</tr>
+					}
+				</tbody>
+
+			</table>
+		</div>
+	</div>
+</div>
+@section Scripts {
+	<script>
+		let table;
+		const currentPage = @((ViewBag.Page ?? 0) - 1);
+		$(document).ready(function () {
+			// Tùy chỉnh xuất file
+			table = setupDataTable({
+				enableExport: true,
+				exportColumns: [0, 1, 2, 3, 4, 5, 6],
+				buttonsToShow: ['copy', 'csv', 'excel', 'pdf', 'print']
+			});
+
+			// Đặt lại trang hiện tại
+			if (!isNaN(currentPage) && currentPage >= 0) {
+				table.page(currentPage).draw('page');
+			}
+
+			// Event Click Update
+			$('#dataTable').on('click', '.btn-update', function () {
+				var id = $(this).val();
+				var currentPage = table.page() + 1;
+				window.location.href = `/Admin/Coupon/Update/${id}?page=${currentPage}`;
+			});
+
+			// Event Click Delete
+			$('#dataTable').on('click', '.btn-delete', function () {
+				var row = $(this).closest('tr');
+				var url = '/Admin/Coupon/Delete';
+				var id = $(this).val();
+				let data = { id };
+				// Gọi Ajax
+				sendAjax({
+					url,
+					data,
+					onSuccess: function () {
+						// Xóa hàng đã chọn và giữ nguyên trang
+						table.row(row).remove().draw(false);
+					}
+				});
+			});
+		});
+	</script>
+}

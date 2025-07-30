@@ -1,25 +1,32 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Models;
+using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services.Abstract;
+using static Azure.Core.HttpHeader;
 
 
 public class CheckoutService : ICheckoutService
 {
     private readonly DataContext _context;
     private readonly IEmailService _emailService;
+    private readonly ICouponService _couponService;
 
-    public CheckoutService(DataContext context, IEmailService emailService)
+    public CheckoutService(DataContext context, IEmailService emailService, ICouponService couponService)
     {
         _context = context;
         _emailService = emailService;
+        _couponService = couponService;
     }
 
     // Thanh toán
-    public async Task<OperationResult> CheckoutAsync(string userEmail, List<CartItemModel> cartItems, ShippingModel shipping)
+    public async Task<OperationResult> CheckoutAsync(string userEmail, CartItemViewModel cartItemVM)
     {
         try
         {
+            var cartItems = cartItemVM.CartItems;
+            var shipping = cartItemVM.Shipping;
+
             // Lấy tồn kho từ giỏ hàng
             var productIds = cartItems.Select(c => c.ProductId).ToList();
             var inventories = await _context.Inventories
@@ -35,14 +42,24 @@ public class CheckoutService : ICheckoutService
                 }
             }
 
-            // Tính tổng tiền sản phẩm
-            decimal totalProductPrice = cartItems.Sum(ci => ci.Total);
-            // Lấy phí ship
-            decimal shippingFee = shipping.Price;
-            // Tổng số tiền thanh toán
-            decimal totalPayment = totalProductPrice + shippingFee;
-            // Khu vực ship
-            string shippingRegion = $"{shipping.City}, {shipping.District}, {shipping.Ward}";
+            // Nếu có mã giảm giá
+            if (!string.IsNullOrEmpty(cartItemVM.CouponCode))
+            {
+                // Tìm Coupon theo code
+                var coupon = await _couponService.FindByCodeAsync(cartItemVM.CouponCode);
+
+                // Kiểm tra tính hợp lệ
+                var result = _couponService.ValidateCoupon(coupon, cartItemVM.TotalProductPrice);
+                if (result.Success)
+                {
+                    coupon.Quantity -= 1; // Giảm số lượng nếu áp dụng thành công
+                }
+                else
+                {
+                    return new OperationResult(result.Success, result.Message);
+                }
+
+            }
 
             // Thêm đơn hàng
             var orderCode = Guid.NewGuid().ToString();
@@ -50,10 +67,12 @@ public class CheckoutService : ICheckoutService
             {
                 OrderCode = orderCode,
                 UserName = userEmail,
-                TotalProductPrice = totalProductPrice,
-                ShippingFee = shippingFee,
-                TotalPayment = totalPayment,
-                ShippingRegion = shippingRegion
+                TotalProductPrice = cartItemVM.TotalProductPrice,
+                ShippingFee = shipping.Price,
+                DiscountValue = cartItemVM.DiscountValue,
+                CouponCode = cartItemVM.CouponCode,
+                TotalPayment = cartItemVM.TotalPayment,
+                ShippingRegion = $"{shipping.City}, {shipping.District}, {shipping.Ward}"
             };
             await _context.Orders.AddAsync(order);
 

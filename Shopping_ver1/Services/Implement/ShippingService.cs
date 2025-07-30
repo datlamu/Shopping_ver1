@@ -95,4 +95,24 @@ public class ShippingService : IShippingService
             return new OperationResult(false, "Xóa phí vấn chuyển thất bại!!!");
         }
     }
+
+    // Lấy shipping
+    public async Task<ShippingModel> GetShippingAsync(string city, string district, string ward)
+    {
+        // Lấy shipping theo khu vực
+        var esistingShopping = await _dataContext.Shippings
+                   .FirstOrDefaultAsync(s => s.City == city && s.District == district && s.Ward == ward);
+
+        decimal shippingPrice = 0;
+
+        // Nếu khu vực này chưa có thì gán giá ship là 50k
+        if (esistingShopping != null)
+            shippingPrice = esistingShopping.Price;
+        else
+            shippingPrice = 50000;
+
+        var shipping = new ShippingModel(shippingPrice, city, district, ward);
+
+        return shipping;
+    }
 }

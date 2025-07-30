@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Shopping_ver1.Helpers;
 using Shopping_ver1.Models;
 using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Repository;
@@ -9,31 +10,74 @@ public class CartService : ICartService
     private readonly DataContext _dataContext;
     private readonly IProductService _productService;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ICouponService _couponService;
 
-    public CartService(DataContext context, IHttpContextAccessor httpContextAccessor, IProductService productService)
+
+    public CartService(DataContext context, IHttpContextAccessor httpContextAccessor, IProductService productService, ICouponService couponService)
     {
         _dataContext = context;
         _httpContextAccessor = httpContextAccessor;
         _productService = productService;
+        _couponService = couponService;
     }
 
     // Lấy danh sách đơn hàng
-    public CartItemViewModel GetListCartItem()
+    public CartItemViewModel GetListCartItem(ShippingModel shipping = null, CouponModel coupon = null)
     {
-        // Lấy danh sách sản phẩm từ giỏ hàng từ session - Nếu session không tồn tại thì trả về giỏ hàng rỗng
+        // Lấy danh sách sản phẩm trong giỏ hàng từ session - Nếu session không tồn tại thì trả về giỏ hàng rỗng
         var session = _httpContextAccessor.HttpContext.Session;
-        if (session == null)
-            return new CartItemViewModel();
-        var cartItem = session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
+        var cartItems = session?.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
 
-        // Tạo ViewModel danh sách sản phẩm và tổng tiền
-        var cartItemViewModel = new CartItemViewModel()
+        // Mặc định nếu chưa có shipping
+        shipping ??= new ShippingModel
         {
-            CartItems = cartItem,
-            GrandTotal = cartItem.Sum(x => x.Total),
+            City = "Tỉnh Thành",
+            District = "Quận Huyện",
+            Ward = "Phường Xã",
+            Price = 0
         };
 
-        return cartItemViewModel;
+        // Tổng tiền sản phẩm
+        decimal totalProductPrice = cartItems.Sum(x => x.Total);
+        decimal shippingPrice = shipping.Price;
+        decimal grandTotal = totalProductPrice + shippingPrice;
+
+        // Thông tin coupon
+        string discountText = FormatCurrency.ToVnCurrency(0);
+        string couponCode = "";
+        decimal discountValue = 0;
+        bool isPercentage = false;
+
+        if (coupon != null)
+        {
+            discountValue = coupon.DiscountValue;
+            couponCode = coupon.Code;
+            if (coupon.DiscountType == "percentage")
+            {
+                isPercentage = true;
+                discountText = $"{discountValue:0.#}%";
+            }
+            else
+            {
+                discountText = FormatCurrency.ToVnCurrency(discountValue);
+            }
+        }
+
+        // Tổng tiền thanh toán sau khi áp dụng giảm giá
+        decimal totalPayment = isPercentage
+            ? grandTotal * (1 - discountValue / 100)
+            : grandTotal - discountValue;
+
+        return new CartItemViewModel
+        {
+            CartItems = cartItems,
+            TotalProductPrice = totalProductPrice,
+            Shipping = shipping,
+            DiscountValue = discountText,
+            CouponCode = couponCode,
+            GrandTotal = grandTotal,
+            TotalPayment = totalPayment
+        };
     }
 
     // Thêm sản phẩm vào giỏ hàng
@@ -182,22 +226,5 @@ public class CartService : ICartService
         session.Remove("Cart");
 
         return new OperationResult(true, "Đã xóa toàn bộ sản phẩm trong giỏ hàng!!!");
-    }
-
-    public async Task<ShippingModel> GetShippingAsync(string city, string district, string ward)
-    {
-        var esistingShopping = await _dataContext.Shippings
-                   .FirstOrDefaultAsync(s => s.City == city && s.District == district && s.Ward == ward);
-
-        decimal shippingPrice = 0;
-
-        if (esistingShopping != null)
-            shippingPrice = esistingShopping.Price;
-        else
-            shippingPrice = 50000;
-
-        var shipping = new ShippingModel(shippingPrice, city, district, ward);
-
-        return shipping;
     }
 }

@@ -14,5 +14,7 @@ namespace Shopping_ver1.Services.Abstract
         Task<OperationResult> UpdateAsync(int id, decimal newPrice);
         // Xóa thể loại
         Task<OperationResult> DeleteAsync(int id);
+        // Lấy shipping
+        Task<ShippingModel> GetShippingAsync(string city, string district, string ward);
     }
 }

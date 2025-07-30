@@ -6,7 +6,7 @@ namespace Shopping_ver1.Services.Abstract
     public interface ICartService
     {
         // Lấy danh sách sản phẩm trong giỏ hàng
-        CartItemViewModel GetListCartItem();
+        CartItemViewModel GetListCartItem(ShippingModel shipping = null, CouponModel coupon = null);
         // Thêm sản phẩm vào giỏ hàng
         Task<OperationResult> AddAsync(int id);
         // Tăng số lượng sản phẩm trong giỏ hàng
@@ -19,6 +19,5 @@ namespace Shopping_ver1.Services.Abstract
         OperationResult Remove(int id);
         // Làm mới giỏ hàng
         OperationResult Clear();
-        Task<ShippingModel> GetShippingAsync(string city, string district, string ward);
     }
 }

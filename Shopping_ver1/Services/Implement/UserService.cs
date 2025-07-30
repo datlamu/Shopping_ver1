@@ -47,7 +47,10 @@ namespace Shopping_ver1.Services.Implement
                 var toEmail = "172100119@dntu.edu.vn";
                 var subject = "Đăng nhập thành công !";
                 var body = "Chúc bạn có trải nghiệm vui vẻ nhé !";
-                await _emailService.SendEmailAsync(toEmail, subject, body);
+                _ = Task.Run(async () =>
+                {
+                    await _emailService.SendEmailAsync(toEmail, subject, body);
+                });
             }
 
             return result;

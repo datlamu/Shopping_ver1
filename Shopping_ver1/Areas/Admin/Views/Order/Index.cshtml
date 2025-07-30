@@ -42,11 +42,7 @@
 								</select>
 							</td>
 							<td class="align-middle">
-								<button class="btn btn-warning btn-sm btn-order-detail"
-										value="@item.OrderCode"
-										data-status="@item.Status"
-										data-total="@item.TotalProductPrice"
-										data-shipping="@item.ShippingFee">
+								<button class="btn btn-warning btn-sm btn-order-detail" value="@item.OrderCode">
 									<i class="fas fa-receipt"></i>
 								</button>
 								<button class="btn btn-danger btn-sm btn-delete" value="@item.Id">
@@ -79,11 +75,8 @@
 			// Event click OrderDetail
 			$('#dataTable').on('click', '.btn-order-detail', function () {
 				var orderCode = $(this).val();
-				var status = $(this).data('status');
-				var total = $(this).data('total');
-				var shipping = $(this).data('shipping');
 				var currentPage = table.page() + 1;
-				window.location.href = `/Admin/Order/OrderDetail?orderCode=${orderCode}&status=${status}&page=${currentPage}&total=${total}&shipping=${shipping}`;
+				window.location.href = `/Admin/Order/OrderDetail?orderCode=${orderCode}&page=${currentPage}`;
 			});
 
 			// Event click Update

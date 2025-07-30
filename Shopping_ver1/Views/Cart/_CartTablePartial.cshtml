@@ -1,11 +1,6 @@
 ﻿@using Shopping_ver1.Models.ViewModels
 @model CartItemViewModel
-@{
-	decimal shippingPrice = ViewBag.Shipping?.Price ?? 0;
-	string city = ViewBag.Shipping?.City ?? "Tỉnh Thành";
-	string district = ViewBag.Shipping?.District ?? "Quận Huyện";
-	string ward = ViewBag.Shipping?.Ward ?? "Phường Xã";
-}
+
 <section id="cart_items">
 	<div class="container">
 		<div class="breadcrumbs">
@@ -35,7 +30,7 @@
 									<h4>@item.ProductName</h4>
 								</td>
 								<td class="cart_product">
-									<a href=""><img src="~/media/products/@item.Image" width="200px" alt=""></a>
+									<a href=""><img src="~/media/products/@item.Image" width="140px" alt=""></a>
 								</td>
 								<td class="cart_price">
 									<p>@FormatCurrency.ToVnCurrency(item.Price)</p>
@@ -49,11 +44,11 @@
 										<i class="fa fa-plus"></i>
 									</button>
 								</td>
-								<td class="cart_total">
+								<td class="cart_price">
 									<p class="cart_total_price">@FormatCurrency.ToVnCurrency(@item.Total)</p>
 								</td>
-								<td class="cart_delete">
-									<button class="btn btn-danger btn-sm remove-cartitem" value="@item.ProductId"><i class="fa fa-times"></i></button>
+								<td class="text-center">
+									<button class="btn btn-danger" value="@item.ProductId"><i class="fa fa-trash"></i></button>
 								</td>
 							</tr>
 						}
@@ -62,24 +57,44 @@
 								<label>Chọn khu vực</label>
 								<div class="form-group">
 									<select class="form-control" id="tinh" name="tinh">
-										<option value="0">@city</option>
+										<option value="0">@Model.Shipping.City</option>
 									</select>
 								</div>
 								<div class="form-group">
 									<select class="form-control" id="quan" name="quan">
-										<option value="0">@district</option>
+										<option value="0">@Model.Shipping.District</option>
 									</select>
 								</div>
 								<div class="form-group">
 									<select class="form-control" id="phuong" name="phuong">
-										<option value="0">@ward</option>
+										<option value="0">@Model.Shipping.Ward</option>
 									</select>
 								</div>
 							</td>
-							<td class="cart_total" colspan="6" align="right">
-								<p class="cart_total_price">Tổng đơn hàng: @FormatCurrency.ToVnCurrency(Model.GrandTotal)</p>
-								<p class="cart_total_price">Phí vận chuyển: @FormatCurrency.ToVnCurrency(shippingPrice)</p>
-								<p class="cart_total_price">Tổng thanh toán: @FormatCurrency.ToVnCurrency(Model.GrandTotal + shippingPrice)</p>
+							<td>
+								<div class="form-group">
+									<label>Mã giảm giá</label>
+									<input id="couponCode" class="form-control" />
+								</div>
+								<button class="btn btn-success btn-sm btn-active-coupon">Kích hoạt</button>
+							</td>
+							<td colspan="3" class="text-right align-top" style="border: none;">
+								<div class="d-flex flex-column align-items-end pr-3">
+									<p class="mb-1">Tổng tiền sản phẩm:</p>
+									<p class="mb-1">Phí vận chuyển:</p>
+									<p class="mb-1 font-weight-bold">Tổng đơn hàng:</p>
+									<p class="mb-1 text-danger">Mã giảm giá:</p>
+									<p class="cart_total_price">Tổng thanh toán:</p>
+								</div>
+							</td>
+							<td colspan="1" class="text-right align-top" style="border: none;">
+								<div class="d-flex flex-column align-items-end">
+									<p class="mb-1">@FormatCurrency.ToVnCurrency(Model.TotalProductPrice)</p>
+									<p class="mb-1">@FormatCurrency.ToVnCurrency(Model.Shipping.Price)</p>
+									<p id="TotalPrice" class="mb-1 font-weight-bold">@FormatCurrency.ToVnCurrency(Model.GrandTotal)</p>
+									<p class="mb-1 text-danger">- @Model.DiscountValue</p>
+									<p class="cart_total_price">@FormatCurrency.ToVnCurrency(Model.TotalPayment)</p>
+								</div>
 							</td>
 						</tr>
 						<tr>

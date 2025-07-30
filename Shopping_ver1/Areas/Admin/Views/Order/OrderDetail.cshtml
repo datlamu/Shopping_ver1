@@ -1,4 +1,4 @@
-﻿@model IEnumerable<OrderDetailModel>
+﻿@model OrderDetailViewModel
 @{
 	ViewData["Title"] = "Chi tiết đơn hàng";
 	var index = 1;
@@ -7,7 +7,10 @@
 <!-- DataTables Example -->
 <div class="card shadow mb-4">
 	<div class="card-header py-3 d-flex justify-content-between align-items-center">
-		<h6 class="m-0 font-weight-bold text-primary">Chi tiết đơn hàng: @ViewBag.OrderCode</h6>
+		<div>
+			<h6 class="m-0 font-weight-bold text-primary mb-2">Chi tiết đơn hàng: @Model.OrderCode</h6>
+			<h6 class="m-0 font-weight-bold text-primary">Khu vực ship: @Model.ShippingRegion</h6>
+		</div>
 		<a class="btn btn-success" asp-area="Admin" asp-controller="Order" asp-action="Index" asp-route-page="@ViewBag.CurrentPage">Quay về danh sách đơn hàng</a>
 	</div>
 
@@ -24,7 +27,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var item in Model)
+					@foreach (var item in Model.OrderDetail)
 					{
 						<tr>
 							<th scope="row">@(index++)</th>
@@ -38,19 +41,22 @@
 				<tfoot>
 					<tr>
 						<td colspan="4" class="text-end align-middle" style="text-align: right">
-							<p><strong>Tổng tiền:</strong></p>
-							<p><strong>Phí ship:</strong></p>
-							<p><strong>Tổng thanh toán:</strong></p>
+							<p><strong>Tổng tiền sản phẩm :</strong></p>
+							<p><strong>Phí vận chuyển :</strong></p>
+							<p class="text-primary"><strong>Tổng đơn hàng :</strong></p>
+							<p class="text-danger"><strong>Mã giảm giá - @Model.CouponCode :</strong></p>
+							<p class="text-success"><strong>Tổng thanh toán :</strong></p>
 						</td>
-						<td class="text-end align-middle">
-							<p>@FormatCurrency.ToVnCurrency(ViewBag.TotalProductPrice)</p>
-							<p>@FormatCurrency.ToVnCurrency(ViewBag.ShippingPrice)</p>
-							<p>@FormatCurrency.ToVnCurrency(ViewBag.ShippingPrice + ViewBag.TotalProductPrice)</p>
+						<td class="align-middle">
+							<p><strong>@FormatCurrency.ToVnCurrency(Model.TotalProductPrice)</strong></p>
+							<p><strong>@FormatCurrency.ToVnCurrency(Model.ShippingFee)</strong></p>
+							<p class="text-primary"><strong>@FormatCurrency.ToVnCurrency(Model.GrandTotal)</strong></p>
+							<p class="text-danger"><strong>- @Model.DiscountValue</strong></p>
+							<p class="text-success"><strong>@FormatCurrency.ToVnCurrency(Model.TotalPayment)</strong></p>
 						</td>
 					</tr>
 				</tfoot>
 			</table>
-
 		</div>
 	</div>
 </div>

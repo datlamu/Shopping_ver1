@@ -37,6 +37,7 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<ISliderService, SliderService>();
 builder.Services.AddTransient<IContactService, ContactService>();
 builder.Services.AddTransient<IShippingService, ShippingService>();
+builder.Services.AddTransient<ICouponService, CouponService>();
 
 // *6 Add Identity
 builder.Services.AddIdentity<UserModel, IdentityRole>()

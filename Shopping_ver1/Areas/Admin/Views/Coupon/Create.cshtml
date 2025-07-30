@@ -1,0 +1,70 @@
+﻿@model CouponModel
+@{
+	ViewData["title"] = "Tạo mã giảm giá mới";
+}
+<h3>Tạo mã giảm giá mới</h3>
+<form asp-area="Admin" asp-controller="Coupon" asp-action="Create" method="post" enctype="multipart/form-data">
+	@Html.AntiForgeryToken()
+	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+	<div class="form-group">
+		<label>Mã giảm giá</label>
+		<input asp-for="Code" class="form-control" />
+		<span asp-validation-for="Code" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<label>Mô tả</label>
+		<input asp-for="Description" class="form-control" />
+		<span asp-validation-for="Description" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<label>Kiểu giảm giá</label>
+		<select asp-for="DiscountType" class="form-control">
+			<option value="percentage">Giảm theo %</option>
+			<option value="fixed">Giảm theo giá cố định</option>
+		</select>
+		<span asp-validation-for="DiscountType" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<label>Giá giảm</label>
+		<input asp-for="DiscountValue" class="form-control" value="20000" />
+		<span asp-validation-for="DiscountValue" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<label>Đơn tối thiểu để kích hoạt mã</label>
+		<input asp-for="MinimumOrderAmount" class="form-control" value="20000" />
+		<span asp-validation-for="MinimumOrderAmount" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<label>Ngày bắt đầu</label>
+		<input asp-for="StartDate" class="form-control" />
+		<span asp-validation-for="StartDate" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<label>Ngày hết hạn</label>
+		<input asp-for="EndDate" class="form-control" />
+		<span asp-validation-for="EndDate" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<label>Số lượng</label>
+		<input asp-for="Quantity" class="form-control" />
+		<span asp-validation-for="Quantity" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<label>Trạng thái</label>
+		<select asp-for="IsActive" class="form-control">
+			<option value="true">Đã kích hoạt</option>
+			<option value="false">Chưa kích hoạt</option>
+		</select>
+		<span asp-validation-for="IsActive" class="text-danger" />
+	</div>
+	<div class="form-group">
+		<button class="btn btn-success">Tạo mới</button>
+	</div>
+</form>
+<a asp-area="Admin" asp-controller="Coupon" asp-action="Index" class="btn btn-success">Quay lại danh sách</a>
+@* RenderPartial *@
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

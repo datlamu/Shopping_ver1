@@ -10,9 +10,14 @@ namespace Shopping_ver1.Controllers
     public class CheckoutController : Controller
     {
         private readonly ICheckoutService _checkoutService;
-        public CheckoutController(ICheckoutService checkoutService)
+        private readonly ICouponService _couponService;
+        private readonly ICartService _cartservice;
+
+        public CheckoutController(ICheckoutService checkoutService, ICouponService couponService, ICartService cartservice)
         {
             _checkoutService = checkoutService;
+            _couponService = couponService;
+            _cartservice = cartservice;
         }
         // Thực hiện thanh toán
         public async Task<IActionResult> Index()
@@ -25,14 +30,6 @@ namespace Shopping_ver1.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // Lấy ra giỏ hàng và kiểm tra
-            var carts = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
-            if (!carts.Any())
-            {
-                TempData["Error"] = "Giỏ hàng trống!";
-                return RedirectToAction("Index", "Cart");
-            }
-
             // Lấy phí vận chuyển
             var shippingCookie = Request.Cookies["ShippingInfo"];
             if (shippingCookie == null)
@@ -42,8 +39,23 @@ namespace Shopping_ver1.Controllers
             }
             var shipping = JsonConvert.DeserializeObject<ShippingModel>(shippingCookie);
 
+            // Lấy mã giảm giá từ Session
+            var appliedCouponCode = HttpContext.Session.GetString("CouponCode");
+            CouponModel coupon = null;
+            if (!string.IsNullOrEmpty(appliedCouponCode))
+            {
+                coupon = await _couponService.FindByCodeAsync(appliedCouponCode);
+            }
+
+            var listCartItem = _cartservice.GetListCartItem(shipping, coupon);
+            if (!listCartItem.CartItems.Any())
+            {
+                TempData["Error"] = "Giỏ hàng trống!";
+                return RedirectToAction("Index", "Cart");
+            }
+
             // Thực hiện thanh toán
-            var result = await _checkoutService.CheckoutAsync(userEmail, carts, shipping);
+            var result = await _checkoutService.CheckoutAsync(userEmail, listCartItem);
             if (!result.Success)
             {
                 TempData["Error"] = result.Message;

@@ -1,4 +1,5 @@
 ﻿using Shopping_ver1.Models;
+using Shopping_ver1.Models.ViewModels;
 
 namespace Shopping_ver1.Services.Abstract
 {
@@ -9,7 +10,7 @@ namespace Shopping_ver1.Services.Abstract
         Task<List<OrderModel>> GetOrderlistAsync();
 
         // Chi tiết đơn hàng
-        Task<List<OrderDetailModel>> GetOrderDetailAsync(string orderCode);
+        Task<OrderDetailViewModel> GetOrderDetailAsync(string orderCode);
 
         // Cập nhật thông tin đơn hàng
         Task<OperationResult> UpdateOrderAsync(string orderCode, int status);

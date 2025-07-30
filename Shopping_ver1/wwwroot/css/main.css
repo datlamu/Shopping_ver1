@@ -1600,7 +1600,7 @@ h2.title {
 .cart_info table tr td {
     border-top: 0 none;
     vertical-align: inherit;
-    padding: 10px
+    padding: 10px 20px
 }
 
 #cart_items .cart_info .cart_description h4 {

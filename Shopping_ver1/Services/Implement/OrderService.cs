@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Models;
+using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services.Abstract;
 
@@ -19,10 +20,27 @@ public class OrderService : IOrderService
     }
 
     // Chi tiết đơn hàng
-    public async Task<List<OrderDetailModel>> GetOrderDetailAsync(string orderCode)
+    public async Task<OrderDetailViewModel> GetOrderDetailAsync(string orderCode)
     {
-        // Chi tiết của đơn ( dựa vào orderCode )
-        return await _dataContext.OrderDetails.Include(o => o.Product).Where(od => od.OrderCode == orderCode).ToListAsync();
+        // Lấy ra chi tiết đơn hàng
+        var orderDetails = await _dataContext.OrderDetails.Include(od => od.Product).Where(od => od.OrderCode == orderCode).ToListAsync();
+
+        // Lấy thông tin đơn hàng
+        var order = await _dataContext.Orders.FirstOrDefaultAsync(o => o.OrderCode == orderCode);
+
+        // Đưa thông tin vào ViewModel
+        return new OrderDetailViewModel()
+        {
+            OrderDetail = orderDetails,
+            OrderCode = order.OrderCode,
+            TotalProductPrice = order.TotalProductPrice,
+            ShippingFee = order.ShippingFee,
+            GrandTotal = order.TotalProductPrice + order.ShippingFee,
+            DiscountValue = order.DiscountValue,
+            CouponCode = order.CouponCode,
+            TotalPayment = order.TotalPayment,
+            ShippingRegion = order.ShippingRegion
+        };
     }
 
     // Cập nhật thông tin đơn hàng

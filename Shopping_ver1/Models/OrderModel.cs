@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 public class OrderModel
 {
@@ -18,8 +17,11 @@ public class OrderModel
 
     public decimal ShippingFee { get; set; } = 0;
 
+    public string DiscountValue { get; set; }
+
+    public string CouponCode { get; set; }
+
     public decimal TotalPayment { get; set; } = 0;
 
     public string ShippingRegion { get; set; }
-
 }
