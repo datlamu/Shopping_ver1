@@ -1,7 +1,9 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using Shopping_ver1.Models;
 using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Services.Abstract;
@@ -145,10 +147,57 @@ namespace Shopping_ver1.Controllers
             return View(orderDetailVM);
         }
 
+        [HttpGet]
         public ActionResult ForgotPassword()
         {
             return View();
         }
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<ActionResult> ForgotPassword(UserModel user)
+        {
+            string baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var message = await _userService.ForgotPassword(user.Email, baseUrl);
 
+            TempData["Success"] = message;
+            return RedirectToAction("Login");
+        }
+
+        [HttpGet]
+        public ActionResult NewPassword(string email, string token)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login"); // hoặc View lỗi
+            }
+
+            var model = new NewPasswordViewModel
+            {
+                Email = email,
+                Token = token
+            };
+
+            return View(model);
+        }
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<ActionResult> NewPassword(NewPasswordViewModel newPassVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(newPassVM);
+            }
+
+            var result = await _userService.NewPassword(newPassVM);
+
+            if (!result.Success)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction("Login");
+            }
+
+            TempData["Success"] = result.Message;
+            return RedirectToAction("Login");
+        }
     }
 }

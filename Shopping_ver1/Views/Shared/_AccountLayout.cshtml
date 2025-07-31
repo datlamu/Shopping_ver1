@@ -37,6 +37,9 @@
 	<!-- Custom scripts for all pages-->
 	<script src="~/assests/js/sb-admin-2.min.js"></script>
 
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.0/dist/sweetalert2.all.min.js"></script>
+	<partial name="_NotificationPartial" />
+
 	@* Render nội dung của section có tên là "Scrips" nếu nó tồn tại *@
 	@await RenderSectionAsync("Scripts", required: false)
 </body>

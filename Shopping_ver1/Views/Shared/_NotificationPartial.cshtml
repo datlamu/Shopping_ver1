@@ -4,14 +4,14 @@
 		Swal.fire({
 			position: 'top-end',
 			icon: 'success',
-			title: @Html.Raw(Json.Serialize(TempData["success"])),
+			title: @Html.Raw(Json.Serialize(TempData["Success"])),
 			showConfirmButton: false,
-			timer: 1500
+			timer: 5000
 		});
 	</script>
 }
 
-@if (TempData["error"] != null)
+@if (TempData["Error"] != null)
 {
 	<script>
 		Swal.fire({
@@ -19,7 +19,7 @@
 			icon: 'error',
 			title: @Html.Raw(Json.Serialize(TempData["Error"])),
 			showConfirmButton: false,
-			timer: 1500
+			timer: 5000
 		});
 	</script>
 }

@@ -23,5 +23,12 @@ namespace Shopping_ver1.Services.Abstract
 
         // Đăng xuất
         Task LogoutAsync();
+
+        // Quên mật khẩu
+        Task<string> ForgotPassword(string userEmail, string baseUrl);
+
+        // Mật khẩu mới
+        Task<OperationResult> NewPassword(NewPasswordViewModel newPassVM);
+
     }
 }

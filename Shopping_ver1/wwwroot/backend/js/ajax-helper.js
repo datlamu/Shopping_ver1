@@ -9,7 +9,7 @@
                 icon: result.success ? 'success' : 'error',
                 title: result.message,
                 showConfirmButton: false,
-                timer: 3500
+                timer: 5000
             });
 
             if (result.success && typeof onSuccess === "function") {
@@ -22,7 +22,7 @@
                 icon: 'error',
                 title: "Có lỗi xảy ra.",
                 showConfirmButton: false,
-                timer: 3500
+                timer: 5000
             });
         }
     });

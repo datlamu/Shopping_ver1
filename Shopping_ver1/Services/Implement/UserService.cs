@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using Shopping_ver1.Models;
 using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Services.Abstract;
@@ -173,6 +174,64 @@ namespace Shopping_ver1.Services.Implement
         public async Task LogoutAsync()
         {
             await _signInManager.SignOutAsync();
+        }
+
+        // Quên mật khẩu
+        public async Task<string> ForgotPassword(string userEmail, string baseUrl)
+        {
+            // Tìm User
+            var user = await _userManager.FindByEmailAsync(userEmail);
+
+            // Nếu user tồn tại và đã xác thực email
+            if (user != null)
+            {
+                // Tạo token và mã hóa token ( tránh lỗi đối với ký tự đặc biệt )
+                string token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                string encodedToken = Uri.EscapeDataString(token);
+                string encodedEmail = Uri.EscapeDataString(userEmail);
+
+                // Tạo link
+                string resetLink = $"{baseUrl}/Account/NewPassword?email={encodedEmail}&token={encodedToken}";
+
+                // Nội dung mail
+                string subject = $"Khôi phục mật khẩu tài khoản {user.Email}";
+                string body = $@"
+                    <p>Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.</p>
+                    <p>Nhấn vào liên kết sau để đặt lại mật khẩu:</p>
+                    <p><a href='{resetLink}'>Đặt lại mật khẩu</a></p>
+                    <p>Nếu bạn không yêu cầu điều này, vui lòng bỏ qua email này.</p>";
+
+                // Gửi mail đến chính email người dùng
+                await _emailService.SendEmailAsync(userEmail, subject, body);
+            }
+
+            return "Nếu email hợp lệ, bạn sẽ nhận được hướng dẫn đặt lại mật khẩu.";
+        }
+
+        // Mật khẩu mới
+        public async Task<OperationResult> NewPassword(NewPasswordViewModel newPassVM)
+        {
+            // Giải mã mail
+            string decodedEmail = Uri.UnescapeDataString(newPassVM.Email);
+
+            // Kiểm tra account
+            var user = await _userManager.FindByEmailAsync(decodedEmail);
+            if (user == null)
+            {
+                return new OperationResult(false, "Không tìm thấy tài khoản !!!");
+            }
+
+            // Giải mã token
+            string decodedToken = Uri.UnescapeDataString(newPassVM.Token);
+
+            // Đặt lại mật khẩu mới
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, newPassVM.Password);
+
+            if (!result.Succeeded)
+            {
+                return new OperationResult(true, "Đã có lỗi vui lòng thử lại");
+            }
+            return new OperationResult(true, "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.");
         }
     }
 }

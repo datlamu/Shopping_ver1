@@ -1,6 +1,6 @@
 ﻿// Cảnh báo khi xóa và tự động ẩn thông báo
 $(function () {
-    $("a.confirmDeletion").on("click", function () {
+    $(".confirmDeletion").on("click", function () {
         return confirm("Confirm deletion");
     });
 
