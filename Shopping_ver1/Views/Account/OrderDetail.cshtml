@@ -1,0 +1,61 @@
+﻿@using Shopping_ver1.Models.ViewModels
+@model OrderDetailViewModel
+@{
+	ViewData["Title"] = "Lịch sử đơn hàng";
+	var index = 1;
+}
+
+<section id="cart_items">
+	<div class="container">
+		<div class="breadcrumbs">
+			<ol class="breadcrumb">
+				<li class="active">Lịch sử đơn hàng của tôi</li>
+			</ol>
+		</div>
+		<div class="table-responsive cart_info">
+			<table class="table table-condensed table-hover" style="margin-bottom: 0;">
+				<thead>
+					<tr class="cart_menu">
+						<td>STT</td>
+						<td>Sản phẩm</td>
+						<td>Giá</td>
+						<td>Số lượng</td>
+						<td>Tổng</td>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model.OrderDetail)
+					{
+						<tr>
+							<td>@(index++)</td>
+							<td>@item.Product.Name</td>
+							<td>@FormatCurrency.ToVnCurrency(@item.Price)</td>
+							<td>@item.Quantity</td>
+							<td>@FormatCurrency.ToVnCurrency(item.Quantity * item.Price)</td>
+						</tr>
+					}
+					<tr>
+						<td colspan="4" class="text-right align-top" style="border: none;">
+							<div class="d-flex flex-column align-items-end pr-3">
+								<p class="mb-1">Tổng tiền sản phẩm:</p>
+								<p class="mb-1">Phí vận chuyển:</p>
+								<p class="mb-1 font-weight-bold">Tổng đơn hàng:</p>
+								<p class="mb-1 text-danger">Mã giảm giá - @Model.CouponCode:</p>
+								<p class="cart_total_price">Tổng thanh toán:</p>
+							</div>
+						</td>
+						<td colspan="1" class="text-left align-top" style="border: none;">
+							<div class="d-flex flex-column align-items-end">
+								<p class="mb-1">@FormatCurrency.ToVnCurrency(Model.TotalProductPrice)</p>
+								<p class="mb-1">@FormatCurrency.ToVnCurrency(Model.ShippingFee)</p>
+								<p id="TotalPrice" class="mb-1 font-weight-bold">@FormatCurrency.ToVnCurrency(Model.GrandTotal)</p>
+								<p class="mb-1 text-danger">- @Model.DiscountValue</p>
+								<p class="cart_total_price">@FormatCurrency.ToVnCurrency(Model.TotalPayment)</p>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section> <!--/#cart_items-->

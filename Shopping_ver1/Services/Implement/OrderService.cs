@@ -19,6 +19,12 @@ public class OrderService : IOrderService
         return await _dataContext.Orders.ToListAsync();
     }
 
+    // Lấy danh sách đơn hàng theo UserEmail
+    public async Task<List<OrderModel>> FindByUserEmailAsync(string userEmail)
+    {
+        return await _dataContext.Orders.Where(o => o.UserName == userEmail).ToListAsync();
+    }
+
     // Chi tiết đơn hàng
     public async Task<OrderDetailViewModel> GetOrderDetailAsync(string orderCode)
     {
@@ -89,11 +95,11 @@ public class OrderService : IOrderService
             _dataContext.Orders.Remove(order);
             await _dataContext.SaveChangesAsync();
 
-            return new OperationResult(true, "Xóa đơn hàng thành công !");
+            return new OperationResult(true, "Hủy đơn hàng thành công !");
         }
         catch
         {
-            return new OperationResult(false, "Xóa đơn hàng thất bại !");
+            return new OperationResult(false, "Hủy đơn hàng thất bại !");
         }
     }
 }

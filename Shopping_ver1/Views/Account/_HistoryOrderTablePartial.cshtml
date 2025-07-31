@@ -1,0 +1,65 @@
+﻿@using Shopping_ver1.Models.ViewModels
+@model IEnumerable<OrderModel>
+@{
+	ViewData["Title"] = "Lịch sử đơn hàng";
+	var index = 1;
+}
+
+<section id="cart_items">
+	<div class="container">
+		<div class="breadcrumbs">
+			<ol class="breadcrumb">
+				<li class="active">Lịch sử đơn hàng của tôi</li>
+			</ol>
+		</div>
+		<div class="table-responsive cart_info">
+			<table class="table table-condensed table-hover" style="margin-bottom: 0;">
+				<thead>
+					<tr class="cart_menu">
+						<td>STT</td>
+						<td>Mã đơn hàng</td>
+						<td>Ngày đặt</td>
+						<td>Trạng thái</td>
+						<td>Tùy chọn</td>
+					</tr>
+				</thead>
+				<tbody>
+					@if (Model.Count() > 0)
+					{
+						foreach (var item in Model)
+						{
+							<tr>
+								<td>@(index++)</td>
+								<td>@item.OrderCode</td>
+								<td>@item.CreateDate.ToString("dd/MM/yyyy")</td>
+								@if (item.Status == 1)
+								{
+									<td class="text-success">Đã xử lý</td>
+								}
+								else
+								{
+									<td class="text-danger">Đang xử lý</td>
+								}
+								<td>
+									<a asp-controller="Account" asp-action="OrderDetail" asp-route-orderCode="@item.OrderCode" class="btn btn-warning"><i class="fa fa-info-circle"></i></a>
+									@if (item.Status != 1)
+									{
+										<button class="btn btn-danger btn-cancel" value="@item.Id"><i class="fa fa-ban"></i></button>
+									}
+								</td>
+							</tr>
+						}
+					}
+					else
+					{
+						<tr>
+							<td class="cart_total">
+								<p class="cart_total_price"><h4>Không có đơn hàng nào</h4></p>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section> <!--/#cart_items-->

@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Shopping_ver1.Models;
 using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Services.Abstract;
 
@@ -8,11 +12,13 @@ namespace Shopping_ver1.Controllers
     {
         // Service
         private readonly IUserService _userService;
+        private readonly IOrderService _orderService;
 
         // Inject Service
-        public AccountController(IUserService userService)
+        public AccountController(IUserService userService, IOrderService orderService)
         {
             _userService = userService;
+            _orderService = orderService;
         }
 
         public IActionResult Index()
@@ -89,6 +95,56 @@ namespace Shopping_ver1.Controllers
             TempData["Success"] = "Đăng xuất thành công!";
             return Redirect(returnUrl);
         }
+
+        // Lịch sử đơn hàng
+        [Authorize]
+        public async Task<IActionResult> HistoryOrder()
+        {
+            // Lấy email người dùng
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            // Lấy danh sách đơn hàng theo email
+            var orders = await _orderService.FindByUserEmailAsync(userEmail);
+
+            if (orders == null || !orders.Any())
+            {
+                TempData["Message"] = "Bạn chưa có đơn hàng nào.";
+                return View(new List<OrderModel>());
+            }
+
+            return View(orders);
+        }
+
+        // Hủy đơn hàng
+        public async Task<IActionResult> CancelOrder(int id)
+        {
+            // Hủy đơn hàng theo id
+            var result = await _orderService.DeleteOrderAsync(id);
+
+            return Json(new { success = result.Success, message = result.Message });
+        }
+
+        // Tải lại bảng 
+        [Authorize]
+        public async Task<IActionResult> ReloadTable()
+        {
+            // Lấy email người dùng
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            // Lấy danh sách đơn hàng theo email
+            var orders = await _orderService.FindByUserEmailAsync(userEmail);
+
+            return PartialView("_HistoryOrderTablePartial", orders);
+        }
+
+        public async Task<IActionResult> OrderDetail(string orderCode)
+        {
+            // Lấy danh sách đơn hàng theo email
+            var orderDetailVM = await _orderService.GetOrderDetailAsync(orderCode);
+
+            return View(orderDetailVM);
+        }
+
         public ActionResult ForgotPassword()
         {
             return View();

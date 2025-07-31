@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Shopping_ver1.Migrations;
 using Shopping_ver1.Models;
 using Shopping_ver1.Services.Abstract;
-using static Azure.Core.HttpHeader;
+using Microsoft.AspNetCore.Authorization;
+
 namespace Shopping_ver1.Controllers
 {
     public class CartController : Controller
@@ -19,6 +19,7 @@ namespace Shopping_ver1.Controllers
         }
 
         // Hiện sản phẩm trong giỏ hàng
+        [Authorize]
         public IActionResult Index()
         {
             var shippingCookie = Request.Cookies["ShippingInfo"];

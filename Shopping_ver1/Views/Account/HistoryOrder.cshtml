@@ -1,0 +1,36 @@
+﻿<div id="cartTableContainer">
+	<partial name="_HistoryOrderTablePartial" model="Model" />
+</div>
+@section Scripts {
+	<script>
+		// Tải lại bảng và gắn lại event
+		function reloadCartTable() {
+			$("#cartTableContainer").load("/Account/ReloadTable", function () {
+				attachCartEvents();
+			});
+		}
+
+		// Gắn sự kiện giỏ hàng
+		function attachCartEvents() {
+			// Hủy đơn hàng Ajax
+			$('.btn-cancel').off('click').on('click', function () {
+				// Url Action
+				var url = '/Account/CancelOrder';
+				// Lấy id của đơn hàng
+				var	id = $(this).val();
+				var data = { id };
+				// Gọi Ajax
+				sendAjax({
+					url,
+					data,
+					onSuccess: function () {
+						reloadCartTable();
+					}
+				});
+			});
+		}
+		$(document).ready(function () {
+			attachCartEvents();
+		});
+	</script>
+}
