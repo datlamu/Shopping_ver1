@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -139,6 +140,7 @@ namespace Shopping_ver1.Controllers
             return PartialView("_HistoryOrderTablePartial", orders);
         }
 
+        // Chi tiết đơn hàng
         public async Task<IActionResult> OrderDetail(string orderCode)
         {
             // Lấy danh sách đơn hàng theo email
@@ -147,6 +149,7 @@ namespace Shopping_ver1.Controllers
             return View(orderDetailVM);
         }
 
+        // Quên mật khẩu
         [HttpGet]
         public ActionResult ForgotPassword()
         {
@@ -163,6 +166,7 @@ namespace Shopping_ver1.Controllers
             return RedirectToAction("Login");
         }
 
+        // Mật khẩu mới
         [HttpGet]
         public ActionResult NewPassword(string email, string token)
         {
@@ -198,6 +202,45 @@ namespace Shopping_ver1.Controllers
 
             TempData["Success"] = result.Message;
             return RedirectToAction("Login");
+        }
+
+        // Mật khẩu mới
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult> AccountInfo()
+        {
+            // Lấy email người dùng
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            // Nếu email rỗng
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return NotFound();
+            }
+
+            var account = await _userService.FindAccountByMailAsync(userEmail);
+
+            return View(account);
+        }
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<ActionResult> AccountInfo(UserViewModel userVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(userVM);
+            }
+
+            var result = await _userService.UpdateAccountInfoAsync(userVM);
+
+            if (!result.Success)
+            {
+                TempData["Error"] = result.Message;
+                return View(userVM);
+            }
+
+            TempData["Success"] = result.Message;
+            return View(userVM);
         }
     }
 }

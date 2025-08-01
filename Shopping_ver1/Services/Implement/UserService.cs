@@ -103,12 +103,12 @@ namespace Shopping_ver1.Services.Implement
         }
 
         // Chỉnh sửa thông tin
-        public async Task<(bool Success, string Message)> EditUserAsync(EditUserViewModel model)
+        public async Task<OperationResult> EditUserAsync(EditUserViewModel model)
         {
             // Tìm kiểm user
             var user = await _userManager.FindByIdAsync(model.Id);
             if (user == null)
-                return (false, "Không tìm thấy user");
+                return new OperationResult(false, "Không tìm thấy user");
 
             // Lấy thông tin thay đổi
             user.Email = model.Email;
@@ -118,26 +118,33 @@ namespace Shopping_ver1.Services.Implement
             // Cập nhật
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
-                return (false, "Cập nhật user thất bại");
+                return new OperationResult(false, "Cập nhật user thất bại");
 
-            // Xóa role cũ
+            // Role hiện tại
             var currentRoles = await _userManager.GetRolesAsync(user);
-            var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
-            if (!removeResult.Succeeded)
-                return (false, "Xóa role cũ thất bại");
+            var currentRole = currentRoles.FirstOrDefault();
 
             // Tìm Role từ RoleId
             var role = await _roleManager.FindByIdAsync(model.RoleId);
             if (role == null)
-                return (false, "Role không hợp lệ");
+                return new OperationResult(false, "Role không hợp lệ");
 
-            // Thêm gán role cho user từ RoleName
-            var result = await _userManager.AddToRoleAsync(user, role.Name);
-            if (!result.Succeeded)
-                return (false, "Gán role thất bại");
+            // Nếu cập nhật role
+            if (currentRole != role.Name)
+            {
+                // Xóa role cũ
+                var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                if (!removeResult.Succeeded)
+                    return new OperationResult(false, "Xóa role cũ thất bại");
+
+                // Gán role mới
+                var result = await _userManager.AddToRoleAsync(user, role.Name);
+                if (!result.Succeeded)
+                    return new OperationResult(false, "Gán role thất bại");
+            }
 
             // Kết quả nếu thành công
-            return (true, "Cập nhật thành công");
+            return new OperationResult(true, "Cập nhật thành công");
         }
 
         // Xóa user
@@ -232,6 +239,43 @@ namespace Shopping_ver1.Services.Implement
                 return new OperationResult(true, "Đã có lỗi vui lòng thử lại");
             }
             return new OperationResult(true, "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.");
+        }
+
+        // Tìm kiếm user từ email
+        public async Task<UserViewModel> FindAccountByMailAsync(string userEmail)
+        {
+            // Kiểm tra user
+            var user = await _userManager.FindByEmailAsync(userEmail);
+
+            if (user == null) return null;
+
+            return new UserViewModel()
+            {
+                Username = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+            };
+        }
+
+        // Cập nhật thông tin tài khoản
+        public async Task<OperationResult> UpdateAccountInfoAsync(UserViewModel userVM)
+        {
+            // Tìm user theo mail
+            var user = await _userManager.FindByEmailAsync(userVM.Email);
+            if (user == null)
+                return new OperationResult(false, "Không tìm thấy thông tin tài khoản này !!!");
+
+            // Lấy thông tin thay đổi
+            user.Email = userVM.Email;
+            user.UserName = userVM.Username;
+            user.PhoneNumber = userVM.PhoneNumber;
+
+            // Cập nhật
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+                return new OperationResult(false, "Cập nhật thông tin tài khoản thất bại !!!");
+
+            return new OperationResult(true, "Cập nhật thông tin tài khoản thành công !!!");
         }
     }
 }

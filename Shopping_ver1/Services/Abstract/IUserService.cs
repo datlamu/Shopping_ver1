@@ -16,7 +16,7 @@ namespace Shopping_ver1.Services.Abstract
         Task<EditUserViewModel> GetEditUserViewModelAsync(string userId);
 
         // Chỉnh sửa thông tin
-        Task<(bool Success, string Message)> EditUserAsync(EditUserViewModel model);
+        Task<OperationResult> EditUserAsync(EditUserViewModel model);
 
         // Xóa user
         Task<OperationResult> DeleteUserAsync(string userId);
@@ -30,5 +30,10 @@ namespace Shopping_ver1.Services.Abstract
         // Mật khẩu mới
         Task<OperationResult> NewPassword(NewPasswordViewModel newPassVM);
 
+        // Tìm kiếm user từ email
+        Task<UserViewModel> FindAccountByMailAsync(string userEmail);
+
+        // Cập nhật thông tin tài khoản
+        Task<OperationResult> UpdateAccountInfoAsync(UserViewModel userVM);
     }
 }
