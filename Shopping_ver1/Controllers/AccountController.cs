@@ -1,13 +1,13 @@
 ﻿using System.Security.Claims;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using Shopping_ver1.Models;
 using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Services.Abstract;
+
 
 namespace Shopping_ver1.Controllers
 {
@@ -16,12 +16,14 @@ namespace Shopping_ver1.Controllers
         // Service
         private readonly IUserService _userService;
         private readonly IOrderService _orderService;
+        private readonly SignInManager<UserModel> _signInManager;
 
         // Inject Service
-        public AccountController(IUserService userService, IOrderService orderService)
+        public AccountController(IUserService userService, IOrderService orderService, SignInManager<UserModel> signInManager)
         {
             _userService = userService;
             _orderService = orderService;
+            _signInManager = signInManager;
         }
 
         public IActionResult Index()
@@ -94,6 +96,7 @@ namespace Shopping_ver1.Controllers
         // Đăng xuất
         public async Task<IActionResult> Logout(string returnUrl = "/")
         {
+            await HttpContext.SignOutAsync();
             await _userService.LogoutAsync();
             TempData["Success"] = "Đăng xuất thành công!";
             return Redirect(returnUrl);
@@ -204,7 +207,7 @@ namespace Shopping_ver1.Controllers
             return RedirectToAction("Login");
         }
 
-        // Mật khẩu mới
+        // Thông tin tài khoản
         [Authorize]
         [HttpGet]
         public async Task<ActionResult> AccountInfo()
@@ -242,5 +245,37 @@ namespace Shopping_ver1.Controllers
             TempData["Success"] = result.Message;
             return View(userVM);
         }
+
+        // Đăng nhập bằng google
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult LoginByGoogle()
+        {
+            var redirectUrl = Url.Action("GoogleResponse", "Account");
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(GoogleDefaults.AuthenticationScheme, redirectUrl);
+            // Chuyển tới giao diện chọn tài khoản của google
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        // Xử lý sau khi đăng nhập bằng Google
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            // Xử lý khi đăng nhập bằng Google
+            var result = await _userService.HandleGoogleLoginAsync();
+
+            // Thất bại quay về trang login
+            if (!result.Success)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction("Login");
+            }
+
+            // Thành công chuyển tới trang chủ
+            TempData["Success"] = result.Message;
+            return RedirectToAction("Index", "Home");
+        }
+
     }
 }

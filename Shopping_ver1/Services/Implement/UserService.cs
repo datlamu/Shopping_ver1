@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using Shopping_ver1.Models;
 using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Services.Abstract;
@@ -276,6 +276,80 @@ namespace Shopping_ver1.Services.Implement
                 return new OperationResult(false, "Cập nhật thông tin tài khoản thất bại !!!");
 
             return new OperationResult(true, "Cập nhật thông tin tài khoản thành công !!!");
+        }
+
+        // Xử lý đăng nhập bằng Google
+        // * Nếu user từng đăng nhập thì vào luôn, chưa thì tạo mới tài khoản liên kết rồi mới vào
+        public async Task<OperationResult> HandleGoogleLoginAsync()
+        {
+            // B1: Lấy thông tin từ Google
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return new OperationResult(false, "Không lấy được thông tin đăng nhập từ Google !!!");
+            }
+
+            // B2: Đăng nhập bằng Google - nếu user đã từng liên kết
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+            if (result.Succeeded)
+            {
+                // Gửi mail nếu vào thành công
+                var mail = info.Principal.FindFirstValue(ClaimTypes.Email);
+                SendLoginEmailAsync(mail);
+                return new OperationResult(true, "Đăng nhập Google thành công !!!");
+            }
+
+            // B3: Nếu chưa từng liên kết trước đó - thì tạo mới
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+            if (email == null)
+            {
+                return new OperationResult(false, "Không thể xác định email từ tài khoản Google !!!");
+            }
+
+            // Nếu email này chưa sử dụng thì tạo tài khoản
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = new UserModel(name, email);
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    return new OperationResult(false, "Không thể tạo tài khoản từ Google !!!");
+                }
+            }
+
+            // B4: Kiểm tra user đã liên kết với Google chưa
+            var logins = await _userManager.GetLoginsAsync(user);
+            var alreadyLinked = logins.Any(l => l.LoginProvider == info.LoginProvider && l.ProviderKey == info.ProviderKey);
+            if (!alreadyLinked)
+            {
+                var addLoginResult = await _userManager.AddLoginAsync(user, info);
+                if (!addLoginResult.Succeeded)
+                {
+                    return new OperationResult(false, "Không thể liên kết tài khoản Google !!!");
+                }
+            }
+
+            // Đăng nhập
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            // Gửi mail nếu vào thành công
+            SendLoginEmailAsync(email);
+
+            return new OperationResult(true, "Đăng nhập với tài khoản Google thành công !!!");
+        }
+
+        // Gửi mail nếu đăng nhập thành công với tài khoản google
+        private void SendLoginEmailAsync(string email)
+        {
+            var subject = "Đăng nhập thành công với tài khoản Google!";
+            var body = "Chúc bạn có trải nghiệm vui vẻ nhé!";
+
+            _ = Task.Run(async () =>
+            {
+                await _emailService.SendEmailAsync(email, subject, body);
+            });
         }
     }
 }

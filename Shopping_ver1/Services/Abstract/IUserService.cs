@@ -35,5 +35,8 @@ namespace Shopping_ver1.Services.Abstract
 
         // Cập nhật thông tin tài khoản
         Task<OperationResult> UpdateAccountInfoAsync(UserViewModel userVM);
+
+        // Xử lý đăng nhập bằng Google
+        Task<OperationResult> HandleGoogleLoginAsync();
     }
 }
