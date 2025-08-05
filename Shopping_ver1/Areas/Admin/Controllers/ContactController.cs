@@ -23,7 +23,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             var data = await _contactService.GetlistItemAsync();
 
             // Trang hiện tại
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(data);
         }
@@ -64,7 +64,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Tìm thông tin liên hệ đã chọn
             var product = await _contactService.FindItemAsync(id);
 
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(product);
         }
@@ -72,7 +72,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(ContactModel contact, int? page)
         {
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             // Kiểm tra thông tin liên hệ
             if (!ModelState.IsValid)

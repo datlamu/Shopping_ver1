@@ -38,6 +38,7 @@ builder.Services.AddTransient<ISliderService, SliderService>();
 builder.Services.AddTransient<IContactService, ContactService>();
 builder.Services.AddTransient<IShippingService, ShippingService>();
 builder.Services.AddTransient<ICouponService, CouponService>();
+builder.Services.AddTransient<IDashboardService, DashboardService>();
 
 // 5. Identity
 builder.Services.AddIdentity<UserModel, IdentityRole>()
@@ -100,7 +101,7 @@ app.UseAuthorization();
 // 9. Routes
 app.MapControllerRoute(
     name: "areas",
-    pattern: "{area:exists}/{controller=Product}/{action=Index}/{id?}");
+    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "category",

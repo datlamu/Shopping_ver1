@@ -23,7 +23,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             var data = await _categoryService.GetlistItemAsync();
 
             // Trang hiện tại
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(data);
         }
@@ -65,7 +65,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             var category = await _categoryService.GetUpdateItemAsync(id);
 
             // Trang hiện tại
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(category);
         }
@@ -73,7 +73,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(CategoryModel category, int? page)
         {
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             // Kiểm tra thông tin thể loại
             if (!ModelState.IsValid)

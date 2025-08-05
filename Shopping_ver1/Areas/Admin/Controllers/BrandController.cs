@@ -24,7 +24,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             var data = await _BrandService.GetlistItemAsync();
 
             // Trang hiện tại
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(data);
         }
@@ -66,7 +66,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             var Brand = await _BrandService.GetUpdateItemAsync(id);
 
             // Trang hiện tại
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(Brand);
         }
@@ -74,7 +74,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(BrandModel Brand, int? page)
         {
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             // Kiểm tra thông tin thương hiệu
             if (!ModelState.IsValid)

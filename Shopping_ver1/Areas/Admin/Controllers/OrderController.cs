@@ -20,7 +20,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             var data = await _orderService.GetOrderlistAsync();
 
             // Trang hiện tại
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(data);
         }
@@ -45,7 +45,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             }
 
             // Trang hiện tại
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(orderDetailVM);
         }

@@ -23,7 +23,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             var products = await _productService.GetlistItemAsync();
 
             // Trang hiện tại
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(products);
         }
@@ -84,7 +84,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Đưa danh sách vào ViewBag
             ViewBag.Categories = categories;
             ViewBag.Brands = brands;
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(product);
         }
@@ -98,7 +98,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Đưa danh sách vào ViewBag
             ViewBag.Categories = categories;
             ViewBag.Brands = brands;
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             // Kiểm tra thông tin sản phẩm
             if (!ModelState.IsValid)

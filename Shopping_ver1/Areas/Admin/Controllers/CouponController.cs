@@ -23,7 +23,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             var data = await _couponService.GetAllAsync();
 
             // Trang hiện tại
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(data);
         }
@@ -67,7 +67,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
                 return Json(new { Success = false, Message = "Không tìm thấy coupon này để cập nhật!!!" });
 
             // Trang hiện tại
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(coupon);
         }
@@ -75,7 +75,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(CouponModel coupon, int? page)
         {
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             // Kiểm tra thông tin coupon
             if (!ModelState.IsValid)

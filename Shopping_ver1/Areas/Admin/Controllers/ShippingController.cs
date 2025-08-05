@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Models;
-using Shopping_ver1.Repository;
 using Shopping_ver1.Services.Abstract;
 
 namespace Shopping_ver1.Areas.Admin.Controllers
@@ -12,21 +10,20 @@ namespace Shopping_ver1.Areas.Admin.Controllers
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)] // Ngăn không lưu cache
     public class ShippingController : Controller
     {
-        private readonly DataContext _dataContext;
         private readonly IShippingService _shippingService;
-        public ShippingController(DataContext dataContext, IShippingService shippingService)
+        public ShippingController(IShippingService shippingService)
         {
-            _dataContext = dataContext;
             _shippingService = shippingService;
         }
 
+        // Danh sách phí ship từng khu vực
         public async Task<IActionResult> Index()
         {
             var shipping = await _shippingService.GetlistItemAsync();
             return View(shipping);
         }
 
-        // Danh sách các thương hiệu
+        // Tạo phí ship
         [HttpGet]
         public IActionResult Create()
         {
@@ -43,18 +40,14 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             return Json(new { result.Success, result.Message });
         }
 
-
+        // Cập nhật phí ship
         [HttpPost]
         public async Task<IActionResult> Update(int id, decimal newPrice)
         {
             // Cập nhật và trả kết quả cho ajax
             var result = await _shippingService.UpdateAsync(id, newPrice);
 
-            return Json(new
-            {
-                result.Success,
-                result.Message
-            });
+            return Json(new { result.Success, result.Message });
         }
 
         // Xóa thể loại

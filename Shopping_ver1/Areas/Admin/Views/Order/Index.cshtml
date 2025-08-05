@@ -2,6 +2,7 @@
 @{
 	ViewData["Title"] = "Đơn hàng";
 	var index = 1;
+	int currentPage = ViewData["Page"] != null ? (int)ViewData["Page"] : 0;
 }
 <style>
 	#dataTable thead th {
@@ -59,7 +60,7 @@
 @section Scripts {
 	<script>
 		let table;
-		const currentPage = @((ViewBag.Page ?? 0) - 1);
+		const currentPage = @(currentPage - 1);
 		$(document).ready(function () {
 			table = setupDataTable({
 				enableExport: true,

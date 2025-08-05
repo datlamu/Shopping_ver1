@@ -39,7 +39,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             )
             .ToListAsync();
 
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(data);
         }
@@ -100,7 +100,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(user);
         }
@@ -108,7 +108,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Update(EditUserViewModel editUser, int? page)
         {
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             // Kiểm tra dữ liệu
             if (!ModelState.IsValid)

@@ -2,6 +2,7 @@
 @{
 	ViewData["Title"] = "Liên hệ";
 	var index = 1;
+	int currentPage = ViewData["Page"] != null ? (int)ViewData["Page"] : 0;
 }
 <!-- DataTables Example -->
 <div class="card shadow mb-4">
@@ -51,7 +52,7 @@
 @section Scripts {
 	<script>
 		let table;
-		const currentPage = @((ViewBag.Page ?? 0) - 1);
+		const currentPage = @(currentPage - 1);
 		console.log("Current Page:", currentPage);
 		$(document).ready(function () {
 			table = setupDataTable({

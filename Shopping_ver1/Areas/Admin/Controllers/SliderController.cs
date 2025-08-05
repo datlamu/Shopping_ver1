@@ -22,7 +22,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Lấy danh sách và phân trang
             var data = await _SliderService.GetlistItemAsync();
 
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             return View(data);
         }
@@ -63,7 +63,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
             // Tìm Slider đã chọn
             var Slider = await _SliderService.FindItemsAsync(id);
 
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             // Quay lại trang create giữ nguyên lại dữ liệu
             return View(Slider);
@@ -72,7 +72,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(SliderModel Slider, int? page)
         {
-            ViewBag.Page = page ?? 0;
+            ViewData["Page"] = page ?? 0;
 
             // Kiểm tra thông tin Slider
             if (!ModelState.IsValid)
