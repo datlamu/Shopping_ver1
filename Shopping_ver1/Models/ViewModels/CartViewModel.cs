@@ -1,6 +1,6 @@
 ﻿namespace Shopping_ver1.Models.ViewModels
 {
-    public class CartItemViewModel
+    public class CartViewModel
     {
         public List<CartItemModel> CartItems { get; set; }
         public decimal TotalProductPrice { get; set; }

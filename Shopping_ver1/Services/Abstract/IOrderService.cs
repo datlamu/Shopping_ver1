@@ -8,9 +8,11 @@ namespace Shopping_ver1.Services.Abstract
 
         // Danh sách đơn hàng
         Task<List<OrderModel>> GetOrderlistAsync();
+        // Danh sách đơn hàng
+        Task<OrderModel> FindByOrderCodelAsync(string orderCode);
 
         // Lấy danh sách đơn hàng
-        Task<List<OrderModel>> FindByUserEmailAsync(string userEmail);
+        Task<List<OrderModel>> GetListByUserEmailAsync(string userEmail);
 
         // Chi tiết đơn hàng
         Task<OrderDetailViewModel> GetOrderDetailAsync(string orderCode);

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Models;
@@ -20,7 +21,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(30);
+    options.IdleTimeout = TimeSpan.FromMinutes(15);
     options.Cookie.IsEssential = true;
 });
 
@@ -39,6 +40,7 @@ builder.Services.AddTransient<IContactService, ContactService>();
 builder.Services.AddTransient<IShippingService, ShippingService>();
 builder.Services.AddTransient<ICouponService, CouponService>();
 builder.Services.AddTransient<IDashboardService, DashboardService>();
+builder.Services.Configure<MoMoSettings>(builder.Configuration.GetSection("MoMoSettings"));
 
 // 5. Identity
 builder.Services.AddIdentity<UserModel, IdentityRole>()
@@ -78,7 +80,7 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-// Cookie Policy
+// 11. Cookie Policy
 var cookiePolicy = new CookiePolicyOptions
 {
     Secure = app.Environment.IsDevelopment() ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always
@@ -88,6 +90,15 @@ var cookiePolicy = new CookiePolicyOptions
 app.UseStatusCodePagesWithRedirects("/Home/Error?statuscode={0}");
 if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
+
+// 12. Ngrok setting
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+// 12. Change all http to https
+app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseRouting();

@@ -110,7 +110,7 @@ namespace Shopping_ver1.Controllers
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
 
             // Lấy danh sách đơn hàng theo email
-            var orders = await _orderService.FindByUserEmailAsync(userEmail);
+            var orders = await _orderService.GetListByUserEmailAsync(userEmail);
 
             if (orders == null || !orders.Any())
             {
@@ -138,7 +138,7 @@ namespace Shopping_ver1.Controllers
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
 
             // Lấy danh sách đơn hàng theo email
-            var orders = await _orderService.FindByUserEmailAsync(userEmail);
+            var orders = await _orderService.GetListByUserEmailAsync(userEmail);
 
             return PartialView("_HistoryOrderTablePartial", orders);
         }

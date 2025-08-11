@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Shopping_ver1.Models
 {
@@ -17,7 +18,7 @@ namespace Shopping_ver1.Models
 
         [Required(ErrorMessage = "Yêu cầu nhập giá sản phẩm")]
         [Range(1, double.MaxValue, ErrorMessage = "Giá phải lớn hơn 0")]
-        [Column(TypeName = "decimal(18,0)")]
+        [Precision(18, 0)]
         [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Giá chỉ được chứa số")]
         public decimal Price { get; set; }
 

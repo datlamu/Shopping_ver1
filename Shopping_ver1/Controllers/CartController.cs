@@ -32,7 +32,7 @@ namespace Shopping_ver1.Controllers
 
             ViewBag.Shipping = shipping;
 
-            var listCartItem = _cartservice.GetListCartItem();
+            var listCartItem = _cartservice.GetAll();
 
             return View(listCartItem);
         }
@@ -135,7 +135,7 @@ namespace Shopping_ver1.Controllers
             }
 
             // Lấy danh sách sản phẩm trong giỏ hàng
-            var listCartItem = _cartservice.GetListCartItem(shipping, coupon);
+            var listCartItem = _cartservice.GetAll(shipping, coupon);
 
             return PartialView("_CartTablePartial", listCartItem);
         }

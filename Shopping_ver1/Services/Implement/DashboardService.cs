@@ -17,7 +17,7 @@ public class DashboardService : IDashboardService
     public async Task<decimal> GetMonthlyIncomeAsync(int month, int year)
     {
         return await _context.Orders
-                .Where(o => o.CreateDate.Month == month && o.CreateDate.Year == year)
+                .Where(o => o.CreateDate.Month == month && o.CreateDate.Year == year && o.Status == 1)
                 .SumAsync(o => (decimal?)o.TotalPayment) ?? 0;
     }
 
@@ -25,7 +25,7 @@ public class DashboardService : IDashboardService
     public async Task<decimal> GetYearlyIncomeAsync(int year)
     {
         return await _context.Orders
-                .Where(o => o.CreateDate.Year == year)
+                .Where(o => o.CreateDate.Year == year && o.Status == 1)
                 .SumAsync(o => (decimal?)o.TotalPayment) ?? 0;
     }
 
@@ -56,7 +56,7 @@ public class DashboardService : IDashboardService
         for (int month = 1; month <= 12; month++)
         {
             var total = await _context.Orders
-                .Where(o => o.CreateDate.Year == year && o.CreateDate.Month == month)
+                .Where(o => o.CreateDate.Year == year && o.CreateDate.Month == month && o.Status == 1)
                 .SumAsync(o => (decimal?)o.TotalPayment) ?? 0;
             monthlyData.Add(total);
         }
@@ -72,7 +72,7 @@ public class DashboardService : IDashboardService
             join o in _context.Orders on od.OrderCode equals o.OrderCode
             join p in _context.Products on od.ProductId equals p.Id
             join c in _context.Categories on p.CategoryId equals c.Id
-            where o.CreateDate.Year == year
+            where o.CreateDate.Year == year && o.Status == 1
             group (od.Quantity * od.Price) by c.Name into g
             select new
             {

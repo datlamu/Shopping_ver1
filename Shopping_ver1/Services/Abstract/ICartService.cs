@@ -5,8 +5,8 @@ namespace Shopping_ver1.Services.Abstract
 {
     public interface ICartService
     {
-        // Lấy danh sách sản phẩm trong giỏ hàng
-        CartItemViewModel GetListCartItem(ShippingModel shipping = null, CouponModel coupon = null);
+        // Lấy giỏ hàng
+        CartViewModel GetAll(ShippingModel shipping = null, CouponModel coupon = null);
         // Thêm sản phẩm vào giỏ hàng
         Task<OperationResult> AddAsync(int id);
         // Tăng số lượng sản phẩm trong giỏ hàng

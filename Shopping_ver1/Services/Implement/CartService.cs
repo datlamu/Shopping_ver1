@@ -10,19 +10,16 @@ public class CartService : ICartService
     private readonly DataContext _dataContext;
     private readonly IProductService _productService;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly ICouponService _couponService;
 
-
-    public CartService(DataContext context, IHttpContextAccessor httpContextAccessor, IProductService productService, ICouponService couponService)
+    public CartService(DataContext context, IHttpContextAccessor httpContextAccessor, IProductService productService)
     {
         _dataContext = context;
         _httpContextAccessor = httpContextAccessor;
         _productService = productService;
-        _couponService = couponService;
     }
 
-    // Lấy danh sách đơn hàng
-    public CartItemViewModel GetListCartItem(ShippingModel shipping = null, CouponModel coupon = null)
+    // Lấy thông tin giỏ hàng
+    public CartViewModel GetAll(ShippingModel shipping = null, CouponModel coupon = null)
     {
         // Lấy danh sách sản phẩm trong giỏ hàng từ session - Nếu session không tồn tại thì trả về giỏ hàng rỗng
         var session = _httpContextAccessor.HttpContext.Session;
@@ -68,7 +65,7 @@ public class CartService : ICartService
             ? grandTotal * (1 - discountValue / 100)
             : grandTotal - discountValue;
 
-        return new CartItemViewModel
+        return new CartViewModel
         {
             CartItems = cartItems,
             TotalProductPrice = totalProductPrice,

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using Microsoft.EntityFrameworkCore;
 public class OrderModel
 {
     [Key]
@@ -13,14 +13,17 @@ public class OrderModel
 
     public int Status { get; set; } = 0;
 
+    [Precision(18, 0)]
     public decimal TotalProductPrice { get; set; } = 0;
 
+    [Precision(18, 0)]
     public decimal ShippingFee { get; set; } = 0;
 
     public string DiscountValue { get; set; }
 
     public string CouponCode { get; set; }
 
+    [Precision(18, 0)]
     public decimal TotalPayment { get; set; } = 0;
 
     public string ShippingRegion { get; set; }
