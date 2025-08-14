@@ -152,6 +152,17 @@ a#scrollUp {
         padding-right: 0;
     }
 
+.header-middle .container #company {
+    color: #B4B1AB;
+    font-family: abel;
+    font-size: 27px;
+    text-transform: uppercase;
+}
+
+.header-middle .container span {
+    color: #FE980F;
+}
+
 .usa {
     border-radius: 0;
     color: #B4B1AB;
@@ -573,6 +584,8 @@ ul.sub-menu {
     padding-bottom: 45px;
 }
 
+
+
 .carousel-indicators li {
     background: #C4C4BE;
 }
@@ -580,11 +593,6 @@ ul.sub-menu {
     .carousel-indicators li.active {
         background: #FE980F;
     }
-
-.item {
-    padding-left: 100px;
-}
-
 
 .pricing {
     position: absolute;
@@ -1347,19 +1355,20 @@ h2.title {
     gap: 10px;
 }
 
-#reviews form span input {
-    background: #F0F0E9;
-    border: 0 none;
-    color: #A6A6A1;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    outline: medium none;
-    padding: 8px;
-    width: 48%;
+#reviews form span {
+    display: flex;
 }
 
-    #reviews form span input:last-child {
-        margin-left: 3%;
+    #reviews form span input {
+        background: #F0F0E9;
+        border: 0 none;
+        color: #A6A6A1;
+        font-family: 'Roboto', sans-serif;
+        font-size: 14px;
+        outline: medium none;
+        padding: 8px;
+        margin-right: 10px;
+        flex: 1;
     }
 
 #reviews textarea {
@@ -1373,7 +1382,6 @@ h2.title {
     padding-left: 10px;
     padding-top: 15px;
     resize: none;
-    width: 99.5%;
 }
 
 #reviews button {
@@ -1401,39 +1409,42 @@ h2.title {
 *******404 CSS******
 **************************/
 
-.logo-404 {
-    margin-top: 60px;
-}
-
 .content-404 h1 {
     color: #363432;
     font-family: 'Roboto', sans-serif;
-    font-size: 41px;
+    font-size: 34px;
     font-weight: 300;
 }
 
-.content-404 img {
-    margin: 0 auto;
+.content-404 {
+    padding: 40px
 }
 
-.content-404 p {
-    color: #363432;
-    font-family: 'Roboto', sans-serif;
-    font-size: 18px;
-}
-
-.content-404 h2 {
-    margin-top: 50px;
-}
-
-    .content-404 h2 a {
-        background: #FE980F;
-        color: #FFFFFF;
-        font-family: 'Roboto', sans-serif;
-        font-size: 44px;
-        font-weight: 300;
-        padding: 8px 40px;
+    .content-404 img {
+        height: 60vh;
+        width: auto;
+        margin: 0 auto;
     }
+
+    .content-404 p {
+        color: #363432;
+        font-family: 'Roboto', sans-serif;
+        font-size: 18px;
+    }
+
+    .content-404 h2 {
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
+
+        .content-404 h2 a {
+            background: #FE980F;
+            color: #FFFFFF;
+            font-family: 'Roboto', sans-serif;
+            font-size: 34px;
+            font-weight: 300;
+            padding: 8px 40px;
+        }
 
 
 /*************************
@@ -2213,6 +2224,8 @@ h2.title {
     .commnets .pull-left {
         margin-right: 22px
     }
+
+
 
     .commnets p,
     .response-area p,

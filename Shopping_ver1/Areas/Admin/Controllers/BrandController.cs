@@ -63,7 +63,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         public async Task<IActionResult> Update(int id, int? page)
         {
             // Tìm thương hiệu đã chọn
-            var Brand = await _BrandService.GetUpdateItemAsync(id);
+            var Brand = await _BrandService.FindByIdAsync(id);
 
             // Trang hiện tại
             ViewData["Page"] = page ?? 0;

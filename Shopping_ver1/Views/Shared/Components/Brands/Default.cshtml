@@ -7,7 +7,7 @@
 		<ul class="nav nav-pills nav-stacked">
 			@foreach (var item in Model)
 			{
-				<li><a asp-controller="Home" asp-action="Brands" asp-route-Slug="@item.Slug"> <span class="pull-right">(50)</span>@item.Name</a></li>
+				<li><a asp-controller="Home" asp-action="Brands" asp-route-Slug="@item.Slug"> <span class="pull-right"></span>@item.Name</a></li>
 			}
 		</ul>
 	</div>

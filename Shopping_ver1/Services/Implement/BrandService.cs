@@ -75,10 +75,16 @@ public class BrandService : IBrandService
         }
     }
 
-    // Tìm kiếm thương hiệu chỉnh sửa
-    public async Task<BrandModel> GetUpdateItemAsync(int id)
+    // Tìm kiếm bằng id
+    public async Task<BrandModel> FindByIdAsync(int id)
     {
         return await _dataContext.Brands.FindAsync(id);
+    }
+
+    // Tìm kiếm bằng slug
+    public async Task<BrandModel> FindBySlugAsync(string slug)
+    {
+        return await _dataContext.Brands.FirstOrDefaultAsync(c => c.Slug == slug);
     }
 
     // Chỉnh sửa thương hiệu

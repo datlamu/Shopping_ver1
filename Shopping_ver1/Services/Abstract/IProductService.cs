@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Shopping_ver1.Helpers;
 using Shopping_ver1.Models;
 
 namespace Shopping_ver1.Services.Abstract
@@ -6,7 +7,9 @@ namespace Shopping_ver1.Services.Abstract
     public interface IProductService
     {
         // Lấy danh sách sản phẩm
-        Task<List<ProductModel>> GetlistItemAsync();
+        Task<List<ProductModel>> GetAllAsync();
+        // Lấy danh sách sản phẩm và phân trang
+        Task<(List<ProductModel> data, Paginate pager)> GetPagedProductListAsync(IQueryable<ProductModel> productsAQ, string sort_by, int page);
 
         // Tìm kiếm
         Task<List<ProductModel>> SearchItem(string search);
@@ -27,10 +30,13 @@ namespace Shopping_ver1.Services.Abstract
         Task<OperationResult> DeleteAsync(int id);
 
         // Sản phẩm liên quan
-        Task<List<ProductModel>> relatedItemsAsync(int categoryId, int productId);
+        Task<List<ProductModel>> RelatedByCategoryAsync(int categoryId, int productId);
 
         // Đánh giá sản phẩm
         Task<OperationResult> ItemReview(RatingModel rating);
+
+        // Lấy thông tin đánh giá sản phẩm
+        Task<List<RatingModel>> GetReviewProduct(int productId);
 
     }
 }

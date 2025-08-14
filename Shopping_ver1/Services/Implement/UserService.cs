@@ -45,7 +45,7 @@ namespace Shopping_ver1.Services.Implement
             // Đăng nhập thành công ( test email )
             if (result.Succeeded)
             {
-                var toEmail = "172100119@dntu.edu.vn";
+                var toEmail = user.Email;
                 var subject = "Đăng nhập thành công !";
                 var body = "Chúc bạn có trải nghiệm vui vẻ nhé !";
                 _ = Task.Run(async () =>

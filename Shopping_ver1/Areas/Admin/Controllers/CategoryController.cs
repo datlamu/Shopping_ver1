@@ -62,7 +62,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         public async Task<IActionResult> Update(int id, int? page)
         {
             // Tìm thể loại đã chọn
-            var category = await _categoryService.GetUpdateItemAsync(id);
+            var category = await _categoryService.FindByIdAsync(id);
 
             // Trang hiện tại
             ViewData["Page"] = page ?? 0;

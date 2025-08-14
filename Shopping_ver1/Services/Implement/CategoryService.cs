@@ -76,9 +76,15 @@ public class CategoryService : ICategoryService
     }
 
     // Tìm kiếm thể loại chỉnh sửa
-    public async Task<CategoryModel> GetUpdateItemAsync(int id)
+    public async Task<CategoryModel> FindByIdAsync(int id)
     {
         return await _dataContext.Categories.FindAsync(id);
+    }
+
+    // Tìm kiếm bằng slug
+    public async Task<CategoryModel> FindBySlugAsync(string slug)
+    {
+        return await _dataContext.Categories.FirstOrDefaultAsync(c => c.Slug == slug);
     }
 
     // Chỉnh sửa thể loại

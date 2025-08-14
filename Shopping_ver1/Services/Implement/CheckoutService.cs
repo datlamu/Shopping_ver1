@@ -103,8 +103,8 @@ public class CheckoutService : ICheckoutService
             await _context.SaveChangesAsync();
 
             // Gửi email 
-            //var toEmail = userEmail;
-            var toEmail = "172100119@dntu.edu.vn"; // test email
+            var toEmail = userEmail;
+            //var toEmail = "172100119@dntu.edu.vn"; // test email
             var subject = "Đặt hàng thành công !";
             var body = $"Cảm ơn bạn đã ủng hộ, Mã đơn hàng của bạn là: {orderCode}!";
             _ = Task.Run(async () =>

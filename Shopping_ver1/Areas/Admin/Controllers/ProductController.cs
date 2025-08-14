@@ -20,7 +20,7 @@ namespace Shopping_ver1.Areas.Admin.Controllers
         public async Task<IActionResult> Index(int? page)
         {
             // Lấy danh sách item
-            var products = await _productService.GetlistItemAsync();
+            var products = await _productService.GetAllAsync();
 
             // Trang hiện tại
             ViewData["Page"] = page ?? 0;

@@ -9,7 +9,8 @@ namespace Shopping_ver1.Services.Abstract
         // Tạo thể loại mới
         Task<OperationResult> CreateAsync(CategoryModel category);
         // Tìm kiếm thể loại chỉnh sửa
-        Task<CategoryModel> GetUpdateItemAsync(int id);
+        Task<CategoryModel> FindByIdAsync(int id);
+        Task<CategoryModel> FindBySlugAsync(string slug);
         // Cập nhật thể loại
         Task<OperationResult> UpdateAsync(CategoryModel category);
         // Xóa thể loại

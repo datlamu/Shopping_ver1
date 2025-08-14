@@ -14,7 +14,7 @@ namespace Shopping_ver1.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var product = await _productService.GetlistItemAsync();
+            var product = await _productService.GetAllAsync();
 
             return View(product);
         }
@@ -49,10 +49,14 @@ namespace Shopping_ver1.Controllers
             if (product == null)
                 return NotFound();
 
-            // Tìm sản phẩm liên quan theo thể loại
-            var relatedProducts = await _productService.relatedItemsAsync(product.CategoryId, product.Id);
+            // Sản phẩm liên quan theo thể loại
+            var relatedProducts = await _productService.RelatedByCategoryAsync(product.CategoryId, product.Id);
+
+            // Đánh giá sản phẩm
+            var reviewProducts = await _productService.GetReviewProduct(product.Id);
 
             ViewBag.RelatedProducts = relatedProducts;
+            ViewBag.ReviewProducts = reviewProducts;
 
             return View(product);
         }

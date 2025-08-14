@@ -16,7 +16,7 @@ public class OrderService : IOrderService
     // Lấy danh sách đơn hàng
     public async Task<List<OrderModel>> GetOrderlistAsync()
     {
-        return await _dataContext.Orders.ToListAsync();
+        return await _dataContext.Orders.Where(o => o.Status != 3).ToListAsync();
     }
 
     public async Task<OrderModel> FindByOrderCodelAsync(string orderCode)
@@ -27,7 +27,7 @@ public class OrderService : IOrderService
     // Lấy danh sách đơn hàng theo UserEmail
     public async Task<List<OrderModel>> GetListByUserEmailAsync(string userEmail)
     {
-        return await _dataContext.Orders.Where(o => o.UserName == userEmail).ToListAsync();
+        return await _dataContext.Orders.Where(o => o.UserName == userEmail && o.Status != 3).ToListAsync();
     }
 
     // Chi tiết đơn hàng

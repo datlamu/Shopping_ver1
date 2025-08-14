@@ -1,50 +1,22 @@
-﻿@model IEnumerable<ProductModel>
-<div class="col-sm-3">
-	<partial name="_SidebarPartial" />
-</div>
-
-<div class="col-sm-9 padding-right">
-	<div class="features_items">
-		<!--features_items-->
-		<h2 class="title text-center">Các sản phẩm</h2>
-		<partial name="_FilterProductPartial" />
-		@foreach (var item in Model)
-		{
-			<div class="col-sm-4">
-				<div class="product-image-wrapper">
-					<div class="single-products">
-						<div class="productinfo text-center">
-							<a asp-controller="Product" asp-action="Details" asp-route-id="@item.Id">
-								<img src="~/media/products/@item.Image" alt="@item.Name" width="100%" />
-								<h2>@FormatCurrency.ToVnCurrency(item.Price)</h2>
-								<p>@item.Name</p>
-							</a>
-							@if (item.Inventory.QuantityInStock > 0)
-							{
-								<button class="btn btn-default add-to-cart" value="@item.Id"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ hàng</button>
-							}
-							else
-							{
-								<button class="btn btn-default add-to-cart" disabled><i class="fa fa-shopping-cart"></i>Hết hàng</button>
-							}
-						</div>
-					</div>
-					<div class="choose">
-						<ul class="nav nav-pills nav-justified">
-							<li><a href="#"><i class="fa fa-plus-square"></i>Yêu thích</a></li>
-							<li><a href="#"><i class="fa fa-plus-square"></i>So sánh</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		}
-	</div><!--features_items-->
+﻿@{
+	string sort_by = ViewBag.Sort_by ?? "";
+	string byAction = ViewBag.ByAction ?? "";
+	string slug = ViewBag.Slug ?? "";
+}
+<div id="MainContainer">
+	<partial name="_ProductPartial" model="Model" />
 </div>
 @section Scripts {
 	<script>
 		$(document).ready(function () {
-			// Chay khi button được click vào
-			$('#sort_by').on('change', function () {
+			// Chỉ tải lại nội dung liên hệ
+			$('#MainContainer').on("click", ".page-ajax", function (e) {
+				e.preventDefault();
+				const page = $(this).data("page");
+				$("#MainContainer").load(`/Home/ProductPartial?page=${page}&sort_by=@sort_by&byAction=@byAction&slug=@slug`);
+			});
+			// Chạy khi có thay đổi
+			$('#MainContainer').on('change', '#sort_by', function () {
 				const sortBy = $(this).val();
 				if (sortBy !== "-----") {
 					const url = new URL(window.location.href);
@@ -52,8 +24,8 @@
 					window.location.href = url.toString();
 				}
 			});
-			// Chay khi button được click vào
-			$('.add-to-cart').click(function () {
+			// Chạy khi button được click vào
+			$('#MainContainer').on('click', '.add-to-cart', function () {
 				// Url Action
 				var url = '/Cart/Add';
 				// Lấy status và productId
@@ -64,4 +36,4 @@
 			});
 		});
 	</script>
-}
+	}

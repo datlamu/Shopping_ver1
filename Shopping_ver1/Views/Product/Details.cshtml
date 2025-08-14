@@ -1,6 +1,7 @@
 ﻿@model ProductModel
 @{
 	var related = ViewBag.RelatedProducts as List<ProductModel> ?? new List<ProductModel>();
+	var ratings = ViewBag.ReviewProducts as List<RatingModel> ?? new List<RatingModel>();
 
 	// Nhóm 3 sản phẩm liên quan
 	int itemsPerGroup = 3;
@@ -22,8 +23,8 @@
 					<img src="~/media/products/@Model.Image" alt="@Model.Name" width="100%" />
 					<h3>ZOOM</h3>
 				</div>
+				@*
 				<div id="similar-product" class="carousel slide" data-ride="carousel">
-
 					<!-- Wrapper for slides -->
 					<div class="carousel-inner">
 						<div class="item active">
@@ -41,16 +42,13 @@
 						<i class="fa fa-angle-right"></i>
 					</a>
 				</div>
-
+				*@
 			</div>
 			<div class="col-sm-7">
 				<div class="product-information">
 					<!--/product-information-->
-					<h2>Tên: @Model.Name</h2>
+					<h2><b>Tên: @Model.Name</b></h2>
 					<p><b>Giá tiền: </b>@FormatCurrency.ToVnCurrency(Model.Price)</p>
-					<p><b>Mô tả: </b>@Html.Raw(Model.Description)</p>
-					<p><b>Thương hiệu: </b>@Model.Brand.Name</p>
-					<p><b>Thể loại: </b>@Model.Category.Name</p>
 					@if (Model.Inventory.QuantityInStock > 0)
 					{
 						<p><b>Kho: </b>Còn @Model.Inventory.QuantityInStock sản phẩm</p>
@@ -72,129 +70,33 @@
 			<!--category-tab-->
 			<div class="col-sm-12">
 				<ul class="nav nav-tabs">
-					<li><a href="#details" data-toggle="tab">Details</a></li>
-					<li><a href="#companyprofile" data-toggle="tab">Company Profile</a></li>
-					<li><a href="#tag" data-toggle="tab">Tag</a></li>
-					<li class="active"><a href="#reviews" data-toggle="tab">Đánh giá (5)</a></li>
+					<li><a href="#details" data-toggle="tab">Mô tả</a></li>
+					<li class="active"><a href="#reviews" data-toggle="tab">Đánh giá</a></li>
 				</ul>
 			</div>
 			<div class="tab-content">
-				<div class="tab-pane fade" id="details">
-					@Model.Description
-				</div>
-
-				<div class="tab-pane fade" id="companyprofile">
-					<div class="col-sm-3">
-						<div class="product-image-wrapper">
-							<div class="single-products">
-								<div class="productinfo text-center">
-									<img src="images/home/gallery1.jpg" alt="" />
-									<h2>$56</h2>
-									<p>Easy Polo Black Edition</p>
-									<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-3">
-						<div class="product-image-wrapper">
-							<div class="single-products">
-								<div class="productinfo text-center">
-									<img src="images/home/gallery3.jpg" alt="" />
-									<h2>$56</h2>
-									<p>Easy Polo Black Edition</p>
-									<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-3">
-						<div class="product-image-wrapper">
-							<div class="single-products">
-								<div class="productinfo text-center">
-									<img src="images/home/gallery2.jpg" alt="" />
-									<h2>$56</h2>
-									<p>Easy Polo Black Edition</p>
-									<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-3">
-						<div class="product-image-wrapper">
-							<div class="single-products">
-								<div class="productinfo text-center">
-									<img src="images/home/gallery4.jpg" alt="" />
-									<h2>$56</h2>
-									<p>Easy Polo Black Edition</p>
-									<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="tab-pane fade" id="tag">
-					<div class="col-sm-3">
-						<div class="product-image-wrapper">
-							<div class="single-products">
-								<div class="productinfo text-center">
-									<img src="images/home/gallery1.jpg" alt="" />
-									<h2>$56</h2>
-									<p>Easy Polo Black Edition</p>
-									<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-3">
-						<div class="product-image-wrapper">
-							<div class="single-products">
-								<div class="productinfo text-center">
-									<img src="images/home/gallery2.jpg" alt="" />
-									<h2>$56</h2>
-									<p>Easy Polo Black Edition</p>
-									<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-3">
-						<div class="product-image-wrapper">
-							<div class="single-products">
-								<div class="productinfo text-center">
-									<img src="images/home/gallery3.jpg" alt="" />
-									<h2>$56</h2>
-									<p>Easy Polo Black Edition</p>
-									<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-3">
-						<div class="product-image-wrapper">
-							<div class="single-products">
-								<div class="productinfo text-center">
-									<img src="images/home/gallery4.jpg" alt="" />
-									<h2>$56</h2>
-									<p>Easy Polo Black Edition</p>
-									<button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
-								</div>
-							</div>
-						</div>
-					</div>
+				<div class="tab-pane fade" id="details" style="padding:10px">
+					<p><b>Mô tả: </b>@Html.Raw(Model.Description)</p>
+					<p><b>Thương hiệu: </b>@Model.Brand.Name</p>
+					<p><b>Thể loại: </b>@Model.Category.Name</p>
 				</div>
 
 				<div class="tab-pane fade active in" id="reviews">
 					<div class="col-sm-12">
-						<ul>
-							<li><a href=""><i class="fa fa-user"></i>EUGEN</a></li>
-							<li><a href=""><i class="fa fa-clock-o"></i>12:41 PM</a></li>
-							<li><a href=""><i class="fa fa-calendar-o"></i>31 DEC 2014</a></li>
-						</ul>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-						<p><b>Write Your Review</b></p>
-
+						@foreach (var item in ratings)
+						{
+							<p><b>Tên: </b>@item.Name</p>
+							<p><b>Email: </b>@item.Email</p>
+							<p>
+								<b>Đánh giá: </b>
+								@for (int i = item.Star; i > 0; i--)
+								{
+									<i class="fa fa-star checked" style="font-size:16px"></i>
+								}
+							</p>
+							<p><b>Email: </b>@Html.Raw(item.Comment)</p>
+							<hr />
+						}
 						<partial name="_ReviewFormPartial" model="new RatingModel { ProductId = Model.Id }" />
 
 					</div>
@@ -261,7 +163,7 @@
 
 			stars.forEach(star => {
 				star.addEventListener("click", function () {
-					const rating = parseInt(this.dataset.value); // lấy từ data-value
+					const rating = parseInt(this.dataset.value); // Đánh giá
 					ratingInput.value = rating;
 
 					stars.forEach(s => {

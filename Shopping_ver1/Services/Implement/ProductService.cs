@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Shopping_ver1.Helpers;
 using Shopping_ver1.Models;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services.Abstract;
@@ -72,13 +73,62 @@ public class ProductService : IProductService
     }
 
     // Lấy danh sách sản phẩm
-    public async Task<List<ProductModel>> GetlistItemAsync()
+    public async Task<List<ProductModel>> GetAllAsync()
     {
         return await _dataContext.Products
             .Include(p => p.Brand)
             .Include(p => p.Category)
             .Include(p => p.Inventory)
             .ToListAsync();
+    }
+
+    // Lọc sản phẩm
+    private IQueryable<ProductModel> SortProducts(IQueryable<ProductModel> productsAQ, string sort_by)
+    {
+        switch (sort_by)
+        {
+            case "price_increase":
+                productsAQ = productsAQ.OrderBy(p => p.Price);
+                break;
+            case "price_decrease":
+                productsAQ = productsAQ.OrderByDescending(p => p.Price);
+                break;
+            case "newest":
+                productsAQ = productsAQ.OrderByDescending(p => p.Id);
+                break;
+            case "oldest":
+                productsAQ = productsAQ.OrderBy(p => p.Id);
+                break;
+            default:
+                break;
+        }
+        return productsAQ;
+    }
+
+    // Lấy danh sách sản phẩm và phân trang ( có lọc sản phẩm )
+    public async Task<(List<ProductModel> data, Paginate pager)> GetPagedProductListAsync(IQueryable<ProductModel> productsAQ, string sort_by, int page)
+    {
+        try
+        {
+            // Lọc sản phẩm
+            productsAQ = SortProducts(productsAQ, sort_by);
+
+            // Tạo phân trang
+            var totalItems = await productsAQ.CountAsync();
+            var pager = new Paginate(totalItems, page, 6);
+
+            // Danh sách items
+            var data = await productsAQ
+                .Skip(pager.Skip)       // Bỏ qua số lượng phần tử
+                .Take(pager.PageSize)   // Lấy số lượng phần tử tiếp đó
+                .ToListAsync();
+
+            return (data, pager);
+        }
+        catch
+        {
+            return (new List<ProductModel>(), new Paginate());
+        }
     }
 
     // Tìm kiếm
@@ -109,7 +159,7 @@ public class ProductService : IProductService
     }
 
     // Sản phẩm liên quan
-    public async Task<List<ProductModel>> relatedItemsAsync(int categoryId, int productId)
+    public async Task<List<ProductModel>> RelatedByCategoryAsync(int categoryId, int productId)
     {
         // Tìm sản phẩm liên quan theo thể loại
         var relatedProducts = await _dataContext.Products
@@ -258,12 +308,17 @@ public class ProductService : IProductService
             await _dataContext.SaveChangesAsync();
 
             return new OperationResult(true, "Gửi đánh giá thành công!!!");
-
         }
         catch
         {
             return new OperationResult(false, "Gửi đánh giá thất bại");
-
         }
+    }
+
+    // Lấy thông tin đánh giá sản phẩm
+    public async Task<List<RatingModel>> GetReviewProduct(int productId)
+    {
+        // Lấy ra tối đa 3 đánh giá - test
+        return await _dataContext.Ratings.Where(r => r.ProductId == productId).Take(3).ToListAsync();
     }
 }

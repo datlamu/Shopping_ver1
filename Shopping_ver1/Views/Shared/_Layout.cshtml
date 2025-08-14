@@ -26,41 +26,15 @@
 
 <body>
 	<header id="header">
-		<!--header-->
-		<div class="header_top">
-			<!--header_top-->
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-6">
-						<div class="contactinfo">
-							<ul class="nav nav-pills">
-								<li><a href="#"><i class="fa fa-phone"></i> +2 95 01 88 821</a></li>
-								<li><a href="#"><i class="fa fa-envelope"></i> info@domain.com</a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="col-sm-6">
-						<div class="social-icons pull-right">
-							<ul class="nav navbar-nav">
-								<li><a href="#"><i class="fa fa-facebook"></i></a></li>
-								<li><a href="#"><i class="fa fa-twitter"></i></a></li>
-								<li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-								<li><a href="#"><i class="fa fa-dribbble"></i></a></li>
-								<li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><!--/header_top-->
-
 		<div class="header-middle">
 			<!--header-middle-->
 			<div class="container">
 				<div class="row">
 					<div class="col-sm-4">
 						<div class="logo pull-left">
-							<a <a asp-controller="Home" asp-action="Index"><img height="40" src="~/media/logos/logo1.png" alt="" /></a>
+							<a id="company" asp-controller="Home" asp-action="Index">
+								Heaven<span>-ICE</span>
+							</a>
 						</div>
 					</div>
 					<div class="col-sm-8">
@@ -102,10 +76,10 @@
 							<ul class="nav navbar-nav collapse navbar-collapse">
 								<li><a asp-controller="Home" asp-action="Index" class="active">Trang chủ</a></li>
 								<li class="dropdown">
-									<a asp-controller="Product">Cửa hàng<i class="fa fa-angle-down"></i></a>
+									<a asp-controller="Home">Cửa hàng<i class="fa fa-angle-down"></i></a>
 									<ul role="menu" class="sub-menu">
 										<li><a asp-controller="Category" asp-action="Index">Thể loại</a></li>
-										<li><a asp-controller="Product" asp-action="Index">Sản phẩm</a></li>
+										<li><a asp-controller="Home" asp-action="Index">Sản phẩm</a></li>
 										<li><a asp-controller="Cart" asp-action="Checkout">Thanh Toán</a></li>
 										<li><a asp-controller="Cart" asp-action="Index">Giỏ hàng</a></li>
 										<li><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
@@ -286,8 +260,8 @@
 		<div class="footer-bottom">
 			<div class="container">
 				<div class="row">
-					<p class="pull-left">Copyright © 2013 E-SHOPPER Inc. All rights reserved.</p>
-					<p class="pull-right">Designed by <span><a target="_blank" href="http://www.themeum.com">Themeum</a></span></p>
+					<p class="pull-left">Lưu ý website này chỉ dùng cho việc học</p>
+					<p class="pull-right">Mọi thắc mắc có thể liên hệ qua Email 172100119.dntu.edu.vn</p>
 				</div>
 			</div>
 		</div>
