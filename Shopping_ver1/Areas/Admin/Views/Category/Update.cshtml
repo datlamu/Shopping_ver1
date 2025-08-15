@@ -1,8 +1,8 @@
 ﻿@model CategoryModel
 @{
-	ViewData["title"] = "Update Category";
+	ViewData["title"] = "Cập nhật thể loại";
 }
-<h3>Update Category</h3>
+<h3>Cập nhật thể loại</h3>
 <form asp-area="Admin" asp-controller="Category" asp-action="Update" method="post" enctype="multipart/form-data">
 	@Html.AntiForgeryToken()
 	<div asp-validation-summary="ModelOnly" class="text-danger"></div>

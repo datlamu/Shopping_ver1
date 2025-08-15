@@ -1,22 +1,19 @@
-﻿using System.Runtime;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using RestSharp;
 using Shopping_ver1.Models;
 using Shopping_ver1.Models.ViewModels;
 using Shopping_ver1.Repository;
 using Shopping_ver1.Services.Abstract;
 
-
 public class CheckoutService : ICheckoutService
 {
     private readonly DataContext _context;
+    private readonly MoMoSettings _MoMosettings;
     private readonly IEmailService _emailService;
     private readonly ICouponService _couponService;
-    private readonly MoMoSettings _MoMosettings;
     private readonly IOrderService _orderService;
     public CheckoutService(
         DataContext context,
@@ -32,7 +29,7 @@ public class CheckoutService : ICheckoutService
         _MoMosettings = MoMosettings.Value;
     }
 
-    // Thanh toán
+    // Thanh toán khi nhận hàng
     public async Task<OperationResult> CheckoutAsync(string userEmail, CartViewModel cartItemVM)
     {
         try
@@ -121,7 +118,6 @@ public class CheckoutService : ICheckoutService
         }
     }
 
-
     // Lưu tạm đơn hàng trước khi thanh toán
     public async Task<(OperationResult result, OrderModel order)> CreatePendingOrderAsync(string userEmail, CartViewModel cartItemVM)
     {
@@ -181,6 +177,7 @@ public class CheckoutService : ICheckoutService
 
         return (new OperationResult(true, ""), order);
     }
+
     // Thanh toán với MoMo
     public async Task<string> CreatePaymentMoMoAsync(int amount, string orderInfo, string orderCode)
     {
@@ -267,6 +264,7 @@ public class CheckoutService : ICheckoutService
         return true;
     }
 
+    // Hủy đơn
     public async Task<bool> CancelOrderAsync(string orderCode)
     {
         var order = await _context.Orders.Where(o => o.OrderCode == orderCode).FirstOrDefaultAsync();
@@ -285,6 +283,7 @@ public class CheckoutService : ICheckoutService
         return true;
     }
 
+    // Tạo khóa mã hóa cho thanh toán MoMo
     private string CreateSignature(string rawData, string secretKey)
     {
         var encoding = new UTF8Encoding();

@@ -100,13 +100,13 @@
 						<tr>
 							<td colspan="6" align="right">
 								<button class="btn btn-danger clear-cart">Giỏ hàng mới</button>
+								<a asp-controller="Checkout" asp-action="Index" class="btn btn-success">Thanh toán khi nhận hàng</a>
 								@if (User.Identity?.IsAuthenticated ?? false)
 								{
-									<form asp-controller="Checkout" asp-action="PayWithMoMo" method="post" style="display:inline;">
-										<input type="hidden" name="amount" value="@((int)Model.TotalPayment)" />
-										<input type="hidden" name="userEmail" value="@User.Identity.Name" />
-										<button type="submit" class="btn " style="background-color: #A50064;color: white">Thanh toán với MoMo</button>
-									</form>
+									<a asp-controller="Checkout" asp-action="PayWithMoMo" class="btn"
+									   style="background-color: #A50064; color: white;">
+										Thanh toán với MoMo
+									</a>
 								}
 							</td>
 						</tr>

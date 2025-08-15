@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shopping_ver1.Models;
@@ -50,6 +49,7 @@ namespace Shopping_ver1.Controllers
             return View(data);
         }
 
+        // Tải lại bảng sản phẩm
         public async Task<IActionResult> ProductPartial(string sort_by = "", int page = 1, string byAction = "", string slug = " ")
         {
             // Truy vấn danh sách sản phẩm
@@ -78,6 +78,7 @@ namespace Shopping_ver1.Controllers
             return PartialView("_ProductPartial", data);
         }
 
+        // Trang liên hệ
         public async Task<IActionResult> Contact(int page = 1)
         {
             // Lấy danh sách và phân trang
@@ -87,7 +88,8 @@ namespace Shopping_ver1.Controllers
 
             return View(data);
         }
-        // Tải lại table cập nhật dữ liệu mới ( ajax )
+
+        // Tải lại bảng liên hệ 
         public async Task<IActionResult> ContactPartial(int page = 1)
         {
             var (data, pager) = await _contactService.GetlistItemAsync(page);

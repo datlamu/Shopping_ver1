@@ -128,6 +128,7 @@ namespace Shopping_ver1.Controllers
                 orderCode: order.OrderCode
             );
 
+            // test data khi tạo mã quét
             //return Json(payUrl);
             return Redirect(payUrl);
         }

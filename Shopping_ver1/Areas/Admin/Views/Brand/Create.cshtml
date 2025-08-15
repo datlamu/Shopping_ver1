@@ -1,8 +1,8 @@
 ﻿@model BrandModel
 @{
-	ViewData["title"] = "Create Brand";
+	ViewData["title"] = "Tạo thương hiệu";
 }
-<h3>Create New Brand</h3>
+<h3>Tạo thương hiệu mới</h3>
 <form asp-area="Admin" asp-controller="Brand" asp-action="Create" method="post" enctype="multipart/form-data">
 	@Html.AntiForgeryToken()
 	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
