@@ -10,6 +10,12 @@ using Shopping_ver1.Services.Implement;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load configuration from appsettings.json, appsettings.Development file, and environment variables
+builder.Configuration
+       .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+       .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+       .AddEnvironmentVariables();
+
 // 1. DBContext
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectedDb")));
