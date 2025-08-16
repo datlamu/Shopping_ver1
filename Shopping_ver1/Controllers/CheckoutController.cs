@@ -26,6 +26,7 @@ namespace Shopping_ver1.Controllers
             _orderService = orderService;
         }
         //Thực hiện thanh toán
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             // Kiểm tra xem user login chưa
@@ -78,6 +79,7 @@ namespace Shopping_ver1.Controllers
         }
 
         // Thanh toán với MoMo
+        [Authorize]
         public async Task<IActionResult> PayWithMoMo()
         {
             // Kiểm tra xem user login chưa
@@ -134,6 +136,7 @@ namespace Shopping_ver1.Controllers
         }
 
         // ReturnUrl từ MoMo
+        [Authorize]
         public IActionResult PaymentCallBack(int resultCode)
         {
             // Nếu thành công trả về lịch sử đơn hàng
@@ -149,6 +152,7 @@ namespace Shopping_ver1.Controllers
 
         // NotifyUrl từ MoMo - xử lý chính xác trạng thái đơn hàng
         [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> MomoNotify([FromBody] MoMoNotifyModel notifyData)
         {
             string orderCode = notifyData.orderId;

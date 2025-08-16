@@ -1,5 +1,8 @@
 ﻿@using Shopping_ver1.Models.ViewModels
 @model CartViewModel
+@{
+	var couponCode = Model.CouponCode != null ? "- " + Model.CouponCode : "";
+}
 
 <section id="cart_items">
 	<div class="container">
@@ -83,7 +86,7 @@
 									<p class="mb-1">Tổng tiền sản phẩm:</p>
 									<p class="mb-1">Phí vận chuyển:</p>
 									<p class="mb-1 font-weight-bold">Tổng đơn hàng:</p>
-									<p class="mb-1 text-danger">Mã giảm giá:</p>
+									<p class="mb-1 text-danger">Mã giảm giá @couponCode:</p>
 									<p class="cart_total_price">Tổng thanh toán:</p>
 								</div>
 							</td>
@@ -101,13 +104,10 @@
 							<td colspan="6" align="right">
 								<button class="btn btn-danger clear-cart">Giỏ hàng mới</button>
 								<a asp-controller="Checkout" asp-action="Index" class="btn btn-success">Thanh toán khi nhận hàng</a>
-								@if (User.Identity?.IsAuthenticated ?? false)
-								{
-									<a asp-controller="Checkout" asp-action="PayWithMoMo" class="btn"
-									   style="background-color: #A50064; color: white;">
-										Thanh toán với MoMo
-									</a>
-								}
+								<a asp-controller="Checkout" asp-action="PayWithMoMo" class="btn"
+								   style="background-color: #A50064; color: white;">
+									Thanh toán với MoMo
+								</a>
 							</td>
 						</tr>
 					}

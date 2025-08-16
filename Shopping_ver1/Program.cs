@@ -69,7 +69,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
 .AddCookie()
 .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
