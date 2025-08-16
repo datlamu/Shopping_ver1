@@ -82,7 +82,7 @@ public class CheckoutService : ICheckoutService
                 DiscountValue = cartItemVM.DiscountValue,
                 CouponCode = cartItemVM.CouponCode,
                 TotalPayment = cartItemVM.TotalPayment,
-                ShippingRegion = $"{shipping.City}, {shipping.District}, {shipping.Ward} - Thanh toán khi nhận hàng"
+                ShippingRegion = $"{shipping.City}, {shipping.District}, {shipping.Ward}"
             };
             await _context.Orders.AddAsync(order);
 
@@ -163,7 +163,7 @@ public class CheckoutService : ICheckoutService
             DiscountValue = cartItemVM.DiscountValue,
             CouponCode = cartItemVM.CouponCode,
             TotalPayment = cartItemVM.TotalPayment,
-            ShippingRegion = $"{cartItemVM.Shipping.City}, {cartItemVM.Shipping.District}, {cartItemVM.Shipping.Ward} - Đã thanh toán với MoMo",
+            ShippingRegion = $"{cartItemVM.Shipping.City}, {cartItemVM.Shipping.District}, {cartItemVM.Shipping.Ward}",
             Status = 3
         };
 

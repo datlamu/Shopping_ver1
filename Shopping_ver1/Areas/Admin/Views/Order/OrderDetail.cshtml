@@ -2,7 +2,6 @@
 @{
 	ViewData["Title"] = "Chi tiết đơn hàng";
 	var index = 1;
-	var couponCode = Model.CouponCode != null ? "- " + Model.CouponCode : "";
 }
 <!-- Page Heading -->
 <!-- DataTables Example -->
@@ -10,7 +9,7 @@
 	<div class="card-header py-3 d-flex justify-content-between align-items-center">
 		<div>
 			<h6 class="m-0 font-weight-bold text-primary mb-2">Chi tiết đơn hàng: @Model.OrderCode</h6>
-			<h6 class="m-0 font-weight-bold text-primary">Địa chỉ giao hàng: @Model.ShippingRegion</h6>
+			<h6 class="m-0 font-weight-bold text-primary">Khu vực ship: @Model.ShippingRegion</h6>
 		</div>
 		<a class="btn btn-success" asp-area="Admin" asp-controller="Order" asp-action="Index" asp-route-page="@ViewBag.CurrentPage">Quay về danh sách đơn hàng</a>
 	</div>
@@ -45,7 +44,7 @@
 							<p><strong>Tổng tiền sản phẩm :</strong></p>
 							<p><strong>Phí vận chuyển :</strong></p>
 							<p class="text-primary"><strong>Tổng đơn hàng :</strong></p>
-							<p class="text-danger"><strong>Mã giảm giá @couponCode :</strong></p>
+							<p class="text-danger"><strong>Mã giảm giá - @Model.CouponCode :</strong></p>
 							<p class="text-success"><strong>Tổng thanh toán :</strong></p>
 						</td>
 						<td class="align-middle">

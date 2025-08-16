@@ -19,6 +19,7 @@ namespace Shopping_ver1.Controllers
         }
 
         // Hiện sản phẩm trong giỏ hàng
+        [Authorize]
         public IActionResult Index()
         {
             var shippingCookie = Request.Cookies["ShippingInfo"];
