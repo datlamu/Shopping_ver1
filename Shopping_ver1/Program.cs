@@ -41,11 +41,11 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddTransient<IEmailService, EmailService>();
-builder.Services.AddTransient<ISliderService, SliderService>();
-builder.Services.AddTransient<IContactService, ContactService>();
-builder.Services.AddTransient<IShippingService, ShippingService>();
-builder.Services.AddTransient<ICouponService, CouponService>();
-builder.Services.AddTransient<IDashboardService, DashboardService>();
+builder.Services.AddScoped<ISliderService, SliderService>();
+builder.Services.AddScoped<IContactService, ContactService>();
+builder.Services.AddScoped<IShippingService, ShippingService>();
+builder.Services.AddScoped<ICouponService, CouponService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.Configure<MoMoSettings>(builder.Configuration.GetSection("MoMoSettings"));
 
 // 5. Identity
