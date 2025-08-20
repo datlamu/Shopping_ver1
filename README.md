@@ -40,7 +40,7 @@ __Quên và thay đổi mật khẩu__
 ![Project](Shopping_ver1/wwwroot/media/readme/EmailLinkNewPass.png)
 ![Project](Shopping_ver1/wwwroot/media/readme/newPass.png)
 __Trang chủ__
-![Project](Shopping_ver1/wwwroot/media/readme/Home.png)
+![Project](Shopping_ver1/wwwroot/media/readme/home.png)
 __Trang sản phẩm__
 ![Project](Shopping_ver1/wwwroot/media/readme/products.png)
 ![Project](Shopping_ver1/wwwroot/media/readme/productDetail.png)
